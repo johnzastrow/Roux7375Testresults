@@ -1,0 +1,141 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T20:03:00Z",
+    "project_root": "https://github.com/johnzastrow/pydataminer",
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false) and not the author's working copy; the repository has only 7 commits, so commit_count_sampled is 7. ArcGIS/ArcPy scripts (Python 2 era code ported to Python 3 / ArcGIS Pro 3.0). Three committed zip archives (dataMiner_10_0.zip, dataMiner_10_1.zip, MappingScriptTools.zip) were listed and their .py members grepped read-only without extracting; they contain vendored third-party code (xlwt, ANTLR) and ArcGIS toolboxes (.tbx) which were not analysed. MappingScriptTools.zip contains a script that writes layer service 'Password' properties into a report file (noted under sensitive data indicators; not a hardcoded secret). Source Windows paths in metadataExporter files are commented-out test paths. The file inventory reports 'sql read ops 240' only because of pattern matches on the word select/ListXxx and is a false positive."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 7,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "*.pem / *.key / credentials.json style files are not excluded (.env and venv directories are)",
+      "committed zip archives (*.zip) are not excluded"
+    ]
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": [
+        "No requirements.txt or pyproject.toml; scripts import xlwt and arcpy (arcpy is supplied by an ArcGIS installation) without declaring them.",
+        "Vendored copies of xlwt (2012/2013 era .py/.pyc) are bundled inside dataMiner_*.zip rather than declared as dependencies."
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "arcgis_script_tool",
+        "framework": "arcpy.GetParameterAsText (run from an ArcGIS Toolbox script tool)",
+        "file": "metadataExporter_v1.1.py"
+      },
+      {
+        "type": "arcgis_script_tool",
+        "framework": "arcpy.GetParameterAsText (older version)",
+        "file": "old_metadataExporter_v1.py"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "metadataExporter_v1.1.py",
+        "detail": "recursively reads GIS datasets under a user-supplied input folder via arcpy (feature classes, tables, rasters, Access workspaces) and exports their metadata",
+        "access_type": "read"
+      },
+      {
+        "file": "metadataExporter_v1.1.py",
+        "detail": "writes temporary metadata XML files to a user-supplied temp folder and deletes them afterwards (os.remove)",
+        "access_type": "write"
+      },
+      {
+        "file": "metadataExporter_v1.1.py",
+        "detail": "writes an Excel workbook (xlwt) to a user-supplied output path",
+        "access_type": "write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "Contact (metadata contact field exported to Excel)",
+        "file": "metadataExporter_v1.1.py"
+      },
+      {
+        "field_or_variable": "service layer 'Password' property written to report (inside MappingScriptTools.zip)",
+        "file": "MappingScriptTools.zip"
+      }
+    ],
+    "office_and_collaboration_sources": [
+      {
+        "type": "excel",
+        "file": "metadataExporter_v1.1.py",
+        "location_or_host": "user-supplied output .xls path (commented test path uses a C:\\ drive path)",
+        "credential_source": "unclear",
+        "access_type": "write"
+      }
+    ]
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": false
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Walks a folder tree of GIS data with ArcPy, extracts each dataset's metadata (title, keywords, abstract, contact, coordinate system, extents, dates) and writes it to an Excel workbook.",
+      "Creates and deletes temporary XML metadata files in a user-specified folder during the run."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "GIS datasets under a user-supplied input folder (file geodatabases, shapefiles, rasters, Access workspaces)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Output Excel (.xls) workbook and temp XML folder",
+        "access": "write",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Run locally by a user inside ArcGIS (script tool) on their own machine; there is no network service.",
+    "unauthorized_action_red_flags": [
+      "Committed zip archives contain a script that writes service layer passwords into a report and vendored third-party code (not analysed in depth)."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    },
+    "top_findings": [
+      "No secrets, routes or databases found; local ArcPy script tool",
+      "No dependency manifest; vendored xlwt/ANTLR in committed zips",
+      "Zip archives not inspected beyond a read-only grep"
+    ]
+  }
+}

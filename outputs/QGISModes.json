@@ -1,0 +1,144 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:34:45Z",
+    "project_root": "https://github.com/johnzastrow/QGISModes",
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of default branch (depth 20); has_uncommitted_changes reflects the clone (false), not the author's working copy. Project is a QGIS desktop plugin (Python, PyQt via qgis.PyQt) plus JSON mode files, SVG icons and Markdown docs; no web server, database or network client code found. Dev tools in tools/ use exec(compile(Path(...).read_text())) to load scripts from a hardcoded Windows path inside the QGIS Python console (developer-only helpers, not part of the shipped plugin) and subprocess.run for 'cmd /c mklink /J' with fixed arguments. Files under docs/ (including docs/qgis-processing-algorithms.xlsx) and screens_errors/ were inventoried but not scanned. Interface and data-access detection patterns in the skill are web/DB oriented; for a desktop plugin these sections are largely empty by design. Personal author email appears in src/qgismodes/metadata.txt (standard QGIS plugin metadata, not a secret)."
+  },
+  "version_control": {
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "*.pem, *.key, credentials.json and similar credential file patterns are not excluded (standard Python template only excludes .env, .venv, venv)"
+    ],
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "src/qgismodes/metadata.txt"
+      ],
+      "package_manager": "none (QGIS plugin; metadata.txt declares plugin_dependencies=QuickMapServices,Data Plotly)",
+      "dependency_count": 2,
+      "findings": [
+        "No requirements.txt/pyproject.toml; no pip-level dependencies declared",
+        "Optional import of jsonschema in src/qgismodes/mode_loader.py with a hand-rolled fallback validator; jsonschema is not declared anywhere",
+        "Runtime depends on QGIS (qgisMinimumVersion=3.44, qgisMaximumVersion=4.99) and the QGIS-bundled Python/Qt"
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "qgis_plugin",
+        "framework": "qgis (classFactory)",
+        "file": "src/qgismodes/__init__.py"
+      },
+      {
+        "type": "dev_script",
+        "framework": "QGIS Python console (exec)",
+        "file": "tools/install_dev_link.py"
+      },
+      {
+        "type": "dev_script",
+        "framework": "QGIS Python console (exec)",
+        "file": "tools/verify_phase1.py"
+      },
+      {
+        "type": "dev_script",
+        "framework": "QGIS Python console (exec)",
+        "file": "tools/diagnose_load.py"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "src/qgismodes/mode_loader.py",
+        "detail": "reads mode JSON files and mode.schema.json from the bundled and per-profile modes folders",
+        "access_type": "read"
+      },
+      {
+        "file": "src/qgismodes/mode_registry.py",
+        "detail": "copies bundled mode files into the user's QGIS profile modes folder (shutil.copy2)",
+        "access_type": "write"
+      },
+      {
+        "file": "src/qgismodes/import_export_service.py",
+        "detail": "imports mode JSON files from user-chosen paths (shutil.copyfile) and writes/exports mode JSON to user-chosen destinations",
+        "access_type": "read_write"
+      },
+      {
+        "file": "tools/install_dev_link.py",
+        "detail": "creates a Windows junction (cmd /c mklink /J) from the QGIS plugin directory to a hardcoded C:\\Users\\<author>\\Github\\QGISModes\\src\\qgismodes path",
+        "access_type": "write"
+      }
+    ],
+    "sensitive_data_indicators": [],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Lets a QGIS desktop user define several simplified QGIS interfaces ('modes') as JSON files and switch between them at runtime by showing or hiding toolbars, panels, menus and processing algorithms.",
+      "Imports and exports mode definition files to and from user-chosen locations on the local file system.",
+      "Stores the active mode in QGIS settings and user modes in the active QGIS profile folder."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Mode definition JSON files (bundled src/qgismodes/modes/ and per-profile qgismodes/modes/ folder)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "QGIS profile settings (QgsSettings key qgismodes/mode)",
+        "access": "unclear (read/write of plugin settings)",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Runs only inside the local QGIS desktop session of whoever installs it; no network listener, no authentication layer, no remote interface.",
+    "unauthorized_action_red_flags": [
+      "No outbound network calls, credentials or database access found in the plugin source.",
+      "Developer helper scripts in tools/ execute script text read from a hardcoded local path via exec() inside the QGIS console; they are not loaded by the plugin itself."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    },
+    "top_findings": [
+      "No committed secrets, no network or database access found in plugin source",
+      "Developer tools in tools/ use exec(compile(...)) on files from a hardcoded author-specific Windows path (not part of the shipped plugin)",
+      "No dependency manifest beyond QGIS metadata.txt; optional jsonschema import is undeclared",
+      "Project README states the repo is an early skeleton, not a working plugin"
+    ]
+  }
+}

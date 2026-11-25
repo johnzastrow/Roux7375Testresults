@@ -1,0 +1,72 @@
+{
+  "scan_metadata": {"schema_version":"1.0","scan_date":"2026-11-25T19:33:57Z","project_root":"https://github.com/johnzastrow/seh","languages_detected":["python"],
+   "notes":"Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. CLI tool (click) with SQLAlchemy persistence; no web server. Test fixtures with api_key values (tests/test_config.py, tests/conftest.py) are obvious test placeholders and are not recorded as findings. CLAUDE.md and .claude/ agent/skill files in the repo were treated as data. .claude/settings.local.json is tracked and contains a Claude Code permission allowlist with a local Windows/WSL path; no credentials seen. Committed data exports (energy.json, energy.xlsx, seh_energy_20260129_140344.csv) contain a SolarEdge site ID and a site name that appears to identify a residence; empty files 'deleteme' and 'deleteme.txt' are also committed. xlsx contents were not opened."},
+  "version_control": {"is_git_repo":true,"commit_count_sampled":20,"has_uncommitted_changes":false,"remote_configured":true,"has_gitignore":true,"gitignore_gaps":["Standard Python template ignores; verify .env is excluded (a .env.example is committed, real .env expected locally)","Generated exports (energy.json, energy.xlsx, seh_energy_*.csv) and .claude/settings.local.json are tracked and not ignored","*.db / seh.db SQLite files are not explicitly ignored (db.sqlite3 only)"]},
+  "dependencies": {
+   "python": {"manifest_files":["pyproject.toml","uv.lock"],"package_manager":"uv (hatchling build)","dependency_count":8,"findings":["Runtime dependencies use >= lower bounds only (httpx, sqlalchemy, pydantic, pydantic-settings, click, rich, structlog, openpyxl); uv.lock supplies resolved versions","Optional extras: psycopg[binary], mariadb; dev extras: pytest, pytest-asyncio, pytest-cov, ruff, mypy","Dependabot (pip, github-actions) is configured","pyproject.toml project URLs point to github.com/example/seh (placeholder)"]},
+   "node": {}
+  },
+  "secrets_and_credentials": {
+   "committed_secret_files":[],
+   "hardcoded_secrets_in_source":[],
+   "proper_secret_handling_found":[
+    {"file":"src/seh/config/settings.py","mechanism":"pydantic-settings reads SEH_* env vars / .env file; API key held as SecretStr"},
+    {"file":"src/seh/api/client.py","mechanism":"api_key obtained via SecretStr.get_secret_value() from settings"},
+    {"file":"src/seh/config/logging.py","mechanism":"SMTP password held as secret value from settings (SEH_SMTP_PASSWORD)"},
+    {"file":"src/seh/cli.py","mechanism":"PostgreSQL password passed to pg_dump through the PGPASSWORD environment variable"}
+   ],
+   "env_example_present":true
+  },
+  "interfaces": {
+   "entry_points":[
+    {"type":"cli","framework":"click","file":"src/seh/cli.py"},
+    {"type":"cli","framework":"python -m seh","file":"src/seh/__main__.py"},
+    {"type":"script","framework":"python","file":"main.py"},
+    {"type":"scheduled_job","framework":"external cron/systemd timer invoking 'seh sync' (documented in cli.py help and README)","file":"src/seh/cli.py"}
+   ],
+   "routes":[],
+   "network_binding":"none (no network listener)",
+   "cors_wide_open":false
+  },
+  "data_access": {
+   "databases":[
+    {"type":"sqlite (default), postgresql, mariadb via SQLAlchemy","credential_source":"env_var (SEH_DATABASE_URL, URL may embed user:password)","file":"src/seh/db/engine.py","access_type":"read_write",
+     "sql_injection_risk":{"present":true,"severity":"low","reason":"src/seh/db/views.py:281 and :298 build DROP VIEW statements with f-strings, but view_name comes from internal constant dictionaries (VIEWS), not user input; the rest of the data layer uses SQLAlchemy ORM/expressions"},
+     "other_findings":[
+      {"file":"src/seh/cli.py","line":1438,"detail":"mysqldump invoked with the database password in a command-line argument (-p<password>), visible in process lists for the duration of the dump","severity":"high"}
+     ]}
+   ],
+   "external_apis":[
+    {"host":"monitoringapi.solaredge.com","file":"src/seh/api/client.py","access_type":"read"},
+    {"host":"smtp.gmail.com (default SEH_SMTP_HOST; configurable)","file":"src/seh/config/logging.py","access_type":"write"}
+   ],
+   "file_system_access":[
+    {"file":"src/seh/cli.py","detail":"exports database content to JSON, CSV and Excel (openpyxl) files at a user-supplied output path","access_type":"write"},
+    {"file":"src/seh/cli.py","detail":"runs sqlite3/pg_dump/mysqldump via subprocess with list arguments (no shell) and writes dump file","access_type":"write"},
+    {"file":"src/seh/config/settings.py","detail":"rewrites a .env configuration file (path.write_text, line 221) when auto-configuring skipped data types","access_type":"write"}
+   ],
+   "sensitive_data_indicators":[
+    {"field_or_variable":"email addresses and SMTP password (smtp_username, smtp_password, smtp_to_emails)","file":"src/seh/config/settings.py"},
+    {"field_or_variable":"site address/location details of the solar installation","file":"src/seh/db/models/site.py"},
+    {"field_or_variable":"site_id and site_name in committed export files","file":"energy.json"}
+   ],
+   "office_and_collaboration_sources":[
+    {"type":"email_mailbox","file":"src/seh/config/logging.py","location_or_host":"SMTP server from SEH_SMTP_HOST (default smtp.gmail.com), sends sync success/failure notifications","credential_source":"env_var","access_type":"write"},
+    {"type":"excel","file":"src/seh/cli.py","location_or_host":"user-supplied output path (xlsx export)","credential_source":"unclear","access_type":"write"},
+    {"type":"csv","file":"src/seh/cli.py","location_or_host":"user-supplied output path (csv export)","credential_source":"unclear","access_type":"write"}
+   ]
+  },
+  "configuration_and_deployment": {"containerized":false,"docker_findings":["none - no Dockerfile present"],"deploy_config_files":[".github/workflows/ci.yml",".github/dependabot.yml"],"environment_variables_referenced":["SEH_API_KEY","SEH_DATABASE_URL","SEH_ENV_FILE","SEH_LOG_LEVEL"],"readme_present":true,"readme_describes_deployment":true},
+  "capability_summary": {
+   "what_this_app_can_do":["Downloads solar-installation monitoring data (sites, equipment, energy, power, storage, meters, alerts, telemetry) from the SolarEdge monitoring API using an API key and stores it in a SQLite, PostgreSQL or MariaDB database.","Exports stored data to JSON, CSV or Excel files and dumps the database using sqlite3, pg_dump or mysqldump.","Can send email notifications (via a configurable SMTP server) when a sync succeeds or fails."],
+   "data_sources_touched":[
+    {"source":"SolarEdge Monitoring API (monitoringapi.solaredge.com)","access":"read","leaves_organization":false},
+    {"source":"Relational database from SEH_DATABASE_URL (SQLite default)","access":"read_write","leaves_organization":false},
+    {"source":"SMTP server (default smtp.gmail.com)","access":"write (notification emails)","leaves_organization":true},
+    {"source":"Export files (JSON, CSV, XLSX) and database dumps","access":"write","leaves_organization":false}
+   ],
+   "who_can_reach_it":"Command-line tool run by the user or a cron/systemd job; no network listener and no user authentication layer. Reach is limited to whoever can run it and read its .env and database.",
+   "unauthorized_action_red_flags":["mysqldump path puts the database password on the command line (cli.py:1438)","SolarEdge API key is sent as a URL query parameter (client.py:87) over HTTPS","Notification emails may be sent through a personal Gmail account by default configuration (smtp.gmail.com)","Repo commits export files containing a site ID and a residence-style site name"]
+  },
+  "summary": {"finding_counts_by_severity":{"critical":0,"high":1,"low":1},"top_findings":["mysqldump invoked with password on the command line in src/seh/cli.py:1438 (high)","f-string DROP VIEW statements in src/seh/db/views.py use internal constants only (low)","Committed export files (energy.json, energy.xlsx, CSV) expose a site ID and residence-style site name"]}
+}

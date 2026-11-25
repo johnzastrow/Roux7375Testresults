@@ -1,0 +1,166 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:35:23Z",
+    "project_root": "https://github.com/johnzastrow/actalog-benchmark",
+    "languages_detected": [
+      "go"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. Go project: full interface/data-access detection for Go is out of scope for skill version 1.0; dependency manifests, secrets patterns, HTTP client usage, CLI flags and file writes were reviewed by reading the source. Go dependencies are listed under an extra key dependencies.go. Extra key secrets_and_credentials.cli_credential_exposure was added for the --pass flag. The project is a CLI client, not a server, so there are no routes."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      ".env, .env.*, *.pem, *.key, credentials.json are not excluded; .gitignore excludes *.json (benchmark result files) and bin/"
+    ]
+  },
+  "dependencies": {
+    "python": {},
+    "node": {},
+    "go": {
+      "manifest_files": [
+        "go.mod",
+        "go.sum"
+      ],
+      "package_manager": "go modules",
+      "dependency_count": 8,
+      "findings": [
+        "go 1.23; direct: fatih/color v1.15.0, urfave/cli/v2 v2.27.7; 6 indirect; all pinned by go.sum",
+        "golang.org/x/sys v0.6.0 is an old indirect version (no CVE claim made)"
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "cmd/actalog-bench/main.go",
+        "mechanism": "buildCommandLine masks the password when echoing the command line into reports"
+      },
+      {
+        "file": ".github/workflows/test.yml",
+        "mechanism": "CODECOV_TOKEN read from GitHub Actions secrets"
+      }
+    ],
+    "env_example_present": false,
+    "cli_credential_exposure": [
+      {
+        "file": "cmd/actalog-bench/main.go",
+        "line": 205,
+        "detail": "login password is accepted via the --pass command-line flag (no env var or prompt alternative seen), so it can appear in shell history and process lists",
+        "severity": "high"
+      }
+    ]
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "cli",
+        "framework": "urfave/cli v2",
+        "file": "cmd/actalog-bench/main.go"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none (client only; makes outbound HTTP(S) requests to the user-supplied --url)",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [
+      {
+        "host": "user-supplied ActaLog instance (--url); committed report shows https://al.fluidgrid.site",
+        "file": "internal/client/client.go",
+        "access_type": "read_write"
+      },
+      {
+        "host": "same target: POST /api/auth/login, GET /api/version, /api/workouts, /api/movements, /api/wods, /api/pr-movements, /api/notifications/count; POST /api/benchmark (server-side benchmark, up to 500000 records)",
+        "file": "internal/metrics/endpoints.go",
+        "access_type": "read_write"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "internal/reporter/json.go",
+        "detail": "writes JSON benchmark results to a user-specified path (0644)",
+        "access_type": "write"
+      },
+      {
+        "file": "internal/reporter/markdown.go",
+        "detail": "writes Markdown report (0644); creates output directories",
+        "access_type": "write"
+      },
+      {
+        "file": "internal/reporter/comparison.go",
+        "detail": "reads prior benchmark JSON files from a directory and writes a comparison report",
+        "access_type": "read_write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "email / password (login payload)",
+        "file": "internal/client/client.go"
+      },
+      {
+        "field_or_variable": "personal email address and production URL recorded in committed report (reports/benchmark_2026-01-03_202645.md, 'User' row)",
+        "file": "reports/benchmark_2026-01-03_202645.md"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      ".github/workflows/test.yml",
+      "Makefile"
+    ],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Measures connectivity (DNS, TCP, TLS), health, API endpoint latency, frontend assets and concurrent load against a user-specified ActaLog server.",
+      "Logs in to the target with a supplied email and password and calls authenticated API endpoints with the returned JWT.",
+      "Can trigger the server's /api/benchmark endpoint, which generates up to 500000 records server-side.",
+      "Writes JSON and Markdown reports and compares earlier result files."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "ActaLog instance API (user-supplied URL)",
+        "access": "read_write (login POST, GETs, server-side benchmark POST)",
+        "leaves_organization": true
+      },
+      {
+        "source": "Local JSON/Markdown report files",
+        "access": "read_write",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Local command-line tool run by the user; no listener. It reaches whatever host the user points it at, including production instances.",
+    "unauthorized_action_red_flags": [
+      "Password accepted as a --pass command-line argument",
+      "A committed report contains a personal email address and the production URL of the tested instance",
+      "Load testing and the server-side benchmark can create heavy load or records on the target"
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 1,
+      "low": 0
+    },
+    "top_findings": [
+      "Password supplied through --pass CLI flag (cmd/actalog-bench/main.go)",
+      "Committed report discloses a personal email address and production URL",
+      "No hardcoded secrets or secret files found"
+    ]
+  }
+}

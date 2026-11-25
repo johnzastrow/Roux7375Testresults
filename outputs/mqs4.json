@@ -1,0 +1,277 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:37:02Z",
+    "project_root": "https://github.com/johnzastrow/mqs4",
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of default branch (depth 20); has_uncommitted_changes reflects the clone (false), not the author's working copy. Repository is a collection of QGIS 4 Processing scripts (Scripts/), a QGIS plugin (Plugins/metadata_manager), a tkinter desktop tool (Scripts/qgis_project_manager.py) and 65 Markdown documents. No web server or HTTP routes exist, so interface route detection is empty by design. Documentation (docs/), test fixtures, screenshots and docs/*/testing files were inventoried but not recorded as findings. Test and doc files containing example passwords (e.g. test_uri_parsing.py with password='p', docstring example password='s3cr3t' in qgis_project_manager.py) are fixtures/examples and were not recorded as secrets. SQL injection entries are low because the interpolated table/layer names come from the local user via the QGIS UI, not from a remote source. Personal author email appears in plugin metadata.txt (standard QGIS plugin metadata). The .gitignore excludes *.json, *.xml, *.jpg and many data formats, which may hide config files. The mqs4/.github/workflows/release-mapsplat.yml references a project that the README says moved to its own repo (stale)."
+  },
+  "version_control": {
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "*.pem, *.key, credentials.json and similar credential file patterns are not listed (standard .env, .venv, venv exclusions are present)"
+    ],
+    "is_git_repo": true,
+    "commit_count_sampled": 13,
+    "has_uncommitted_changes": false
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "Plugins/metadata_manager/pyproject.toml",
+        "Plugins/metadata_manager/uv.lock",
+        "Plugins/metadata_manager/metadata.txt"
+      ],
+      "package_manager": "uv",
+      "dependency_count": 1,
+      "findings": [
+        "pyproject.toml has no runtime dependencies (empty list) and one dev dependency, pytest>=9.0.2 (unpinned lower bound, locked in uv.lock)",
+        "Scripts/qgis_project_manager.py requires psycopg2 (docstring says pip install psycopg2-binary) but there is no manifest for Scripts/ declaring it",
+        "Scripts and plugin rely on QGIS-bundled Python, qgis.core and osgeo (GDAL), which are not declared"
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "Plugins/metadata_manager/plugin_upload.py",
+        "mechanism": "getpass.getpass() interactive prompt for the plugins.qgis.org password"
+      },
+      {
+        "file": "Scripts/qgis_project_manager.py",
+        "mechanism": "PostgreSQL password entered in a GUI field; supports authcfg (QGIS auth config id) and can strip user/password from project URIs"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "qgis_plugin",
+        "framework": "qgis (classFactory)",
+        "file": "Plugins/metadata_manager/__init__.py"
+      },
+      {
+        "type": "qgis_processing_script",
+        "framework": "QgsProcessingAlgorithm",
+        "file": "Scripts/inventory_miner.py"
+      },
+      {
+        "type": "qgis_processing_script",
+        "framework": "QgsProcessingAlgorithm",
+        "file": "Scripts/vectors2gpkg.py"
+      },
+      {
+        "type": "qgis_processing_script",
+        "framework": "QgsProcessingAlgorithm",
+        "file": "Scripts/batchvectorrename.py"
+      },
+      {
+        "type": "qgis_processing_script",
+        "framework": "QgsProcessingAlgorithm",
+        "file": "Scripts/extract_styles_from_projects.py"
+      },
+      {
+        "type": "desktop_gui",
+        "framework": "tkinter",
+        "file": "Scripts/qgis_project_manager.py"
+      },
+      {
+        "type": "cli",
+        "framework": "optparse",
+        "file": "Plugins/metadata_manager/plugin_upload.py"
+      },
+      {
+        "type": "cli",
+        "framework": "script",
+        "file": "Plugins/metadata_manager/fix_metadata_status.py"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite (GeoPackage inventory)",
+        "credential_source": "none",
+        "file": "Plugins/metadata_manager/processors/inventory_processor.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": true,
+          "severity": "low",
+          "reason": "lines 638 and 664 build SELECT/UPDATE statements with an f-string table name (layer_name); the value comes from a QGIS dialog field, not from untrusted remote input; values are otherwise parameterized"
+        }
+      },
+      {
+        "type": "sqlite (GeoPackage/SpatiaLite rename)",
+        "credential_source": "none",
+        "file": "Scripts/batchvectorrename.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": true,
+          "severity": "low",
+          "reason": "line 791 builds ALTER TABLE [old] RENAME TO [new] with names from the user's selected layers/rename rules; local desktop use, no remote input"
+        }
+      },
+      {
+        "type": "sqlite (metadata cache database)",
+        "credential_source": "none",
+        "file": "Plugins/metadata_manager/db/manager.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "no string-built SQL found in db/manager.py or db/schema.py in the pattern scan"
+        }
+      },
+      {
+        "type": "postgresql",
+        "credential_source": "unclear (entered in tkinter GUI fields or parsed from QGIS project datasource URIs, which may embed user/password)",
+        "file": "Scripts/qgis_project_manager.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "queries use psycopg2 parameters and psycopg2.sql Identifier composition (lines 487-547, 725-734)"
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "plugins.qgis.org (XML-RPC upload of plugin zip with username/password)",
+        "file": "Plugins/metadata_manager/plugin_upload.py",
+        "access_type": "write"
+      },
+      {
+        "host": "user-specified PostgreSQL host",
+        "file": "Scripts/qgis_project_manager.py",
+        "access_type": "read_write"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "Plugins/metadata_manager/db/metadata_writer.py",
+        "detail": "writes .qmd metadata files next to scanned datasets (line 226)",
+        "access_type": "write"
+      },
+      {
+        "file": "Scripts/batchvectorrename.py",
+        "detail": "copies/backs up data files and directories (shutil.copytree/copy2) before renaming layers",
+        "access_type": "write"
+      },
+      {
+        "file": "Scripts/qgis_project_manager.py",
+        "detail": "exports an updated .qgs XML file to a user-chosen path (line 762)",
+        "access_type": "write"
+      },
+      {
+        "file": "Scripts/extract_styles_from_projects.py",
+        "detail": "writes a combined styles XML output file (line 534); reads QGIS project files from user-chosen directories",
+        "access_type": "read_write"
+      },
+      {
+        "file": "Scripts/inventory_miner.py",
+        "detail": "recursively scans user-chosen directories, reading vector/raster files and metadata files (ISO 19115, FGDC, ESRI)",
+        "access_type": "read"
+      },
+      {
+        "file": "Plugins/metadata_manager/processors/inventory_processor.py",
+        "detail": "runs subprocess df on a scanned path (fixed command, line 282)",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "scanned_by_user, scanned_by_machine (getpass.getuser(), socket.gethostname()) stored in inventory records",
+        "file": "Plugins/metadata_manager/processors/inventory_processor.py"
+      },
+      {
+        "field_or_variable": "contact email/phone/address fields in metadata schema and wizard",
+        "file": "Plugins/metadata_manager/db/schema.py"
+      },
+      {
+        "field_or_variable": "PostgreSQL password",
+        "file": "Scripts/qgis_project_manager.py"
+      },
+      {
+        "field_or_variable": "plugins.qgis.org password (interactive)",
+        "file": "Plugins/metadata_manager/plugin_upload.py"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      ".github/workflows/release-metadata-manager.yml (tag mm-v* creates a GitHub Release, contents: write, uses GITHUB_TOKEN)",
+      ".github/workflows/release-mapsplat.yml (tag v*; project reportedly moved to its own repo)"
+    ],
+    "environment_variables_referenced": [
+      "QGIS_PREFIX_PATH",
+      "TEST_INVENTORY_DB"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Scans user-chosen directories for geospatial files (vector, raster, metadata files) and builds an inventory GeoPackage with extents; records the scanning user name and machine name.",
+      "Lets a user create and edit layer metadata (contacts, keywords, links) through a wizard and writes it to a local cache database and .qmd files.",
+      "Batch-renames vector layers and their files/tables with backup copies; converts vectors into GeoPackages; extracts styles from QGIS projects.",
+      "Reads QGIS project files, can connect to a PostgreSQL server with user-supplied credentials to read and update project content stored in a database table, and can export modified project XML.",
+      "Includes a command-line uploader that sends a plugin zip with username and password to plugins.qgis.org."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Local geospatial files and directories chosen by the user (scanned and renamed)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Inventory/metadata GeoPackage and SQLite cache databases",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "PostgreSQL database holding QGIS projects (qgis_project_manager.py, user-supplied host)",
+        "access": "read_write",
+        "leaves_organization": "unclear (depends on the host the user enters)"
+      },
+      {
+        "source": "plugins.qgis.org (plugin upload)",
+        "access": "write (plugin zip and credentials)",
+        "leaves_organization": true
+      }
+    ],
+    "who_can_reach_it": "Desktop tools run locally by the QGIS user; no network listener and no authentication layer of their own.",
+    "unauthorized_action_red_flags": [
+      "Inventory records capture the OS user name and machine host name of whoever ran the scan.",
+      "qgis_project_manager.py parses and can display/test PostgreSQL credentials embedded in QGIS project datasource URIs.",
+      "plugin_upload.py transmits a username and password to plugins.qgis.org over HTTPS XML-RPC (author-supplied, interactive prompt)."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 2
+    },
+    "top_findings": [
+      "Local desktop QGIS tools: no routes, no hardcoded secrets or committed secret files",
+      "Low: f-string table names in SQL (inventory_processor.py:638/664, batchvectorrename.py:791), values come from local UI",
+      "qgis_project_manager.py handles PostgreSQL passwords from project URIs and a GUI field",
+      "Scripts/ requires psycopg2 but has no dependency manifest"
+    ]
+  }
+}

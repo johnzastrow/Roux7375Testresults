@@ -1,0 +1,74 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:35:51Z",
+    "project_root": "https://github.com/johnzastrow/stratavis",
+    "languages_detected": [],
+    "notes": "Fresh shallow clone of default branch (depth 20); has_uncommitted_changes reflects the clone (false), not the author's working copy. The repository contains only documentation (README.md, stratavis_architecture.md, stratavis_phased_plan.md) and a .gitignore: there is no source code, no dependency manifest, no routes and no data-access code to scan. languages_detected is empty for that reason. Statements about the planned design (FastAPI, GeoPackage, JWT, React, Docker Compose) come from the design documents and describe intent only; they were not observed in code. The docker-compose snippet in stratavis_architecture.md contains the placeholder JWT_SECRET=<secret>, not a real value. Only 2 commits exist."
+  },
+  "version_control": {
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "*.pem, *.key and credentials.json patterns are not excluded (standard Python template excludes .env, .envrc, .venv, venv)"
+    ],
+    "is_git_repo": true,
+    "commit_count_sampled": 2,
+    "has_uncommitted_changes": false
+  },
+  "dependencies": {
+    "python": {},
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [],
+    "routes": [],
+    "network_binding": "none",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [],
+    "file_system_access": [],
+    "sensitive_data_indicators": [],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present (architecture document contains an illustrative docker-compose snippet only)"
+    ],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": false
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Nothing is executable yet: the repository holds only design documents for a planned multi-user web application that stores, edits and visualizes time-based (and optionally spatial) event data in timeline and map viewers."
+    ],
+    "data_sources_touched": [],
+    "who_can_reach_it": "Not applicable: there is no running code. The design documents describe a planned FastAPI service with JWT login, public read access and role-gated editing, deployable locally, on a LAN or on a VPS behind HTTPS.",
+    "unauthorized_action_red_flags": [
+      "No code present, so no red flags in implementation. The design document plans a JWT_SECRET environment variable and bcrypt password hashing; these should be re-scanned when code exists."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    },
+    "top_findings": [
+      "No source code in the repository - documentation only",
+      "No secrets or secret-shaped files found",
+      "Design documents (not code) describe planned FastAPI/GeoPackage/JWT stack; rescan once implementation exists"
+    ]
+  }
+}

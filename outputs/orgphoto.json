@@ -1,0 +1,26 @@
+{
+  "scan_metadata": {"schema_version":"1.0","scan_date":"2026-11-25T19:31:40Z","project_root":"https://github.com/johnzastrow/orgphoto","languages_detected":["python"],
+   "notes":"Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. Python CLI (op.py) read directly for SQL, file operations and logging. Test photos/logs under testing/ and the committed .claude/settings.local.json (Claude Code permission allowlist, no credentials) were noted but not treated as secrets. GitHub Actions YAML is out of scope for deep analysis in skill version 1.0."},
+  "version_control": {"is_git_repo":true,"commit_count_sampled":20,"has_uncommitted_changes":false,"remote_configured":true,"has_gitignore":true,
+   "gitignore_gaps":[".env and .env.* are not excluded","*.pem, *.key and credentials.json are not excluded","venv is covered only as .venv/ and /photocopy/venv"]},
+  "dependencies": {"python":{"manifest_files":["pyproject.toml","uv.lock"],"package_manager":"uv","dependency_count":5,"findings":["runtime deps exifread>=3.5.1 and hachoir>=3.4.0 use lower-bound ranges (lockfile uv.lock pins exact versions); dev group has pyinstaller, pytest, ruff","pyproject project name is 'op' with placeholder description 'Add your description here'"]},"node":{}},
+  "secrets_and_credentials": {"committed_secret_files":[],"hardcoded_secrets_in_source":[],"proper_secret_handling_found":[],"env_example_present":false},
+  "interfaces": {"entry_points":[{"type":"cli","framework":"argparse","file":"op.py"}],"routes":[],"network_binding":"none","cors_wide_open":false},
+  "data_access": {
+   "databases":[{"type":"sqlite","credential_source":"none (local file .orgphoto_cache.db in the target directory)","file":"op.py","access_type":"read_write","sql_injection_risk":{"present":false,"severity":"low","reason":"all execute/executemany calls use ? placeholders; no string-built SQL found"}}],
+   "external_apis":[],
+   "file_system_access":[
+     {"file":"op.py","detail":"recursively reads user-supplied source directory (photos/videos) and copies or moves files (shutil.copy2 / shutil.move) into YYYY_MM_DD subdirectories of the destination; can delete/demote duplicates depending on mode","access_type":"read_write"},
+     {"file":"op.py","detail":"writes events.log in the destination directory and a SQLite hash cache .orgphoto_cache.db","access_type":"write"}],
+   "sensitive_data_indicators":[{"field_or_variable":"EXIF metadata (creation dates, possibly GPS) read from user photos","file":"op.py"}],
+   "office_and_collaboration_sources":[]},
+  "configuration_and_deployment": {"containerized":false,"docker_findings":["none - no Dockerfile present"],
+   "deploy_config_files":[".github/workflows/build.yml","op.spec",".github/dependabot.yml"],
+   "environment_variables_referenced":[],"readme_present":true,"readme_describes_deployment":true},
+  "capability_summary": {
+   "what_this_app_can_do":["Scans a chosen folder tree of photos and videos and copies or moves each file into date-named folders (YYYY_MM_DD) in a destination folder, using EXIF dates or file timestamps.","Detects duplicate files by SHA-256 hash and applies one of several handling modes, including selecting a master file and demoting others.","Maintains a local SQLite hash cache and an events.log file in the destination directory."],
+   "data_sources_touched":[{"source":"User-specified local photo/video directories","access":"read_write","leaves_organization":false},{"source":"Local SQLite cache .orgphoto_cache.db and events.log in destination","access":"read_write","leaves_organization":false}],
+   "who_can_reach_it":"Command-line tool run locally by whoever invokes it; no network listener and no authentication, with the file-system permissions of the running user.",
+   "unauthorized_action_red_flags":["Moves files from the source tree when the move option is used, which can alter original photo archives; no network or external data transfer found."]},
+  "summary": {"finding_counts_by_severity":{"critical":0,"high":0,"low":0},"top_findings":["No secrets, routes or external APIs found","SQLite cache uses parameterized queries (no injection path)","Tool moves/copies user files with the user's own file permissions"]}
+}

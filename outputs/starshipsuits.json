@@ -1,0 +1,20 @@
+{
+  "scan_metadata": {"schema_version":"1.0","scan_date":"2026-11-25T19:31:41Z","project_root":"https://github.com/johnzastrow/starshipsuits","languages_detected":[],
+   "notes":"Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. Static HTML/CSS site plus GitHub Actions YAML and netlify.toml; no Python or Node code, so languages_detected is empty and route/data-access detection is not applicable (out of scope for skill version 1.0 for non-Python/Node code, but nothing relevant was found on manual inspection). woff2 fonts and a JPG are binary assets and were not scanned."},
+  "version_control": {"is_git_repo":true,"commit_count_sampled":11,"has_uncommitted_changes":false,"remote_configured":true,"has_gitignore":true,"gitignore_gaps":[]},
+  "dependencies": {
+   "python": {}, "node": {},
+   "github_actions": {"manifest_files":[".github/workflows/pages.yml",".github/dependabot.yml"],"package_manager":"github-actions","dependency_count":4,"findings":["Actions pinned to major version tags (checkout@v7, configure-pages@v6, upload-pages-artifact@v5, deploy-pages@v5), not commit SHAs","Dependabot configured weekly for github-actions"]}
+  },
+  "secrets_and_credentials": {"committed_secret_files":[],"hardcoded_secrets_in_source":[],"proper_secret_handling_found":[{"file":".gitignore","mechanism":"ignores .env, .env.*, *.pem, *.key as a backstop; README states no secrets belong in the repo"}],"env_example_present":false},
+  "interfaces": {"entry_points":[{"type":"static_site","framework":"plain HTML/CSS","file":"web/index.html"}],"routes":[],"network_binding":"none (static files; served by Netlify or GitHub Pages)","cors_wide_open":false},
+  "data_access": {"databases":[],"external_apis":[],"file_system_access":[],"sensitive_data_indicators":[],"office_and_collaboration_sources":[]},
+  "configuration_and_deployment": {"containerized":false,"docker_findings":["none - no Dockerfile present"],"deploy_config_files":["netlify.toml",".github/workflows/pages.yml",".github/dependabot.yml"],"environment_variables_referenced":[],"readme_present":true,"readme_describes_deployment":true},
+  "capability_summary": {
+   "what_this_app_can_do":["Serves a public single-page 'coming soon' website for the Starship Suits fursuit studio; no forms, scripts, backend or contact route."],
+   "data_sources_touched":[],
+   "who_can_reach_it":"Public static site intended for the open internet (starshipsuits.com via Netlify; optional GitHub Pages staging). No authentication, which is appropriate for a public static page; no data is exposed beyond the published web/ directory.",
+   "unauthorized_action_red_flags":[]
+  },
+  "summary": {"finding_counts_by_severity":{"critical":0,"high":0,"low":0},"top_findings":["No severity-tagged findings; static site with CSP and security headers in netlify.toml","GitHub Actions referenced by version tag rather than commit SHA (informational)"]}
+}

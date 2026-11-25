@@ -1,0 +1,291 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:33:01Z",
+    "project_root": "https://github.com/johnzastrow/mqs",
+    "languages_detected": [
+      "python",
+      "shell"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. Collection of QGIS plugins and Processing scripts, not a web service. Shell/batch files (Makefiles, .sh, .bat) skimmed only; full interface/data-access detection for shell is out of scope for skill version 1.0. Images, QGIS styles/projects (.qml, .qgz, .qmd), Qt resource/UI files and docs excluded. Scripts/metadatamanager is a near-duplicate of Plugins/metadata_manager. Plugins/metadata_manager/db/manager.py and widgets were not read line-by-line. Extra key secrets_and_credentials.cli_credential_exposure was added for the --password option."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      ".env, .env.*, *.pem, *.key, credentials.json are not excluded (gitignore is focused on spatial data files)",
+      "node_modules not listed (no Node code present)"
+    ]
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "Plugins/metadata_manager/pyproject.toml",
+        "Plugins/metadata_manager/uv.lock",
+        "Plugins/metadata_manager/metadata.txt",
+        "Plugins/mapsplat/metadata.txt",
+        "Scripts/metadatamanager/metadata.txt"
+      ],
+      "package_manager": "uv (metadata_manager only); other components have no manifest",
+      "dependency_count": 0,
+      "findings": [
+        "Plugins/metadata_manager/pyproject.toml declares dependencies = [] (placeholder description 'Add your description here')",
+        "Scripts/qgis_project_manager.py requires psycopg2-binary (documented only in a docstring/import guard); no manifest declares it",
+        "Scripts and plugins rely on QGIS-provided PyQGIS/PyQt5; Scripts/ have no manifest at all"
+      ]
+    },
+    "node": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": []
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "Plugins/metadata_manager/plugin_upload.py",
+        "mechanism": "password prompted with getpass when not supplied; password masked when printing URL"
+      },
+      {
+        "file": "Scripts/qgis_project_manager.py",
+        "mechanism": "PostgreSQL password entered in GUI field at runtime and passed to psycopg2; not stored in source"
+      }
+    ],
+    "env_example_present": false,
+    "cli_credential_exposure": [
+      {
+        "file": "Plugins/metadata_manager/plugin_upload.py",
+        "line": 78,
+        "detail": "plugins.qgis.org password may be passed with the -w/--password command-line option (visible in shell history/process list); getpass prompt is used if omitted. Same code duplicated in Scripts/metadatamanager/plugin_upload.py",
+        "severity": "high"
+      }
+    ]
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "qgis_plugin",
+        "framework": "QGIS plugin (classFactory)",
+        "file": "Plugins/metadata_manager/__init__.py"
+      },
+      {
+        "type": "qgis_plugin",
+        "framework": "QGIS plugin (classFactory)",
+        "file": "Plugins/mapsplat/__init__.py"
+      },
+      {
+        "type": "qgis_processing_scripts",
+        "framework": "QGIS Processing toolbox scripts",
+        "file": "Scripts/inventory_miner.py"
+      },
+      {
+        "type": "qgis_processing_scripts",
+        "framework": "QGIS Processing toolbox scripts",
+        "file": "Scripts/vectors2gpkg.py"
+      },
+      {
+        "type": "cli",
+        "framework": "optparse (upload to plugins.qgis.org)",
+        "file": "Plugins/metadata_manager/plugin_upload.py"
+      },
+      {
+        "type": "gui",
+        "framework": "tkinter",
+        "file": "Scripts/qgis_project_manager.py"
+      },
+      {
+        "type": "cli",
+        "framework": "script",
+        "file": "Plugins/metadata_manager/main.py"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET/HEAD",
+        "path": "/* (static files of the exported web map)",
+        "file": "Plugins/mapsplat/exporter.py",
+        "auth_detected": false,
+        "severity": "high"
+      }
+    ],
+    "network_binding": "0.0.0.0 (http.server.HTTPServer((\"\", PORT)) in the generated serve.py template written by Plugins/mapsplat/exporter.py:1371)",
+    "cors_wide_open": true
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite (GeoPackage inventory)",
+        "credential_source": "none (local file)",
+        "file": "Plugins/metadata_manager/processors/inventory_processor.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": true,
+          "severity": "low",
+          "reason": "table name interpolated with an f-string (lines 638, 664) from the user-entered layer_name dialog parameter; values are bound parameters; local desktop input only"
+        }
+      },
+      {
+        "type": "sqlite (GeoPackage/SpatiaLite layer rename)",
+        "credential_source": "none (local file)",
+        "file": "Scripts/batchvectorrename.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": true,
+          "severity": "low",
+          "reason": "ALTER TABLE [old] RENAME TO [new] built with f-string (line 791) from layer names/user rename input; local desktop use only"
+        }
+      },
+      {
+        "type": "postgresql (QGIS project store)",
+        "credential_source": "user-entered at runtime in GUI",
+        "file": "Scripts/qgis_project_manager.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "uses psycopg2.sql Identifier composition and %s parameters"
+        }
+      },
+      {
+        "type": "sqlite (metadata manager database)",
+        "credential_source": "none (local file)",
+        "file": "Plugins/metadata_manager/db/manager.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "not traced in detail; no string-built SQL flagged by grep"
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "plugins.qgis.org (XML-RPC plugin upload)",
+        "file": "Plugins/metadata_manager/plugin_upload.py",
+        "access_type": "write"
+      },
+      {
+        "host": "unpkg.com (MapLibre/pmtiles JS loaded by generated map HTML) and build.protomaps.com / protomaps.github.io (basemap tiles/fonts)",
+        "file": "Plugins/mapsplat/exporter.py",
+        "access_type": "read"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "Plugins/mapsplat/exporter.py",
+        "detail": "writes exported web map (style.json, index.html, serve.py, README) to user output folder; deletes temp gpkg",
+        "access_type": "write"
+      },
+      {
+        "file": "Scripts/batchvectorrename.py",
+        "detail": "copies and renames vector files with backups",
+        "access_type": "read_write"
+      },
+      {
+        "file": "Plugins/metadata_manager/db/metadata_writer.py",
+        "detail": "writes .qmd metadata files next to datasets",
+        "access_type": "write"
+      },
+      {
+        "file": "Plugins/metadata_manager/processors/inventory_processor.py",
+        "detail": "scans directory trees, records scanning username (getpass.getuser), runs `df`",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "password",
+        "file": "Scripts/qgis_project_manager.py"
+      },
+      {
+        "field_or_variable": "email, phone (metadata contact fields)",
+        "file": "Plugins/metadata_manager/widgets/metadata_wizard.py"
+      },
+      {
+        "field_or_variable": "email, phone",
+        "file": "Plugins/metadata_manager/db/schema.py"
+      },
+      {
+        "field_or_variable": "scanned_by_user (OS username)",
+        "file": "Plugins/metadata_manager/processors/inventory_processor.py"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      ".github/workflows/release-metadata-manager.yml",
+      ".github/workflows/release-mapsplat.yml",
+      "Plugins/metadata_manager/Makefile",
+      "Plugins/mapsplat/Makefile",
+      "Scripts/metadatamanager/Makefile"
+    ],
+    "environment_variables_referenced": [
+      "QGIS_PREFIX_PATH",
+      "TEST_INVENTORY_DB"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Inventories vector/raster files in directory trees into a GeoPackage and records the scanning OS username and file paths.",
+      "Edits and writes QGIS .qmd metadata (including contact email/phone) for datasets via a wizard.",
+      "Exports a QGIS project as a PMTiles web map and writes a serve.py that serves the folder over HTTP on all interfaces with permissive CORS and no login.",
+      "Reads and edits QGIS project XML stored in a PostgreSQL table using credentials typed into a GUI.",
+      "Renames vector layers/tables in bulk, with file backups.",
+      "Uploads a plugin zip to plugins.qgis.org using the author's credentials."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Local vector/raster files and GeoPackages",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "PostgreSQL qgis_projects table (user-supplied host)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "plugins.qgis.org XML-RPC",
+        "access": "write (plugin zip upload)",
+        "leaves_organization": true
+      },
+      {
+        "source": "unpkg.com / protomaps hosts (loaded by exported web map in the viewer's browser)",
+        "access": "read",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Desktop tools run locally by the user. The one network listener is the optional serve.py generated for exported web maps: it binds all interfaces with no authentication, so anyone on the local network can read the exported map folder while it is running.",
+    "unauthorized_action_red_flags": [
+      "Generated serve.py binds 0.0.0.0 with Access-Control-Allow-Origin * and no authentication",
+      "plugin_upload.py accepts the password via -w/--password command-line option (visible in shell history/process list) though it prompts if omitted",
+      "Inventory records the OS username of the scanner and file paths into a database"
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 2,
+      "low": 2
+    },
+    "top_findings": [
+      "Generated serve.py (Plugins/mapsplat/exporter.py) binds all interfaces, CORS *, no auth",
+      "F-string table names in SQL (inventory_processor.py, batchvectorrename.py) - local-only, low",
+      ".gitignore does not exclude .env / key / credential files",
+      "No committed secrets found"
+    ]
+  }
+}

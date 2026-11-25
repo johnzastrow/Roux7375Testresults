@@ -1,0 +1,71 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T20:06:00Z",
+    "project_root": "https://github.com/johnzastrow/mainegeo",
+    "languages_detected": [],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false) and not the author's working copy; the repository has only 2 commits. Repository contains only nine SVG illustrations (Maine geographic artwork), a LICENSE and a one-line README ('a collection of stuff for collaboration'). SVG files were checked for scripts and external links; only the standard w3.org namespace URLs were found. No Python or Node source code is present, so no interface, database or dependency detection was applicable."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 2,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": false,
+    "gitignore_gaps": [
+      "no .gitignore file present (no executable code or secrets observed, so no practical gap)"
+    ]
+  },
+  "dependencies": {
+    "python": {},
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [],
+    "routes": [],
+    "network_binding": "none",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [],
+    "file_system_access": [],
+    "sensitive_data_indicators": [],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": false
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Nothing executable: the repository stores SVG illustration files of Maine geography and terrain."
+    ],
+    "data_sources_touched": [],
+    "who_can_reach_it": "No executable code or network service; content is only readable by whoever can access the GitHub repository.",
+    "unauthorized_action_red_flags": []
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    },
+    "top_findings": [
+      "No executable code, dependencies or secrets found; repository holds SVG artwork only",
+      "No .gitignore present"
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "scan_metadata": {"schema_version":"1.0","scan_date":"2026-11-25T19:31:40Z","project_root":"https://github.com/johnzastrow/qgis-plugin-skill","languages_detected":["python","shell","yaml","markdown"],
+   "notes":"Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. The repo is an Agent Skill (Markdown docs plus build helper scripts and templates), not a running service. One Python script (build_plugin.py) was read; shell scripts (build_plugin.sh, deploy_local.sh, tests/smoke_build.sh), Makefile and GitHub Actions YAML are out of scope for full interface/data-access detection in skill version 1.0 and were only inspected for secrets, network calls and env use. The only external host string found, example.invalid, is a deliberate test fixture in tests/smoke_build.sh. No dependency manifest for Python/Node; setup.cfg and ruff.toml are lint configs."},
+  "version_control": {"is_git_repo":true,"commit_count_sampled":13,"has_uncommitted_changes":false,"remote_configured":true,"has_gitignore":true,
+   "gitignore_gaps":[".env and .env.* are not excluded","*.pem, *.key and credentials.json are not excluded"]},
+  "dependencies": {"python":{"manifest_files":[],"package_manager":"none","dependency_count":0,"findings":["build_plugin.py imports only the standard library; no manifest is needed. Workflow templates run linters and scanners via 'uv run --with' at CI time (detect-secrets and others), declared inline rather than in a manifest."]},"node":{}},
+  "secrets_and_credentials": {"committed_secret_files":[],"hardcoded_secrets_in_source":[],
+   "proper_secret_handling_found":[{"file":".github/workflows/release.yml","mechanism":"GitHub Actions built-in github.token via GH_TOKEN env (no stored secret)"},{"file":"skills/qgis-plugin/templates/release.yml","mechanism":"GitHub Actions github.token; template also runs a detect-secrets gate that fails on findings"}],
+   "env_example_present":false},
+  "interfaces": {"entry_points":[{"type":"cli","framework":"argparse","file":"skills/qgis-plugin/scripts/build_plugin.py"},{"type":"cli","framework":"bash","file":"skills/qgis-plugin/scripts/build_plugin.sh"},{"type":"cli","framework":"bash","file":"skills/qgis-plugin/scripts/deploy_local.sh"},{"type":"cli","framework":"bash","file":"tests/smoke_build.sh"}],
+   "routes":[],"network_binding":"none","cors_wide_open":false},
+  "data_access": {"databases":[],"external_apis":[],
+   "file_system_access":[{"file":"skills/qgis-plugin/scripts/build_plugin.py","detail":"copies plugin sources into a temp staging dir, deletes stale staging dirs, writes a plugin zip","access_type":"read_write"},{"file":"skills/qgis-plugin/scripts/deploy_local.sh","detail":"installs the built plugin into a local QGIS profile plugins directory","access_type":"write"}],
+   "sensitive_data_indicators":[],"office_and_collaboration_sources":[]},
+  "configuration_and_deployment": {"containerized":false,"docker_findings":["none - no Dockerfile present"],
+   "deploy_config_files":[".github/workflows/release.yml","skills/qgis-plugin/templates/release.yml","skills/qgis-plugin/templates/Makefile",".claude-plugin/marketplace.json"],
+   "environment_variables_referenced":["GH_TOKEN"],"readme_present":true,"readme_describes_deployment":true},
+  "capability_summary": {
+   "what_this_app_can_do":["Provides guidance and reference documents that teach an AI coding agent how to write, debug, package and publish QGIS plugins.","Builds a plugin zip from a manifest and verifies it, and can copy it into a local QGIS profile.","Release workflow validates version consistency and creates a GitHub Release using the workflow token."],
+   "data_sources_touched":[{"source":"Local plugin source tree and local QGIS profile directory","access":"read_write","leaves_organization":false},{"source":"GitHub Releases (via github.token in CI)","access":"write","leaves_organization":true}],
+   "who_can_reach_it":"No network service. Scripts run locally by whoever invokes them; the release workflow runs in GitHub Actions with contents: write permission.",
+   "unauthorized_action_red_flags":["none found"]},
+  "summary": {"finding_counts_by_severity":{"critical":0,"high":0,"low":0},"top_findings":["No secrets, routes or databases found; this is a documentation and build-tooling skill","Release workflow grants contents: write (needed to create releases); .gitignore does not list .env or key files"]}
+}

@@ -1,0 +1,901 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:40:00Z",
+    "project_root": "https://github.com/johnzastrow/bittabby",
+    "languages_detected": [
+      "go",
+      "javascript"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false) and not the author's working copy. Primary language is Go (with templ templates, SQL migrations and a small vendored htmx.min.js); full interface/data-access detection for Go is out of scope for skill version 1.0, so routes, database and external-host findings were gathered by reading source manually (internal/web/server.go, internal/store/sqldb, internal/notify, internal/config) rather than by the standard Python/Node patterns. Excluded as non-findings: test-file fixtures (internal/web/*_test.go hard-coded test passwords/SMTP values), generated *_templ.go files, and vendored internal/web/static/htmx.min.js. Dependencies are in an extra 'go' key under dependencies. Authenticated routes carry severity null (no finding); only unauthenticated routes are severity-tagged."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": []
+  },
+  "dependencies": {
+    "python": {},
+    "node": {},
+    "go": {
+      "manifest_files": [
+        "go.mod",
+        "go.sum"
+      ],
+      "package_manager": "go modules",
+      "dependency_count": 14,
+      "findings": [
+        "Exact versions pinned in go.mod with go.sum present; no wildcard or unpinned versions.",
+        "Direct dependencies: a-h/templ, go-sql-driver/mysql, golang.org/x/crypto, modernc.org/sqlite (pure Go).",
+        "CI runs govulncheck (.github/workflows/ci.yml) and a commit message records a Go toolchain bump to fix stdlib vulnerabilities."
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "internal/config/config.go",
+        "mechanism": "environment variables (BITT_TICK_SECRET, BITT_DB_DSN, BITT_SMTP_PASSWORD, BITT_NTFY_TOKEN) with file-based secret support (config tests check file mode 0600)"
+      },
+      {
+        "file": "compose.yaml",
+        "mechanism": "file-based secrets from ./secrets (gitignored) mounted into containers"
+      },
+      {
+        "file": "internal/auth/password.go",
+        "mechanism": "passwords hashed with golang.org/x/crypto"
+      },
+      {
+        "file": "internal/web/handlers_tick.go",
+        "mechanism": "constant-time comparison of bearer shared secret; fails closed when unset"
+      },
+      {
+        "file": "internal/store/sqldb/accounts.go",
+        "mechanism": "SMTP host/user/from stored in DB settings (UPDATE ... SET smtp_host = ?, ...)"
+      }
+    ],
+    "env_example_present": true
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "web_app",
+        "framework": "go net/http (ServeMux) with templ + htmx",
+        "file": "cmd/bittabby/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "bittabby --healthcheck flag",
+        "file": "cmd/bittabby/main.go"
+      },
+      {
+        "type": "scheduled_job",
+        "framework": "external cron container calling POST /internal/tick",
+        "file": "compose.yaml"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/static/",
+        "file": "internal/web/server.go",
+        "line": 74,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Static assets / service worker; no data."
+      },
+      {
+        "method": "GET",
+        "path": "/sw.js",
+        "file": "internal/web/server.go",
+        "line": 77,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Static assets / service worker; no data."
+      },
+      {
+        "method": "POST",
+        "path": "/internal/tick",
+        "file": "internal/web/server.go",
+        "line": 86,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Outside session auth by design; handler handlers_tick.go checks Bearer shared secret with constant-time compare and fails closed when no secret configured."
+      },
+      {
+        "method": "GET",
+        "path": "/setup",
+        "file": "internal/web/server.go",
+        "line": 89,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "First-run setup; handler is only usable while no account exists (AUTH-03)."
+      },
+      {
+        "method": "POST",
+        "path": "/setup",
+        "file": "internal/web/server.go",
+        "line": 90,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "First-run setup; handler is only usable while no account exists (AUTH-03)."
+      },
+      {
+        "method": "GET",
+        "path": "/login",
+        "file": "internal/web/server.go",
+        "line": 93,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Login form/handler; CSRF and login rate handling present in handlers_auth.go."
+      },
+      {
+        "method": "POST",
+        "path": "/login",
+        "file": "internal/web/server.go",
+        "line": 94,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Login form/handler; CSRF and login rate handling present in handlers_auth.go."
+      },
+      {
+        "method": "POST",
+        "path": "/logout",
+        "file": "internal/web/server.go",
+        "line": 95,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Session logout."
+      },
+      {
+        "method": "GET",
+        "path": "/{$}",
+        "file": "internal/web/server.go",
+        "line": 98,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "GET",
+        "path": "/tabs/new",
+        "file": "internal/web/server.go",
+        "line": 99,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs",
+        "file": "internal/web/server.go",
+        "line": 100,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "GET",
+        "path": "/tabs/{id}",
+        "file": "internal/web/server.go",
+        "line": 101,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/charges",
+        "file": "internal/web/server.go",
+        "line": 102,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "GET",
+        "path": "/tabs/{id}/pay",
+        "file": "internal/web/server.go",
+        "line": 105,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "GET",
+        "path": "/tabs/{id}/card",
+        "file": "internal/web/server.go",
+        "line": 106,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "GET",
+        "path": "/tabs/{id}/settle",
+        "file": "internal/web/server.go",
+        "line": 107,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/settle",
+        "file": "internal/web/server.go",
+        "line": 108,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/payments",
+        "file": "internal/web/server.go",
+        "line": 109,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/adjustments",
+        "file": "internal/web/server.go",
+        "line": 110,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/entries/{seq}/undo",
+        "file": "internal/web/server.go",
+        "line": 111,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/participants",
+        "file": "internal/web/server.go",
+        "line": 112,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/participants/{userID}/remove",
+        "file": "internal/web/server.go",
+        "line": 113,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/details",
+        "file": "internal/web/server.go",
+        "line": 116,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/archive",
+        "file": "internal/web/server.go",
+        "line": 117,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/schedule",
+        "file": "internal/web/server.go",
+        "line": 120,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/fee",
+        "file": "internal/web/server.go",
+        "line": 121,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/interest",
+        "file": "internal/web/server.go",
+        "line": 122,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/loan",
+        "file": "internal/web/server.go",
+        "line": 123,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/reminders/preview",
+        "file": "internal/web/server.go",
+        "line": 124,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/reminders",
+        "file": "internal/web/server.go",
+        "line": 125,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/items",
+        "file": "internal/web/server.go",
+        "line": 126,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/items/{itemID}",
+        "file": "internal/web/server.go",
+        "line": 127,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/tabs/{id}/items/{itemID}/remove",
+        "file": "internal/web/server.go",
+        "line": 128,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "GET",
+        "path": "/profile",
+        "file": "internal/web/server.go",
+        "line": 131,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/profile/details",
+        "file": "internal/web/server.go",
+        "line": 132,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/profile/password",
+        "file": "internal/web/server.go",
+        "line": 133,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/profile/avatar",
+        "file": "internal/web/server.go",
+        "line": 134,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/profile/avatar/remove",
+        "file": "internal/web/server.go",
+        "line": 135,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "POST",
+        "path": "/profile/notifications",
+        "file": "internal/web/server.go",
+        "line": 136,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "GET",
+        "path": "/users/{id}/avatar",
+        "file": "internal/web/server.go",
+        "line": 137,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAuth session middleware"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/users",
+        "file": "internal/web/server.go",
+        "line": 140,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAdmin middleware (admin role)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users",
+        "file": "internal/web/server.go",
+        "line": 141,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAdmin middleware (admin role)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users/{id}/notify",
+        "file": "internal/web/server.go",
+        "line": 142,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAdmin middleware (admin role)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users/{id}/active",
+        "file": "internal/web/server.go",
+        "line": 143,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAdmin middleware (admin role)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users/{id}/reconcile",
+        "file": "internal/web/server.go",
+        "line": 144,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAdmin middleware (admin role)"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/notifications",
+        "file": "internal/web/server.go",
+        "line": 145,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAdmin middleware (admin role)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/notifications/delivery",
+        "file": "internal/web/server.go",
+        "line": 146,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAdmin middleware (admin role)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/notifications/reminders",
+        "file": "internal/web/server.go",
+        "line": 147,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAdmin middleware (admin role)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/notifications/test",
+        "file": "internal/web/server.go",
+        "line": 148,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireAdmin middleware (admin role)"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/reconcile",
+        "file": "internal/web/server.go",
+        "line": 152,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/reconcile/upload",
+        "file": "internal/web/server.go",
+        "line": 153,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/reconcile/setup",
+        "file": "internal/web/server.go",
+        "line": 154,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/formats/{id}/rename",
+        "file": "internal/web/server.go",
+        "line": 155,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/payments/{seq}/not-in-bank",
+        "file": "internal/web/server.go",
+        "line": 156,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/reviews/{id}/undo",
+        "file": "internal/web/server.go",
+        "line": 157,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/upload",
+        "file": "internal/web/server.go",
+        "line": 158,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/reconcile/map/{token}",
+        "file": "internal/web/server.go",
+        "line": 159,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/map/{token}",
+        "file": "internal/web/server.go",
+        "line": 160,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/reconcile/imports/{id}",
+        "file": "internal/web/server.go",
+        "line": 161,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/settings",
+        "file": "internal/web/server.go",
+        "line": 162,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/rules",
+        "file": "internal/web/server.go",
+        "line": 163,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/rules/{id}/delete",
+        "file": "internal/web/server.go",
+        "line": 164,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/confirm",
+        "file": "internal/web/server.go",
+        "line": 165,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/confirm-exact",
+        "file": "internal/web/server.go",
+        "line": 166,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/matches/{id}/undo",
+        "file": "internal/web/server.go",
+        "line": 167,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "GET",
+        "path": "/admin/reconcile/lines/{id}",
+        "file": "internal/web/server.go",
+        "line": 168,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/lines/{id}/record",
+        "file": "internal/web/server.go",
+        "line": 169,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/lines/{id}/unrecord",
+        "file": "internal/web/server.go",
+        "line": 170,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/lines/{id}/ignore",
+        "file": "internal/web/server.go",
+        "line": 171,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/reconcile/lines/{id}/unignore",
+        "file": "internal/web/server.go",
+        "line": 172,
+        "auth_detected": true,
+        "severity": null,
+        "note": "requireReconcile middleware (per-request 'can reconcile' permission)"
+      }
+    ],
+    "network_binding": ":8080 (all interfaces, BITT_ADDR default); compose.fluidgrid.yaml maps to a different host port behind a Caddy proxy",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite (default, modernc.org/sqlite, /data/bitt.db)",
+        "credential_source": "env_var",
+        "file": "internal/store/sqldb/dialect_sqlite.go",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "Queries in non-test code use ? placeholders via database/sql; only string-concatenated SQL found is in maria_test.go test setup (CREATE/DROP DATABASE with test-generated name)."
+        }
+      },
+      {
+        "type": "mariadb/mysql (optional, BITT_DB_DRIVER/BITT_DB_DSN)",
+        "credential_source": "env_var",
+        "file": "internal/store/sqldb/dialect_maria.go",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "Same parameterised database/sql layer as SQLite."
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "configurable SMTP server (BITT_SMTP_HOST)",
+        "file": "internal/notify/notify.go",
+        "access_type": "write"
+      },
+      {
+        "host": "ntfy server (BITT_NTFY_URL, ntfy.sh default examples)",
+        "file": "internal/notify/notify.go",
+        "access_type": "write"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "cmd/bittabby/main.go",
+        "detail": "SQLite database file under BITT_DB_PATH (/data/bitt.db in container)",
+        "access_type": "read_write"
+      },
+      {
+        "file": "internal/web/handlers_reconcile_import.go",
+        "detail": "bank statement CSV uploaded via /admin/reconcile/upload (parsed in memory, stored to DB)",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "password (hash)",
+        "file": "internal/auth/password.go"
+      },
+      {
+        "field_or_variable": "email",
+        "file": "internal/store/sqldb/accounts.go"
+      },
+      {
+        "field_or_variable": "phone",
+        "file": "internal/web/views/profile.templ"
+      },
+      {
+        "field_or_variable": "financial ledger balances, payments, loans, bank statement lines",
+        "file": "internal/store/sqldb/entries.go"
+      },
+      {
+        "field_or_variable": "bank CSV lines (description/amount)",
+        "file": "internal/store/sqldb/lines.go"
+      }
+    ],
+    "office_and_collaboration_sources": [
+      {
+        "type": "csv",
+        "file": "internal/web/handlers_reconcile_import.go",
+        "location_or_host": "user-uploaded bank export CSV (e.g. TransactionHistory.csv) via web form",
+        "credential_source": "unclear",
+        "access_type": "read"
+      },
+      {
+        "type": "email_mailbox",
+        "file": "internal/notify/notify.go",
+        "location_or_host": "SMTP host from config (net/smtp); outbound reminders only",
+        "credential_source": "env_var",
+        "access_type": "write"
+      }
+    ]
+  },
+  "configuration_and_deployment": {
+    "containerized": true,
+    "docker_findings": [
+      "Dockerfile: multi-stage golang:1.26.8-alpine build, final image gcr.io/distroless/static-debian12:nonroot; USER 65532:65532 (non-root); EXPOSE 8080; VOLUME /data; built-in HEALTHCHECK.",
+      "compose.yaml uses ghcr.io/johnzastrow/bitt:latest (unpinned tag) and maps 8080:8080; a second cron container POSTs /internal/tick with bearer secret.",
+      "BITT_SECURE_COOKIES defaults to false; compose comments warn to set true behind HTTPS."
+    ],
+    "deploy_config_files": [
+      "Dockerfile",
+      "compose.yaml",
+      "compose.fluidgrid.yaml",
+      "Makefile",
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml"
+    ],
+    "environment_variables_referenced": [
+      "BITT_ADDR",
+      "BITT_APPEND_ONLY_TRIGGERS",
+      "BITT_BASE_URL",
+      "BITT_DB_DRIVER",
+      "BITT_DB_DSN",
+      "BITT_DB_PATH",
+      "BITT_EMAIL_FROM",
+      "BITT_LEDGER_TRIGGERS",
+      "BITT_NOTIFY_LOOKBACK_DAYS",
+      "BITT_NOTIFY_MAX_PER_TICK",
+      "BITT_NTFY_TOKEN",
+      "BITT_NTFY_URL",
+      "BITT_READ_TIMEOUT",
+      "BITT_REMINDER_BODY",
+      "BITT_REMINDER_DAYS",
+      "BITT_REMINDER_TITLE",
+      "BITT_SECURE_COOKIES",
+      "BITT_SHUTDOWN_TIMEOUT",
+      "BITT_SMTP_HOST",
+      "BITT_SMTP_PASSWORD",
+      "BITT_SMTP_PORT",
+      "BITT_SMTP_USERNAME",
+      "BITT_TICK_SECRET",
+      "BITT_TIMEZONE",
+      "BITT_WRITE_TIMEOUT"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Lets signed-in users keep shared running-balance 'tabs' for money owed between people: post charges, record payments, adjustments, late fees and interest, loan terms, and undo entries as reversing entries.",
+      "Lets admins create users, enable/disable accounts, configure email and ntfy notification delivery, and grant a 'can reconcile' permission.",
+      "Lets permitted users upload bank CSV exports and match, confirm, record or ignore bank lines against recorded payments.",
+      "Sends payment reminders by email (SMTP) and ntfy when an external cron calls POST /internal/tick with the shared secret.",
+      "Lets users upload and view profile avatars."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "SQLite database file (or optional MariaDB) holding users, tabs, ledger entries, bank lines",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "User-uploaded bank statement CSV files",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "SMTP server (configurable)",
+        "access": "write (reminder emails with names/amounts)",
+        "leaves_organization": true
+      },
+      {
+        "source": "ntfy server (configurable, ntfy.sh style)",
+        "access": "write (reminder notifications)",
+        "leaves_organization": true
+      }
+    ],
+    "who_can_reach_it": "Listens on :8080 (all interfaces) by default. Every application route is behind a session login (requireAuth, requireAdmin, or requireReconcile); only /healthz, /static, /sw.js, /setup, /login, /logout are open, and /internal/tick requires a bearer secret. Session cookies are only marked Secure when BITT_SECURE_COOKIES=true.",
+    "unauthorized_action_red_flags": [
+      "Financial ledger and bank statement lines are personal financial data stored unencrypted in a local SQLite/MariaDB database.",
+      "Notification content may leave the network through SMTP and ntfy (ntfy.sh if configured).",
+      "BITT_SECURE_COOKIES defaults to false.",
+      "GET/POST /setup is open until the first account is created."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 7
+    },
+    "top_findings": [
+      "No hardcoded secrets or committed secret files found outside test fixtures",
+      "Unauthenticated routes are limited to health, static, setup, login/logout (low)",
+      "Secure cookie flag defaults to off; compose uses :latest image tag",
+      "Optional notification egress to SMTP and ntfy servers"
+    ]
+  }
+}

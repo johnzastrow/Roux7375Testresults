@@ -1,0 +1,292 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:52:00Z",
+    "project_root": "https://github.com/johnzastrow/marimo-qgis",
+    "languages_detected": [
+      "python",
+      "shell"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false) and not the author's working copy. QGIS plugin plus marimo notebooks (Python); a shell script (qgis-env.sh) is present and full interface/data-access detection for shell is out of scope for skill version 1.0 (read only for env vars/hosts). Notebooks in example/, notebooks/ are marimo apps (Python) and were read for imports only. Binary data files (example/example.gpkg, notebooks/stations.gpkg, example/spatialite.db) were not inspected. Routes listed are the localhost bridge server in the plugin; authenticated routes carry severity null (no finding). The plugin launches 'python -m marimo edit <notebook>' as a subprocess and can run pip install into QGIS's Python; those are capabilities noted in the capability summary, not scored as findings."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "no exclusion for .env / *.env / .env.* files",
+      "no exclusion for *.pem / *.key / credentials.json style files",
+      "*.db / *.gpkg data files are not ignored (example/spatialite.db and gpkg sample data are committed)"
+    ]
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "pyproject.toml",
+        "uv.lock",
+        "plugin/metadata.txt"
+      ],
+      "package_manager": "uv",
+      "dependency_count": 9,
+      "findings": [
+        "pyproject.toml lists pandas and numpy with no version constraint (unpinned); other dependencies use >= lower bounds only.",
+        "uv.lock is present and pins resolved versions.",
+        "pyproject.toml has placeholder description ('Add your description here') and version 0.1.0 while plugin/metadata.txt is 0.6.0.",
+        "Plugin itself uses only the standard library on the QGIS side; marimo is installed by the user into QGIS's Python via pip at run time (unpinned)."
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "plugin/bridge/auth.py",
+        "mechanism": "per-session bearer token from secrets.token_urlsafe(32), validated with hmac.compare_digest"
+      },
+      {
+        "file": "qgis_bridge/__init__.py",
+        "mechanism": "token and port passed to notebooks through MARIMO_QGIS_TOKEN / MARIMO_QGIS_PORT environment variables"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "qgis_plugin",
+        "framework": "QGIS classFactory / PyQt dock",
+        "file": "plugin/__init__.py"
+      },
+      {
+        "type": "web_api",
+        "framework": "http.server ThreadingHTTPServer (localhost bridge)",
+        "file": "plugin/bridge/server.py"
+      },
+      {
+        "type": "notebook",
+        "framework": "marimo apps",
+        "file": "notebooks/stations_analysis.py"
+      },
+      {
+        "type": "notebook",
+        "framework": "marimo apps",
+        "file": "example/simple_marimo_qgis.py"
+      },
+      {
+        "type": "cli",
+        "framework": "shell environment helper",
+        "file": "qgis-env.sh"
+      },
+      {
+        "type": "cli",
+        "framework": "QGIS Processing script that launches marimo",
+        "file": "processing/launch_marimo.py"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/api/project",
+        "file": "plugin/bridge/server.py",
+        "auth_detected": true,
+        "severity": null,
+        "note": "Bearer token required (server.py _authorized, hmac.compare_digest in auth.py)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/layers",
+        "file": "plugin/bridge/server.py",
+        "auth_detected": true,
+        "severity": null,
+        "note": "Bearer token required"
+      },
+      {
+        "method": "GET",
+        "path": "/api/layer/<name>",
+        "file": "plugin/bridge/server.py",
+        "auth_detected": true,
+        "severity": null,
+        "note": "Bearer token required; returns layer features as FlatGeobuf"
+      },
+      {
+        "method": "GET",
+        "path": "/api/layer-info/<name>",
+        "file": "plugin/bridge/server.py",
+        "auth_detected": true,
+        "severity": null,
+        "note": "Bearer token required"
+      },
+      {
+        "method": "GET",
+        "path": "/api/extent",
+        "file": "plugin/bridge/server.py",
+        "auth_detected": true,
+        "severity": null,
+        "note": "Bearer token required"
+      },
+      {
+        "method": "GET",
+        "path": "/api/selected",
+        "file": "plugin/bridge/server.py",
+        "auth_detected": true,
+        "severity": null,
+        "note": "Bearer token required"
+      },
+      {
+        "method": "POST",
+        "path": "/api/insert",
+        "file": "plugin/bridge/server.py",
+        "auth_detected": true,
+        "severity": null,
+        "note": "Bearer token required; adds a layer to the open QGIS project from posted FlatGeobuf bytes (body size-bounded)"
+      },
+      {
+        "method": "POST",
+        "path": "/api/run",
+        "file": "plugin/bridge/server.py",
+        "auth_detected": true,
+        "severity": null,
+        "note": "Bearer token required; runs any QGIS Processing algorithm id with caller-supplied params via processing.run (plugin/bridge/api.py:291)"
+      }
+    ],
+    "network_binding": "127.0.0.1 only (random port, bridge); marimo launched with its own defaults (no explicit host flag)",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite (in-memory version probe)",
+        "credential_source": "not applicable",
+        "file": "plugin/environment.py",
+        "access_type": "read",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "only connects to ':memory:' to read the sqlite version; no user-input SQL in plugin code"
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "github.com (downloads repository zip of example/notebooks folders)",
+        "file": "plugin/environment.py",
+        "access_type": "read"
+      },
+      {
+        "host": "PyPI via pip (installs marimo and user-requested packages)",
+        "file": "plugin/ui/process.py",
+        "access_type": "read"
+      },
+      {
+        "host": "astral.sh (uv install hint text only)",
+        "file": "processing/launch_marimo.py",
+        "access_type": "unclear"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "plugin/ui/process.py",
+        "detail": "writes per-launch log files",
+        "access_type": "write"
+      },
+      {
+        "file": "plugin/ui/dock.py",
+        "detail": "writes scaffolded notebook files to user-chosen paths",
+        "access_type": "write"
+      },
+      {
+        "file": "plugin/environment.py",
+        "detail": "extracts downloaded example zip into a destination directory",
+        "access_type": "write"
+      },
+      {
+        "file": "plugin/bridge/api.py",
+        "detail": "writes FlatGeobuf temp files for layer transfer",
+        "access_type": "write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "latitude (sample station coordinates)",
+        "file": "notebooks/stations_analysis.py"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml",
+      "Makefile",
+      "qgis-env.sh"
+    ],
+    "environment_variables_referenced": [
+      "APPDATA",
+      "MARIMO_QGIS_PORT",
+      "MARIMO_QGIS_TOKEN",
+      "MARIMO_QGIS_UV",
+      "QT_QPA_PLATFORM",
+      "QGIS_PYTHON_PATH",
+      "PYTHON_CANDIDATES",
+      "MARIMO_DEPS"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Runs marimo reactive notebooks on QGIS's own Python interpreter, launched from a dock inside QGIS.",
+      "Exposes a token-protected localhost HTTP bridge that lets notebooks read the open QGIS project (layers, features, extent, selection), insert layers back into it, and run any QGIS Processing algorithm.",
+      "Installs marimo and any packages the user names into QGIS's Python with pip, and can download example notebooks from GitHub.",
+      "Scaffolds new notebook files and writes launch logs to disk."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Open QGIS project layers (via local bridge)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "github.com repository zip (examples)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "PyPI via pip",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Sample GeoPackage/SpatiaLite files in repo",
+        "access": "read",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Desktop use only. The bridge binds 127.0.0.1 on a random port and requires a per-session bearer token on every request, so it is reachable only by local processes that know the token. Notebooks themselves can run arbitrary Python as the QGIS user.",
+    "unauthorized_action_red_flags": [
+      "POST /api/run executes any Processing algorithm with caller-supplied parameters (guarded only by the local bearer token).",
+      "Notebooks launched by the plugin execute arbitrary Python on QGIS's interpreter by design.",
+      "pip installs of unpinned packages into the QGIS Python environment at run time."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    },
+    "top_findings": [
+      "No severity-tagged findings: all bridge routes require a bearer token and bind 127.0.0.1",
+      "Unpinned pandas/numpy in pyproject.toml; runtime pip installs into QGIS Python",
+      "Local bridge can run arbitrary Processing algorithms"
+    ]
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:32:55Z",
+    "project_root": "https://github.com/johnzastrow/mapsplat",
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. QGIS desktop plugin (PyQGIS/Qt). The plugin generates a Python serve.py and an HTML/JavaScript viewer as string templates inside exporter.py; the generated serve.py was analyzed as part of the plugin since it is shipped to users. JavaScript embedded in templates is out of scope for skill version 1.0 interface detection. CLAUDE.md in the repo was treated as data. mapsplat.zip (committed release artifact) was not unpacked. Test fixtures with C:/Users/me paths in test/test_config_manager.py are sample strings, not recorded as findings."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      ".env/*.env, *.pem, *.key and credential files are not excluded (no secrets pattern present)",
+      "mapsplat.zip build artifact is committed to the repo"
+    ]
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "metadata.txt"
+      ],
+      "package_manager": "none (QGIS plugin; metadata.txt only)",
+      "dependency_count": 0,
+      "findings": [
+        "No requirements.txt/pyproject.toml; runtime relies on QGIS-provided PyQGIS/Qt plus external CLIs (ogr2ogr/GDAL, optional pmtiles CLI)",
+        ".github/workflows/release.yml installs unpinned 'pip install pyqt5 pytest' for CI"
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "qgis_plugin",
+        "framework": "PyQGIS (classFactory)",
+        "file": "__init__.py"
+      },
+      {
+        "type": "web_static_server_generated",
+        "framework": "python http.server (generated serve.py)",
+        "file": "exporter.py"
+      },
+      {
+        "type": "ci_workflow",
+        "framework": "github-actions (tag-triggered release)",
+        "file": ".github/workflows/release.yml"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET/HEAD/OPTIONS",
+        "path": "/* (static files of exported map, via generated serve.py)",
+        "file": "exporter.py",
+        "auth_detected": false,
+        "severity": "low"
+      }
+    ],
+    "network_binding": "generated serve.py defaults to 127.0.0.1:8000; --host 0.0.0.0 option documented for LAN/VPS use",
+    "cors_wide_open": true
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [
+      {
+        "host": "unpkg.com (maplibre-gl@4.7.1, pmtiles@3.2.0)",
+        "file": "exporter.py",
+        "access_type": "read"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "exporter.py",
+        "detail": "writes exported web map package (style.json, index.html, PMTiles, serve.py, README.txt, lib/ assets) to the user-chosen output folder; removes temporary .gpkg files",
+        "access_type": "write"
+      },
+      {
+        "file": "exporter.py",
+        "detail": "runs ogr2ogr/ogrinfo/pmtiles via subprocess with list arguments (no shell) on exported layers",
+        "access_type": "read_write"
+      },
+      {
+        "file": "config_manager.py",
+        "detail": "reads/writes plugin configuration JSON",
+        "access_type": "read_write"
+      },
+      {
+        "file": "mapsplat_dockwidget.py",
+        "detail": "appends to an export log file",
+        "access_type": "write"
+      }
+    ],
+    "sensitive_data_indicators": [],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      ".github/workflows/release.yml",
+      "Makefile",
+      "deploy.ps1",
+      "deploy.bat"
+    ],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Exports a QGIS project's vector and raster layers to a self-contained static web map (PMTiles + MapLibre GL JS style and HTML viewer).",
+      "Downloads MapLibre GL JS and PMTiles JavaScript assets from unpkg.com at export time (no checksum verification) to bundle them for offline use, falling back to CDN links on failure.",
+      "Generates a serve.py local web server that serves the exported map directory with HTTP Range support and Access-Control-Allow-Origin: * on every response."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "QGIS project layers (local vector/raster data)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Exported map package files in the output folder",
+        "access": "write",
+        "leaves_organization": false
+      },
+      {
+        "source": "unpkg.com (MapLibre/PMTiles JS assets)",
+        "access": "read",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "The plugin runs inside the user's QGIS. The generated serve.py binds to 127.0.0.1 by default (local only) with no authentication; if started with --host 0.0.0.0 it serves the exported map to anyone on the network. README documents deploying exports to static hosts and Linux VPS (Caddy/Nginx).",
+    "unauthorized_action_red_flags": [
+      "Generated serve.py sends Access-Control-Allow-Origin: * with no authentication; safe by default on 127.0.0.1 but exposed if bound to 0.0.0.0",
+      "JavaScript libraries are downloaded from unpkg.com at export time over HTTPS without integrity checks"
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 1
+    },
+    "top_findings": [
+      "Generated serve.py has no auth and wildcard CORS, default bind 127.0.0.1 (low); becomes exposed with --host 0.0.0.0",
+      "Remote JS assets downloaded from unpkg.com without checksum",
+      "No dependency manifest beyond QGIS metadata.txt; CI installs unpinned pip packages"
+    ]
+  }
+}

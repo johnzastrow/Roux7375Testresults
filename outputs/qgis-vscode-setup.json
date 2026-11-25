@@ -1,0 +1,144 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:36:14Z",
+    "project_root": "https://github.com/johnzastrow/qgis-vscode-setup",
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of default branch (depth 20); has_uncommitted_changes reflects the clone (false), not the author's working copy. Single commit in history. Repository is a QGIS PyQGIS scripting workspace (two QGIS console scripts) plus a developer setup helper (dev_setup/configure.py) that generates .vscode/settings.json and .env. No web interface, database or network client code exists. The QGIS scripts run inside the QGIS Python console and operate on layers in the open QGIS project. No README.md at repository root (CLAUDE.md and dev_setup/README.md exist); purpose taken from CLAUDE.md and dev_setup/README.md."
+  },
+  "version_control": {
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "*.pem, *.key and credentials.json patterns are not excluded (.env, .venv and .vscode are excluded)"
+    ],
+    "is_git_repo": true,
+    "commit_count_sampled": 1,
+    "has_uncommitted_changes": false
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "package_manager": "uv",
+      "dependency_count": 1,
+      "findings": [
+        "Runtime dependencies list is empty; one dev dependency (qgis-stubs) with no version constraint in pyproject.toml, locked by uv.lock",
+        "Scripts require the QGIS-bundled Python (qgis.core, qgis.PyQt), which is not declared"
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "dev_setup/configure.py",
+        "mechanism": "os.environ.get('LOCALAPPDATA') for a path lookup (not a secret); generated .env is gitignored"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "cli",
+        "framework": "argparse",
+        "file": "dev_setup/configure.py"
+      },
+      {
+        "type": "qgis_console_script",
+        "framework": "qgis",
+        "file": "parcel_hook_generator.py"
+      },
+      {
+        "type": "qgis_console_script",
+        "framework": "qgis",
+        "file": "hook_lines.py"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "dev_setup/configure.py",
+        "detail": "writes .vscode/settings.json and .env in the project root (machine-specific paths); probes QGIS install locations (C:\\OSGeo4W, C:\\Program Files\\QGIS*) and, on WSL, converts them to /mnt/c paths",
+        "access_type": "read_write"
+      },
+      {
+        "file": "dev_setup/configure.py",
+        "detail": "subprocess.run([python_exe, '-c', 'import qgis.core; ...']) with a path taken from qgis_config.json or auto-detection, timeout 15s (Linux/macOS import probe)",
+        "access_type": "read"
+      },
+      {
+        "file": "parcel_hook_generator.py",
+        "detail": "adds a line feature to a user-chosen QGIS vector layer and commits edits",
+        "access_type": "write"
+      },
+      {
+        "file": "hook_lines.py",
+        "detail": "reads a named layer from the open QGIS project and writes hooked line features to a new in-memory layer",
+        "access_type": "read_write"
+      }
+    ],
+    "sensitive_data_indicators": [],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [
+      "LOCALAPPDATA"
+    ],
+    "readme_present": false,
+    "readme_describes_deployment": false
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Generates VS Code settings and a .env file so a developer gets IntelliSense and import resolution for the QGIS Python API (auto-detects Windows/WSL2 QGIS installs).",
+      "parcel_hook_generator.py draws a Z-shaped hook line between two selected parcel polygons and writes it to a chosen QGIS line layer.",
+      "hook_lines.py adds hook barbs to lines of a named layer and outputs them to an in-memory layer."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Layers loaded in the open QGIS project (user-selected parcel polygon and output line layers)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": ".vscode/settings.json and .env in the project root (generated, gitignored)",
+        "access": "write",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Local developer machine only: scripts run in the user's QGIS console and the setup helper is a local command; no network listener or authentication layer.",
+    "unauthorized_action_red_flags": [
+      "None found: no network calls, credentials or database access in the code. The setup helper runs a configured Python executable via subprocess with fixed arguments."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    },
+    "top_findings": [
+      "No secrets, network calls or databases found",
+      "dev_setup/configure.py runs a configured Python executable via subprocess (fixed arguments, path from local config)",
+      "No root README; dev-only qgis-stubs dependency is unpinned in pyproject.toml (locked in uv.lock)"
+    ]
+  }
+}

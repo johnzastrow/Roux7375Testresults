@@ -1,0 +1,188 @@
+{
+  "scan_metadata": {
+    "languages_detected": [
+      "rust"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. Rust command-line tools (no web server); full interface/data-access detection for Rust is out of scope for skill version 1.0, so source (src/db.rs, src/system_checks.rs, src/config.rs, src/collector.rs, bins) was read manually. Rust dependencies are reported under an extra 'rust' key in dependencies. A tracked file named 'dsg' at the repo root contains shell history with a git user name and a personal email address (no credential); it is recorded under sensitive_data_indicators. CLAUDE.md and docs/AI_INSTRUCTIONS.md exist in the repo and were treated as data, not instructions.",
+    "scan_date": "2026-11-25T19:36:24Z",
+    "schema_version": "1.0",
+    "project_root": "https://github.com/johnzastrow/systers"
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "no .env, *.pem, *.key or credentials.json patterns (none present; the project has no secrets)",
+      "tracked stray file 'dsg' (git config command history with a personal email) is not ignored"
+    ],
+    "commit_count_sampled": 20
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": []
+    },
+    "node": {},
+    "rust": {
+      "manifest_files": [
+        "Cargo.toml",
+        "Cargo.lock"
+      ],
+      "package_manager": "cargo",
+      "dependency_count": 11,
+      "findings": [
+        "10 runtime and 1 dev dependency (rusqlite 0.31 bundled, chrono, sysinfo 0.30, anyhow, clap 4.5, log, env_logger, regex, serde, serde_json, serde_yaml 0.9); all use semver ranges resolved by the committed Cargo.lock",
+        "serde_yaml 0.9 is an archived/unmaintained crate upstream (recognized with moderate confidence; no CVE claimed)"
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "src/bin/syswriter.rs",
+        "mechanism": "SYSTERS_DB_PATH and SYSTERS_LOG_PATHS read from environment (paths, not secrets)"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "cli",
+        "framework": "rust clap (systers main)",
+        "file": "src/main.rs"
+      },
+      {
+        "type": "cli",
+        "framework": "rust clap (syswriter collector)",
+        "file": "src/bin/syswriter.rs"
+      },
+      {
+        "type": "cli",
+        "framework": "rust clap (sysreport report generator)",
+        "file": "src/bin/sysreport.rs"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none - no listener",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite",
+        "credential_source": "none (local file; ~/.systers.db default, overridable by SYSTERS_DB_PATH or --db-path)",
+        "file": "src/db.rs",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "rusqlite params! binding is used; no format!-built SQL found in db.rs (table drops and renames use fixed strings during schema migration)"
+        }
+      }
+    ],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "src/collector.rs",
+        "detail": "reads system logs: /var/log/syslog, /var/log/messages, /var/log/kern.log, /var/log/auth.log (configurable via SYSTERS_LOG_PATHS or config)",
+        "access_type": "read"
+      },
+      {
+        "file": "src/bin/sysreport.rs",
+        "detail": "writes report output file (line 87)",
+        "access_type": "write"
+      },
+      {
+        "file": "src/config.rs",
+        "detail": "reads and writes YAML config under ./systers.yaml, ~/.config/systers/config.yaml or /etc/systers/config.yaml",
+        "access_type": "read_write"
+      },
+      {
+        "file": "src/system_checks.rs",
+        "detail": "runs external commands (which, apt, dnf, lsblk, smartctl, systemctl, du) without a shell; 'apt update -qq' refreshes package lists, du path comes from config",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "personal email address and git user name in shell-history file",
+        "file": "dsg"
+      },
+      {
+        "field_or_variable": "auth.log content stored in log_entries table (may contain usernames and source IPs)",
+        "file": "src/collector.rs"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      "config.example.yaml"
+    ],
+    "environment_variables_referenced": [
+      "HOME",
+      "SYSTERS_DB_PATH",
+      "SYSTERS_LOG_PATHS",
+      "RUST_LOG"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Collects CPU, memory, disk and load metrics from the local Linux host and stores them in a local SQLite database (syswriter).",
+      "Scans local system logs (syslog, messages, kern.log, auth.log) for error and warning patterns and stores matching entries in the database.",
+      "Generates terminal or file summary reports from the stored data with configurable thresholds (sysreport).",
+      "Optionally runs enhanced checks by invoking apt, dnf, lsblk, smartctl, systemctl and du, including 'apt update', to report updates, disk health, failed services and large directories.",
+      "Deletes data older than a configurable retention period."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Local SQLite database (system_metrics and log_entries tables)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Local host log files under /var/log (including auth.log)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Local host metrics via sysinfo and system commands",
+        "access": "read",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Command-line tools run by whoever executes them on the host; no network listener and no authentication. Database file permissions are the default umask (docs/SECURITY_EVALUATION.md notes this as a recommendation). Reading /var/log/auth.log typically requires elevated privileges.",
+    "unauthorized_action_red_flags": [
+      "Reads authentication logs (/var/log/auth.log) and stores extracts in an unencrypted SQLite file with default permissions",
+      "Runs 'apt update' as part of a check, which changes package lists and may need sudo",
+      "TODO lists a planned feature to send alerts and summaries over SMTP (not implemented in source as of this scan)"
+    ]
+  },
+  "summary": {
+    "top_findings": [
+      "No secrets, keys or credentials found in source or config",
+      "Tracked file 'dsg' holds shell history with a personal email address",
+      "Stores auth.log extracts in a local SQLite file with default permissions",
+      "Executes external system commands (no shell, fixed program names) including 'apt update'",
+      "Cargo.lock committed; dependencies in semver ranges"
+    ],
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    }
+  }
+}

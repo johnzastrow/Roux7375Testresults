@@ -1,0 +1,102 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:36:07Z",
+    "project_root": "https://github.com/johnzastrow/utilities",
+    "languages_detected": ["shell"],
+    "notes": "Fresh shallow clone of the default branch (depth 20; the repo has only 10 commits), so has_uncommitted_changes reflects the clone (false), not the author's working copy. The project is entirely Bash shell scripts; full interface/data-access detection for Shell is out of scope for skill version 1.0, so the scripts were read for secrets, destructive operations, file access and network use. No Python or Node code or manifests exist. Several scripts were produced with GitHub Copilot per the commit history."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 10,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": ["gitignore is the Python template: .env, .env.*, *.pem, *.key, credentials.json are not excluded (*.log is excluded)"]
+  },
+  "dependencies": {
+    "python": {},
+    "node": {},
+    "shell": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": ["no manifest; scripts rely on standard Linux tools (find, tar, lsof/ss, systemctl, last, lastlog, du, awk, grep)"]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {"type": "cli", "framework": "bash", "file": "scripts/backup-directory.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/clean-old-logs.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/check-user-activity.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/list-users.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/search-logs.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/tail-logs.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/system-info.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/network-info.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/port-check.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/service-status.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/memory-check.sh"},
+      {"type": "cli", "framework": "bash", "file": "scripts/disk-usage-report.sh"},
+      {"type": "cli", "framework": "bash template", "file": "bash_script_template.sh"},
+      {"type": "cli", "framework": "bash example", "file": "example_file_processor.sh"}
+    ],
+    "routes": [],
+    "network_binding": "none (no listeners; port-check.sh and network-info.sh only inspect local ports/interfaces)",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [],
+    "file_system_access": [
+      {"file": "scripts/clean-old-logs.sh", "detail": "deletes (rm -f) *.log, *.log.* and *.gz files older than N days under a user-supplied directory (default /var/log); has a dry-run option; no check that the path is a log directory", "access_type": "write"},
+      {"file": "scripts/backup-directory.sh", "detail": "creates a tar.gz of a user-supplied source directory in a backup directory", "access_type": "read_write"},
+      {"file": "scripts/list-users.sh", "detail": "reads /etc/passwd and lastlog", "access_type": "read"},
+      {"file": "scripts/check-user-activity.sh", "detail": "reads last/lastlog output and failed-login lines from /var/log/auth.log", "access_type": "read"},
+      {"file": "scripts/search-logs.sh", "detail": "greps logs under /var/log or user-given files", "access_type": "read"},
+      {"file": "scripts/tail-logs.sh", "detail": "tails /var/log/syslog, messages, auth.log or a user-given log", "access_type": "read"}
+    ],
+    "sensitive_data_indicators": [
+      {"field_or_variable": "user accounts, login history, failed login attempts (/etc/passwd, lastlog, auth.log)", "file": "scripts/check-user-activity.sh"},
+      {"field_or_variable": "user account list", "file": "scripts/list-users.sh"}
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": ["none - no Dockerfile present"],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Reports system, memory, disk, network, listening-port and service status on the local Linux host.",
+      "Lists local user accounts and shows login history and failed login attempts from system logs, when run with sufficient privileges.",
+      "Searches and tails system logs.",
+      "Deletes old log files under a chosen directory (default /var/log) and creates compressed backups of a chosen directory.",
+      "Provides a Bash script template with logging, argument parsing and cleanup traps."
+    ],
+    "data_sources_touched": [
+      {"source": "Local system logs and account files (/var/log, /etc/passwd, lastlog)", "access": "read", "leaves_organization": false},
+      {"source": "User-chosen log directory (clean-old-logs.sh)", "access": "write (deletes files)", "leaves_organization": false},
+      {"source": "User-chosen source and backup directories (backup-directory.sh)", "access": "read_write", "leaves_organization": false}
+    ],
+    "who_can_reach_it": "Local command-line scripts run by whoever has shell access; no network service. Several reads (auth.log, lastlog) and the /var/log cleanup need elevated privileges.",
+    "unauthorized_action_red_flags": [
+      "clean-old-logs.sh permanently deletes logs with rm -f, which affects audit trails if run with the default /var/log path outside dry-run mode",
+      "check-user-activity.sh and list-users.sh expose account and failed-login information to whoever runs them"
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {"critical": 0, "high": 0, "low": 0},
+    "top_findings": ["no severity-tagged findings", "clean-old-logs.sh deletes logs (default /var/log) with no path guard beyond optional dry run"]
+  }
+}

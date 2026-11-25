@@ -1,0 +1,223 @@
+{
+  "scan_metadata": {
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. This is a QGIS desktop plugin (PyQt/qgis.core), not a web service: there are no routes or network listeners. Python code was read directly; 'qgis' and 'osgeo' imports are provided by the QGIS host and not declared in any manifest (metadata.txt declares qgisMinimumVersion 3.40 and maximum 4.99). Excluded: docs/ images, a .pptx, i18n .ts file, and docs/testing scratch scripts (reviewed only for paths and secrets). Version mismatch observed: metadata.txt is 0.6.5, README badge says 0.6.4, docs/TODO.md says 0.4.1.",
+    "scan_date": "2026-11-25T19:35:44Z",
+    "schema_version": "1.0",
+    "project_root": "https://github.com/johnzastrow/metadatamgr"
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "pyproject.toml and uv.lock are ignored (intentional per .gitignore comments) so there is no committed dependency manifest for development tooling"
+    ],
+    "commit_count_sampled": 17
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "metadata.txt",
+        "setup.cfg"
+      ],
+      "package_manager": "none (QGIS plugin; CI uses uv run --with for flake8, bandit, detect-secrets, pytest)",
+      "dependency_count": 0,
+      "findings": [
+        "no requirements.txt or pyproject.toml is committed; third-party code comes from the QGIS host (qgis, PyQt, osgeo/GDAL) and the standard library (sqlite3, xml.etree, pathlib, getpass, socket, platform)",
+        "missing manifest: imports of qgis/osgeo are not declared; metadata.txt only declares the QGIS version range 3.40 to 4.99",
+        "CI tooling versions are not pinned (uv run --with flake8/bandit/detect-secrets)"
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": ".github/workflows/ci.yml",
+        "mechanism": "detect-secrets hook with committed .secrets.baseline and bandit run in CI"
+      },
+      {
+        "file": ".pre-commit-config.yaml",
+        "mechanism": "pre-commit hooks configured (secret scanning per commit 7515ac8)"
+      },
+      {
+        "file": ".gitignore",
+        "mechanism": "excludes .env, .env.*, *.key, *.pem, *.p12, *.pfx, *_rsa, credentials.json, secrets.*"
+      },
+      {
+        "file": "SECURITY.md",
+        "mechanism": "states the plugin handles no authentication and stores no credentials"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "qgis_plugin",
+        "framework": "QGIS classFactory / PyQt dock widget",
+        "file": "__init__.py"
+      },
+      {
+        "type": "qgis_plugin",
+        "framework": "PyQt dock widget",
+        "file": "MetadataManager_dockwidget.py"
+      },
+      {
+        "type": "cli",
+        "framework": "python script (one-off DB repair)",
+        "file": "fix_metadata_status.py"
+      },
+      {
+        "type": "cli",
+        "framework": "python test/manual scripts",
+        "file": "test_metadata_writer.py"
+      },
+      {
+        "type": "cli",
+        "framework": "shell build scripts",
+        "file": "scripts/build_plugin.sh"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none - desktop plugin, no listener",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite/geopackage",
+        "credential_source": "none (local file chosen by user)",
+        "file": "db/manager.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "db/manager.py passes query parameters separately (execute_query(query, params)); values are bound"
+        }
+      },
+      {
+        "type": "sqlite/geopackage",
+        "credential_source": "none (local file chosen by user)",
+        "file": "processors/inventory_processor.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": true,
+          "severity": "low",
+          "reason": "f-string interpolates the inventory table name at lines 696 and 723, but the name is first passed through _safe_identifier() (added in v0.6.5) and values are bound with ?; table name comes from a plugin setting, not a network or multi-user input, so it is a latent pattern only"
+        }
+      }
+    ],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "processors/inventory_processor.py",
+        "detail": "recursively scans a user-selected directory tree (rglob) and reads file metadata and sidecar XML (FGDC, ESRI, ISO 19115)",
+        "access_type": "read"
+      },
+      {
+        "file": "db/metadata_writer.py",
+        "detail": "writes .qmd metadata sidecar files next to datasets (line 225) and embeds metadata into GeoPackages",
+        "access_type": "write"
+      },
+      {
+        "file": "processors/inventory_processor.py",
+        "detail": "writes inventory GeoPackage output",
+        "access_type": "write"
+      },
+      {
+        "file": "test_fix_status.py",
+        "detail": "hardcoded path C:\\\\Users\\\\br8kw\\\\Downloads\\\\geo_inv.gpkg (developer test script)",
+        "access_type": "unclear"
+      },
+      {
+        "file": "test_metadata_writer.py",
+        "detail": "hardcoded paths C:\\\\test\\\\data\\\\roads.shp and test.gpkg (developer test script)",
+        "access_type": "unclear"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "scanned_by_user (OS username via getpass), scanned_by_machine (hostname), OS version",
+        "file": "processors/inventory_processor.py"
+      },
+      {
+        "field_or_variable": "contact fields: email, phone, address",
+        "file": "db/schema.py"
+      },
+      {
+        "field_or_variable": "email (contact entry in wizard)",
+        "file": "widgets/metadata_wizard.py"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      "Makefile",
+      "pb_tool.cfg",
+      "scripts/build_plugin.sh",
+      "install.sh",
+      "install.bat",
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml",
+      ".github/dependabot.yml"
+    ],
+    "environment_variables_referenced": [
+      "QGIS_PREFIX_PATH",
+      "TEST_INVENTORY_DB"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Scans a user-selected folder tree for geospatial datasets and writes an inventory of files (format, CRS, size, metadata status) into a local GeoPackage.",
+      "Lets a QGIS user create and edit layer metadata through a 4-step wizard with contact and link management, and saves it to a local database cache, .qmd sidecar files, or embedded GeoPackage metadata.",
+      "Parses existing FGDC, ESRI, ISO 19115 and embedded metadata from local files to pre-fill forms.",
+      "Shows a metadata quality dashboard with completion statistics by directory, format and CRS.",
+      "Records the scanning user's OS username, machine hostname and OS version in the inventory records for multi-user tracking."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Local GeoPackage/SQLite inventory and metadata database (geospatial_inventory and related tables)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Local geospatial data files and metadata sidecars (shp, gpkg, FGDC/ESRI/ISO XML, .qmd)",
+        "access": "read_write (reads datasets and metadata; writes .qmd and embedded metadata)",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Runs inside the user's own QGIS desktop session; no listener, no authentication and none needed. Anyone with filesystem access to the shared GeoPackage can read the inventory, including recorded usernames and hostnames.",
+    "unauthorized_action_red_flags": [
+      "Records OS username and machine hostname of each scanner in the inventory database (personal/operational data stored without any stated consent or retention policy)",
+      "Writes metadata sidecar files and embedded metadata into the user's data directories"
+    ]
+  },
+  "summary": {
+    "top_findings": [
+      "No secrets, secret files or provider keys found; CI runs detect-secrets and bandit",
+      "f-string SQL for table name guarded by _safe_identifier (latent, low)",
+      "No dependency manifest; relies on QGIS host libraries",
+      "Inventory records capture OS username, hostname and OS version",
+      "Developer test scripts contain hardcoded Windows paths including a user profile path"
+    ],
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 1
+    }
+  }
+}

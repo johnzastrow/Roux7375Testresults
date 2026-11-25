@@ -1,0 +1,27 @@
+{
+  "scan_metadata": {"schema_version":"1.0","scan_date":"2026-11-25T19:31:40Z","project_root":"https://github.com/johnzastrow/lineup","languages_detected":["python"],
+   "notes":"Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. Python desktop GUI (customtkinter) read directly for SQL, file operations and persistence. The raw 'sensitive data' hits for 'weight' are false positives (font weight in UI code). The .image_cache/ directory (17 thumbnail PNGs plus cache_metadata.json) is tracked in git although listed in .gitignore; cache_metadata.json records a local Windows user-profile path (C:/Users/<name>/Pictures/duplicates_to_review/...). uv.lock is also tracked although listed in .gitignore. Committed .claude/settings.local.json is a permission allowlist with no credentials. Test CSV fixtures (tests/*.csv, requirements/*.csv) are sample data of duplicate-report rows and were not examined for personal data beyond field names."},
+  "version_control": {"is_git_repo":true,"commit_count_sampled":20,"has_uncommitted_changes":false,"remote_configured":true,"has_gitignore":true,
+   "gitignore_gaps":[".env and .env.* are not excluded","*.pem, *.key and credentials.json are not excluded","venv/.venv directories are not excluded","files listed in .gitignore (.image_cache/, uv.lock) are nevertheless tracked in git"]},
+  "dependencies": {"python":{"manifest_files":["pyproject.toml","uv.lock"],"package_manager":"uv","dependency_count":4,"findings":["all four runtime deps (customtkinter, pillow, pandas, pillow-heif) use lower-bound ranges (>=); uv.lock pins exact versions but is listed in .gitignore","no dev/test dependency group declared although pytest-style tests exist"]},"node":{}},
+  "secrets_and_credentials": {"committed_secret_files":[],"hardcoded_secrets_in_source":[],"proper_secret_handling_found":[],"env_example_present":false},
+  "interfaces": {"entry_points":[{"type":"gui","framework":"customtkinter","file":"main.py"},{"type":"cli","framework":"argparse","file":"migration_utility.py"}],"routes":[],"network_binding":"none","cors_wide_open":false},
+  "data_access": {
+   "databases":[{"type":"sqlite","credential_source":"none (local file .lineup_cache.db or user-chosen .db)","file":"database_manager.py","access_type":"read_write",
+     "sql_injection_risk":{"present":true,"severity":"low","reason":"data_manager_enhanced.py:415 builds 'SELECT * FROM images WHERE {field} LIKE ?' with an f-string for the column name (values are parameterized); no caller in the application passes a user-supplied field (only tests call search_images), so no untrusted input reaches it currently - latent risk"}}],
+   "external_apis":[],
+   "file_system_access":[
+     {"file":"main.py","detail":"reads user-selected CSV files (pandas read_csv) produced by photochomper; writes recent-database list to ~/.lineup_recent_databases.txt","access_type":"read_write"},
+     {"file":"list_screen.py","detail":"permanently deletes image files selected in the UI (Path.unlink), also in main.py:1107 and image_manager.py:1012; moves files to a user-chosen directory","access_type":"read_write"},
+     {"file":"image_manager.py","detail":"reads source images and writes thumbnail cache (.image_cache/ with cache_metadata.json)","access_type":"read_write"},
+     {"file":"migration_utility.py","detail":"exports database to CSV and can delete the SQLite database file","access_type":"write"}],
+   "sensitive_data_indicators":[{"field_or_variable":"local file paths of user photos (File Path column)","file":"data_manager_enhanced.py"}],
+   "office_and_collaboration_sources":[{"type":"csv","file":"main.py","location_or_host":"user-selected CSV exported by photochomper (tests use tests/duplicates_report_*.csv)","credential_source":"unclear","access_type":"read_write"}]},
+  "configuration_and_deployment": {"containerized":false,"docker_findings":["none - no Dockerfile present"],"deploy_config_files":[],"environment_variables_referenced":[],"readme_present":true,"readme_describes_deployment":false},
+  "capability_summary": {
+   "what_this_app_can_do":["Loads a CSV of duplicate/similar photo groups, caches it in a local SQLite database, and shows groups with thumbnails, master markers and a list view.","Lets the local user move or permanently delete selected image files from disk.","Exports the database back to CSV and keeps a recent-databases list in the user's home directory."],
+   "data_sources_touched":[{"source":"CSV duplicate report from photochomper","access":"read","leaves_organization":false},{"source":"Local SQLite database .lineup_cache.db","access":"read_write","leaves_organization":false},{"source":"User photo files on local disk","access":"read_write (move/delete)","leaves_organization":false}],
+   "who_can_reach_it":"Desktop application run locally by the person who starts it; no network listener and no login. It acts with that user's file-system permissions.",
+   "unauthorized_action_red_flags":["Permanently deletes image files (Path.unlink) with no recycle bin; no network or external data transfer found."]},
+  "summary": {"finding_counts_by_severity":{"critical":0,"high":0,"low":1},"top_findings":["Latent SQL injection pattern (f-string column name) in search_images; no untrusted caller found","Gitignored .image_cache/ and uv.lock are tracked; cache metadata contains a local Windows user path","App permanently deletes user files; no secrets, routes or external APIs found"]}
+}

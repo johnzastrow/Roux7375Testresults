@@ -1,0 +1,874 @@
+{
+ "scan_metadata": {
+  "schema_version": "1.0",
+  "scan_date": "2026-11-25T19:31:40Z",
+  "project_root": "https://github.com/johnzastrow/garminview",
+  "languages_detected": [
+   "python",
+   "typescript",
+   "vue",
+   "shell"
+  ],
+  "notes": "Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. Python FastAPI backend and Vue 3 frontend; routes were taken from backend/garminview/api/main.py and the routers; no authentication or authorization dependency exists anywhere in the API (only the get_db dependency), so every route is auth_detected false. Route severity follows the calibration pattern: sensitivity of data and write capability, with the compensating factor that the Docker backend itself publishes no host port (only the Caddy frontend on 8080 is published, and its proxy regex forwards health, training, body, admin, sync, activities, assessments, export, nutrition paths to the backend; /actalog read paths are not proxied by Caddy but /admin/actalog is). Because the API binds 0.0.0.0 inside the container and defaults to the author's LAN, who can reach it depends on deployment. backend/.env was not read in full: only variable names and 4-character prefixes were examined and redacted. Also tracked in git: backend/garmindb.log, backend/logs/sync.log, backend/logs/uvicorn.log and docs/myfitnesspal/File-Export-2012-03-24-to-2026-03-11.zip (personal MyFitnessPal export, not opened). Excluded as test fixtures/false positives: raw 'weight' sensitive-data hits (exercise weight), test.example hosts, tests/. Shell scripts (entrypoint.sh, prep.sh) and GitHub Actions YAML are out of scope for deep detection in v1.0. Marimo notebooks under backend/notebooks are Python and were treated as such."
+ },
+ "version_control": {
+  "is_git_repo": true,
+  "commit_count_sampled": 20,
+  "has_uncommitted_changes": false,
+  "remote_configured": true,
+  "has_gitignore": true,
+  "gitignore_gaps": [
+   "backend/.env is tracked in git even though '.env' is in .gitignore (committed before or force-added; ignore rules do not untrack files)",
+   "backend/garmindb.log and backend/logs/*.log are tracked despite *.log being ignored",
+   "*.pem, *.key and credentials.json are not excluded",
+   "node_modules is ignored only via frontend/.gitignore"
+  ]
+ },
+ "dependencies": {
+  "python": {
+   "manifest_files": [
+    "backend/pyproject.toml",
+    "backend/uv.lock"
+   ],
+   "package_manager": "uv",
+   "dependency_count": 27,
+   "findings": [
+    "22 runtime dependencies use lower-bound (>=) ranges; uv.lock pins exact versions",
+    "garmindb pinned to >=3.6.7,<3.7 deliberately",
+    "backend/notebooks import marimo and altair, which are not declared in pyproject.toml",
+    "pymysql, cryptography, weasyprint (native libs cairo/pango) required at runtime"
+   ]
+  },
+  "node": {
+   "manifest_files": [
+    "frontend/package.json",
+    "frontend/package-lock.json"
+   ],
+   "package_manager": "npm",
+   "dependency_count": 21,
+   "findings": [
+    "axios pinned exactly (1.20.0); other packages use caret ranges with lockfile present",
+    "node >=22 required"
+   ]
+  }
+ },
+ "secrets_and_credentials": {
+  "committed_secret_files": [
+   {
+    "file": "backend/.env",
+    "type": ".env (tracked in git despite .gitignore entry; contains GARMINVIEW_DB_URL in user:password@host form, value begins 'jcz:***REDACTED***')",
+    "severity": "critical"
+   }
+  ],
+  "hardcoded_secrets_in_source": [
+   {
+    "file": "backend/garminview/core/config.py",
+    "line": 19,
+    "variable_name": "secret_key",
+    "redacted_snippet": "secret_key: str = \"chan***REDACTED***\"",
+    "severity": "low"
+   },
+   {
+    "file": "backend/.env",
+    "line": 5,
+    "variable_name": "GARMINVIEW_SECRET_KEY",
+    "redacted_snippet": "GARMINVIEW_SECRET_KEY=chan***REDACTED***",
+    "severity": "low"
+   }
+  ],
+  "proper_secret_handling_found": [
+   {
+    "file": "backend/garminview/core/config.py",
+    "mechanism": "pydantic-settings reads GARMINVIEW_* variables from the environment / .env"
+   },
+   {
+    "file": "docker-compose.yml",
+    "mechanism": "env_file: .env (not baked into image); GARMINDB_CONFIG_DIR mounted read-only"
+   },
+   {
+    "file": ".github/workflows/release.yml",
+    "mechanism": "GitHub Actions GITHUB_TOKEN for GHCR push"
+   }
+  ],
+  "env_example_present": true
+ },
+ "interfaces": {
+  "entry_points": [
+   {
+    "type": "web_api",
+    "framework": "fastapi",
+    "file": "backend/garminview/api/main.py"
+   },
+   {
+    "type": "web_ui",
+    "framework": "vue3 + vite (served by Caddy)",
+    "file": "frontend/src/main.ts"
+   },
+   {
+    "type": "scheduled_job",
+    "framework": "apscheduler (cron schedules stored in DB)",
+    "file": "backend/garminview/core/startup.py"
+   },
+   {
+    "type": "cli",
+    "framework": "python script",
+    "file": "backend/scripts/migrate_to_mariadb.py"
+   },
+   {
+    "type": "notebook",
+    "framework": "marimo",
+    "file": "backend/notebooks/health_explorer.py"
+   }
+  ],
+  "routes": [
+   {
+    "method": "GET",
+    "path": "/",
+    "file": "backend/garminview/api/main.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "status/version only"
+   },
+   {
+    "method": "GET",
+    "path": "/health/",
+    "file": "backend/garminview/api/routes/health_check.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "status check"
+   },
+   {
+    "method": "GET",
+    "path": "/health/daily",
+    "file": "backend/garminview/api/routes/health_check.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/health/sleep",
+    "file": "backend/garminview/api/routes/health_check.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/health/intraday-hr",
+    "file": "backend/garminview/api/routes/health_check.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/health/hr-zones",
+    "file": "backend/garminview/api/routes/health_check.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/activities/",
+    "file": "backend/garminview/api/routes/activities.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/activities/hr-zones",
+    "file": "backend/garminview/api/routes/activities.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/activities/vo2max-trend",
+    "file": "backend/garminview/api/routes/activities.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/activities/{activity_id}",
+    "file": "backend/garminview/api/routes/activities.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/training/load",
+    "file": "backend/garminview/api/routes/training.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/training/readiness",
+    "file": "backend/garminview/api/routes/training.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/training/max-hr-aging",
+    "file": "backend/garminview/api/routes/training.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/body/weight",
+    "file": "backend/garminview/api/routes/body.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication (body weight/composition)"
+   },
+   {
+    "method": "GET",
+    "path": "/body/composition",
+    "file": "backend/garminview/api/routes/body.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication (body weight/composition)"
+   },
+   {
+    "method": "GET",
+    "path": "/nutrition/daily",
+    "file": "backend/garminview/api/routes/nutrition.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication (nutrition)"
+   },
+   {
+    "method": "GET",
+    "path": "/nutrition/energy-balance",
+    "file": "backend/garminview/api/routes/nutrition.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication (nutrition)"
+   },
+   {
+    "method": "GET",
+    "path": "/assessments/",
+    "file": "backend/garminview/api/routes/assessments.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/assessments/correlations/matrix",
+    "file": "backend/garminview/api/routes/assessments.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/assessments/data-quality/completeness",
+    "file": "backend/garminview/api/routes/assessments.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/export/csv",
+    "file": "backend/garminview/api/routes/export.py",
+    "auth_detected": false,
+    "severity": "critical",
+    "note": "bulk export of health metrics by date range for anyone who can reach the server, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/export/json",
+    "file": "backend/garminview/api/routes/export.py",
+    "auth_detected": false,
+    "severity": "critical",
+    "note": "bulk export of health metrics by date range for anyone who can reach the server, no authentication"
+   },
+   {
+    "method": "POST",
+    "path": "/sync/trigger",
+    "file": "backend/garminview/api/routes/sync.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "starts garmindb_cli subprocess (downloads from Garmin Connect using stored credentials), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/sync/status",
+    "file": "backend/garminview/api/routes/sync.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "sync status/log output, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/sync/logs",
+    "file": "backend/garminview/api/routes/sync.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "sync status/log output, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/sync/stream",
+    "file": "backend/garminview/api/routes/sync.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "sync status/log output, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/config",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "critical",
+    "note": "returns every app_config row (key and value) with no filtering; actalog_password is stored in app_config, so it is returned in plaintext to unauthenticated callers"
+   },
+   {
+    "method": "PUT",
+    "path": "/admin/config/{key}",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated write of any existing configuration value (including actalog_url/credentials and parser URL)"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/schedules",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "lists sync schedules"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/schedules",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated modification of scheduled sync jobs"
+   },
+   {
+    "method": "PUT",
+    "path": "/admin/schedules/{schedule_id}",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated modification of scheduled sync jobs"
+   },
+   {
+    "method": "DELETE",
+    "path": "/admin/schedules/{schedule_id}",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated modification of scheduled sync jobs"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/schema-version",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "admin read, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/sync-logs",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "admin read, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/athlete-metrics",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "admin read, no authentication; personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/anomalies",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "admin read, no authentication; personal health/fitness data (single user), no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/profile",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "returns user profile (age/DOB-derived and physiological settings), no authentication"
+   },
+   {
+    "method": "PUT",
+    "path": "/admin/profile",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated update of user profile"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/anomalies/exclude",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated data-exclusion changes"
+   },
+   {
+    "method": "DELETE",
+    "path": "/admin/anomalies/exclude",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated data-exclusion changes"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/upload/mfp",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated upload and import of a MyFitnessPal zip (ZIP-only check on filename)"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/import/polar",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated: reads Polar JSON files from a caller-supplied server filesystem directory path"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/backfill/polar",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated bulk data rewrite"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/backfill/mfp",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated bulk data rewrite"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/tasks",
+    "file": "backend/garminview/api/routes/admin.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "data-management task list"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/workouts",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/workouts/{workout_id}",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/workouts/{workout_id}/session-vitals",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/workouts/{workout_id}/match-candidates",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/movements",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/movements/{movement_id}/history",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/wods",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/wods/{wod_id}/history",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/prs",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "GET",
+    "path": "/actalog/cross-reference",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "workout/fitness data from Actalog, no authentication"
+   },
+   {
+    "method": "POST",
+    "path": "/actalog/workouts/{workout_id}/match",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated write linking Garmin activity to workout"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/actalog/config",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "returns Actalog URL/email and has_password flag only (password not returned)"
+   },
+   {
+    "method": "PUT",
+    "path": "/admin/actalog/config",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated write of Actalog URL, email and password (stored plaintext in app_config)"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/actalog/sync",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated trigger of sync with external Actalog server using stored credentials"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/actalog/test-connection",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated; accepts caller-supplied url/email/password query params and makes an outbound login request to that URL (server-side request to arbitrary host)"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/actalog/sync/status",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "sync status"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/actalog/parser/status",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "parser status / queue of workout notes"
+   },
+   {
+    "method": "GET",
+    "path": "/admin/actalog/parser/queue",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "parser queue of workout notes (user free text), no authentication"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/actalog/parser/run",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated parser action; run/reparse send note text to a configured LLM endpoint, push writes to external Actalog"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/actalog/parser/approve/{parse_id}",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated parser review action"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/actalog/parser/push/{parse_id}",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated parser action; run/reparse send note text to a configured LLM endpoint, push writes to external Actalog"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/actalog/parser/reject/{parse_id}",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated parser review action"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/actalog/parser/dismiss/{parse_id}",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated parser review action"
+   },
+   {
+    "method": "POST",
+    "path": "/admin/actalog/parser/reparse/{workout_id}",
+    "file": "backend/garminview/api/routes/actalog.py",
+    "auth_detected": false,
+    "severity": "high",
+    "note": "unauthenticated parser action; run/reparse send note text to a configured LLM endpoint, push writes to external Actalog"
+   }
+  ],
+  "network_binding": "uvicorn --host 0.0.0.0 --port 8000 (backend/entrypoint.sh); Caddy listens on :8080 and compose publishes ${GARMINVIEW_PORT:-8080}",
+  "cors_wide_open": false
+ },
+ "data_access": {
+  "databases": [
+   {
+    "type": "mariadb (mysql+pymysql) or sqlite, selected by GARMINVIEW_DB_BACKEND",
+    "credential_source": "env_var / env_file (GARMINVIEW_DB_URL); a backend/.env containing the URL is committed to git",
+    "file": "backend/garminview/core/database.py",
+    "access_type": "read_write",
+    "sql_injection_risk": {
+     "present": true,
+     "severity": "low",
+     "reason": "backend/garminview/api/routes/admin.py:76 builds 'ALTER TABLE ... ADD COLUMN {col} {definition}' with an f-string, but both values come from a hardcoded list; scripts/migrate_to_mariadb.py:91 interpolates table names from inspected schema. No user-controlled input reaches either. All other queries use SQLAlchemy ORM or bound parameters (latent risk only)."
+    }
+   },
+   {
+    "type": "sqlite (GarminDB files garmin.db, garmin_activities.db, garmin_monitoring.db etc.)",
+    "credential_source": "none (local files under GARMINVIEW_HEALTH_DATA_DIR)",
+    "file": "backend/garminview/ingestion/file_adapters/garmindb_monitoring.py",
+    "access_type": "read",
+    "sql_injection_risk": {
+     "present": false,
+     "severity": "low",
+     "reason": "sqlite3 queries use bound parameters; adapters only read"
+    }
+   }
+  ],
+  "external_apis": [
+   {
+    "host": "Garmin Connect (via garmindb_cli / garminconnect library; credentials from mounted ~/.GarminDb config)",
+    "file": "backend/garminview/api/routes/sync.py",
+    "access_type": "read"
+   },
+   {
+    "host": "Actalog server (URL and credentials stored in app_config; user-configured)",
+    "file": "backend/garminview/ingestion/actalog_client.py",
+    "access_type": "read_write"
+   },
+   {
+    "host": "Actalog server write-back (POST of matched Garmin data)",
+    "file": "backend/garminview/ingestion/actalog_writeback.py",
+    "access_type": "write"
+   },
+   {
+    "host": "Ollama or OpenAI-compatible LLM server (default http://localhost:11434, configurable URL; receives workout note text)",
+    "file": "backend/garminview/ingestion/notes_parser.py",
+    "access_type": "write"
+   }
+  ],
+  "file_system_access": [
+   {
+    "file": "backend/garminview/ingestion/file_adapters/*.py",
+    "detail": "reads GarminDB SQLite files and FIT/JSON exports from GARMINVIEW_HEALTH_DATA_DIR (~/HealthData)",
+    "access_type": "read"
+   },
+   {
+    "file": "backend/garminview/api/routes/admin.py",
+    "detail": "import/polar reads JSON from a caller-supplied directory path",
+    "access_type": "read"
+   },
+   {
+    "file": "backend/garminview/api/routes/sync.py",
+    "detail": "writes sync.log in the log directory; runs garmindb_cli with cwd in the log dir",
+    "access_type": "write"
+   }
+  ],
+  "sensitive_data_indicators": [
+   {
+    "field_or_variable": "health metrics: heart rate, sleep, weight, body composition, HRV, GPS latitude from Polar activity files",
+    "file": "backend/garminview/ingestion/polar/parsers/training_session.py"
+   },
+   {
+    "field_or_variable": "dob / age for max-HR analysis",
+    "file": "backend/garminview/analysis/max_hr_aging.py"
+   },
+   {
+    "field_or_variable": "actalog email and password",
+    "file": "backend/garminview/api/routes/actalog.py"
+   },
+   {
+    "field_or_variable": "MyFitnessPal nutrition export (zip tracked in repo)",
+    "file": "docs/myfitnesspal/File-Export-2012-03-24-to-2026-03-11.zip"
+   }
+  ],
+  "office_and_collaboration_sources": [
+   {
+    "type": "csv",
+    "file": "backend/garminview/ingestion/mfp_zip_parser.py",
+    "location_or_host": "MyFitnessPal export zip (Nutrition/Measurement/Exercise-Summary CSVs) uploaded via /admin/upload/mfp",
+    "credential_source": "unclear",
+    "access_type": "read"
+   },
+   {
+    "type": "csv",
+    "file": "backend/garminview/api/routes/export.py",
+    "location_or_host": "CSV download of health metrics",
+    "credential_source": "unclear",
+    "access_type": "write"
+   }
+  ]
+ },
+ "configuration_and_deployment": {
+  "containerized": true,
+  "docker_findings": [
+   "backend and frontend images both run as unprivileged users (UID 1000) - no root",
+   "backend image: python:3.12-slim; uv copied from ghcr.io/astral-sh/uv:latest (unpinned)",
+   "frontend: caddy:2-alpine multi-stage build",
+   "docker-compose pulls ghcr.io/johnzastrow/garminview-*:latest by default",
+   "bind-mounts host HealthData (read-only) and ~/.GarminDb (Garmin credentials, read-only) into the backend",
+   "entrypoint runs 'alembic upgrade head' on every start and serves uvicorn on 0.0.0.0:8000"
+  ],
+  "deploy_config_files": [
+   "docker-compose.yml",
+   "docker-compose.override.yml",
+   "backend/Dockerfile",
+   "frontend/Dockerfile",
+   "frontend/Caddyfile",
+   "backend/entrypoint.sh",
+   ".github/workflows/ci.yml",
+   ".github/workflows/release.yml"
+  ],
+  "environment_variables_referenced": [
+   "GARMINVIEW_DB_BACKEND",
+   "GARMINVIEW_DB_URL",
+   "GARMINVIEW_DB_PATH",
+   "GARMINVIEW_HEALTH_DATA_DIR",
+   "GARMINVIEW_LOG_LEVEL",
+   "GARMINVIEW_LOG_DIR",
+   "GARMINVIEW_SECRET_KEY",
+   "GARMINVIEW_CORS_ORIGINS",
+   "IMAGE_TAG",
+   "HEALTH_DATA_DIR",
+   "GARMINDB_CONFIG_DIR",
+   "GARMINVIEW_PORT",
+   "VITE_API_URL",
+   "GARMINDB_LOG_LEVEL"
+  ],
+  "readme_present": true,
+  "readme_describes_deployment": true
+ },
+ "capability_summary": {
+  "what_this_app_can_do": [
+   "Shows personal Garmin (and Polar/MyFitnessPal/Actalog) health and training data - sleep, HR, weight, activities, training load, nutrition - in a web dashboard, to anyone who can reach the server; no login is required.",
+   "Lets anyone who can reach it export health metrics as CSV or JSON for any date range.",
+   "Lets anyone who can reach it read all app configuration (including the stored Actalog password), change configuration and schedules, upload MyFitnessPal exports, trigger Garmin downloads and Actalog syncs, and import files from a server directory path.",
+   "Runs scheduled background syncs against Garmin Connect via GarminDB and against an Actalog server, and parses workout notes with a configurable LLM endpoint."
+  ],
+  "data_sources_touched": [
+   {
+    "source": "MariaDB or SQLite application database (health, nutrition, workouts, app_config)",
+    "access": "read_write",
+    "leaves_organization": false
+   },
+   {
+    "source": "GarminDB SQLite files and Garmin Connect (via garmindb_cli)",
+    "access": "read (download)",
+    "leaves_organization": false
+   },
+   {
+    "source": "Actalog server (user-configured URL)",
+    "access": "read_write",
+    "leaves_organization": true
+   },
+   {
+    "source": "Ollama / OpenAI-compatible LLM endpoint (workout note text)",
+    "access": "write (sends text)",
+    "leaves_organization": true
+   },
+   {
+    "source": "MyFitnessPal and Polar export files",
+    "access": "read",
+    "leaves_organization": false
+   }
+  ],
+  "who_can_reach_it": "Whoever can reach the published frontend port (default 8080 on the host, listening on all interfaces) - the API behind it has no authentication on any route. In local development it is reachable from the same machine only if bound to localhost.",
+  "unauthorized_action_red_flags": [
+   "backend/.env is tracked in git and contains a database connection string with credentials (value redacted)",
+   "GET /admin/config returns all app_config values, including the stored Actalog password in plaintext, without any authentication",
+   "/export/csv and /export/json return bulk personal health data without authentication",
+   "POST /admin/actalog/test-connection makes outbound requests to a caller-supplied URL (SSRF-style) without authentication",
+   "Workout note text is sent to a configurable LLM endpoint; if that is a third-party service, user data leaves the network",
+   "A personal MyFitnessPal export zip and sync logs are committed to the repository"
+  ]
+ },
+ "summary": {
+  "finding_counts_by_severity": {
+   "critical": 4,
+   "high": 53,
+   "low": 16
+  },
+  "top_findings": [
+   "No authentication on any API route, including admin, config, export and sync endpoints",
+   "backend/.env with a credential-bearing database URL is tracked in git (critical)",
+   "GET /admin/config exposes the stored Actalog password; /export/* returns bulk personal health data (critical)"
+  ]
+ }
+}

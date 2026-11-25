@@ -1,0 +1,556 @@
+{
+  "scan_metadata": {
+    "languages_detected": [
+      "go",
+      "typescript",
+      "sql"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. Backend is Go and the web client is React/TypeScript (PWA). Full interface/data-access detection for Go is out of scope for skill version 1.0, so routes, auth wiring, SQL and outbound hosts were verified by reading internal/httpapi, internal/repository/sqlite, internal/spotify and cmd/waxgrove manually. Extra dependency ecosystem (go) is reported as an additional key under dependencies. Excluded: committed build output internal/webui/dist (minified PWA bundle and workbox), slides/ package-lock, svg/png assets. Routes: authenticated routes carry no severity because the auth check (authed middleware validating the session cookie) is visibly applied to each; the five public routes are rated low. README states the project status is early (foundation scaffolded) although git history shows M1-M3 features implemented.",
+    "scan_date": "2026-11-25T19:34:54Z",
+    "schema_version": "1.0",
+    "project_root": "https://github.com/johnzastrow/waxgrove"
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [],
+    "commit_count_sampled": 20
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": []
+    },
+    "node": {
+      "manifest_files": [
+        "app/package.json",
+        "app/package-lock.json",
+        "slides/package.json",
+        "slides/package-lock.json"
+      ],
+      "package_manager": "npm",
+      "dependency_count": 15,
+      "findings": [
+        "app/package.json pins exact versions for all 5 dependencies and 6 devDependencies",
+        "slides/package.json uses caret ranges (@slidev/cli ^52.0.0, @slidev/theme-default ^0.25.0) for 2 devDependencies; lockfile present"
+      ]
+    },
+    "go": {
+      "manifest_files": [
+        "go.mod",
+        "go.sum"
+      ],
+      "package_manager": "go modules",
+      "dependency_count": 14,
+      "findings": [
+        "1 direct dependency (modernc.org/sqlite v1.56.0) and 13 indirect, all pinned; go.sum present"
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "internal/config/config.go",
+        "mechanism": "os.Getenv: WAXGROVE_SECRET_KEY (32-byte base64 key), WAXGROVE_ADDR, WAXGROVE_DB, WAXGROVE_BASE_URL, WAXGROVE_ENV, WAXGROVE_INVITE_ONLY, WAXGROVE_SPOTIFY, WAXGROVE_METADATA_SOURCE, WAXGROVE_CONTACT; server refuses to start without the key"
+      },
+      {
+        "file": "internal/crypto/secrets.go",
+        "mechanism": "AES-256-GCM encryption of provider OAuth tokens and per-user Spotify client secrets at rest, key from environment never the database"
+      },
+      {
+        "file": "internal/auth/auth.go",
+        "mechanism": "Argon2id password hashing"
+      },
+      {
+        "file": "internal/httpapi/api.go",
+        "mechanism": "session cookie HttpOnly, SameSite=Lax, Secure flag configurable"
+      },
+      {
+        "file": "compose.yaml",
+        "mechanism": "WAXGROVE_SECRET_KEY and WAXGROVE_BASE_URL are required substitutions from .env (compose fails if unset)"
+      },
+      {
+        "file": ".gitignore",
+        "mechanism": "excludes .env, .env.*, *.pem, *.p8, *.key, *.db and /data/"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "web_api",
+        "framework": "go net/http (ServeMux)",
+        "file": "cmd/waxgrove/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "go (subcommands such as genkey, healthcheck)",
+        "file": "cmd/waxgrove/main.go"
+      },
+      {
+        "type": "web_client",
+        "framework": "react + vite PWA embedded in the Go binary",
+        "file": "app/src/main.tsx"
+      },
+      {
+        "type": "background_jobs",
+        "framework": "go in-process job runner",
+        "file": "internal/jobs/jobs.go"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/health",
+        "file": "internal/httpapi/server.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/api/instance",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/api/version",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/register",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/login",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/logout",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/me",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/invites",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/me/password",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/records",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/records/remote",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/playlists",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/playlists",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/playlists/{id}",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/playlists/{id}",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/playlists/{id}",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/playlists/{id}/tracks",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "PUT",
+        "path": "/api/playlists/{id}/tracks",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/playlists/{id}/tracks/{pos}",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/playlists/{id}/history",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/playlists/{id}/export.jspf",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/playlists/import",
+        "file": "internal/httpapi/api.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/crate",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/crate",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/crate/paste",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/crate/{id}/resolve",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/crate/{id}",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/crate",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/crate/commit",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/playlists/{id}/annotations",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "PUT",
+        "path": "/api/playlists/{id}/rating",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/playlists/{id}/rating",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/playlists/{id}/tags",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/tags/{id}",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/playlists/{id}/comments",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/comments/{id}",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/shared",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/playlists/{id}/fork",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/me/export",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/me",
+        "file": "internal/httpapi/crate.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/connect/spotify",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "PUT",
+        "path": "/api/connect/spotify/app",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/connect/spotify/begin",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/connect/spotify/callback",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/connect/spotify",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/import/spotify",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/playlists/{id}/export/spotify",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/playlists/{id}/syncs",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/jobs",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/jobs/{id}",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      },
+      {
+        "method": "POST",
+        "path": "/api/jobs/{id}/cancel",
+        "file": "internal/httpapi/connect.go",
+        "auth_detected": true
+      }
+    ],
+    "network_binding": "127.0.0.1:8080 by default (internal/config/config.go); Dockerfile and compose.yaml set WAXGROVE_ADDR=0.0.0.0:8080 inside the container, with compose publishing 127.0.0.1:${WAXGROVE_HOST_PORT:-8080}:8080 (host loopback only, intended to sit behind a TLS reverse proxy)",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite",
+        "credential_source": "none (local file path from WAXGROVE_DB)",
+        "file": "internal/repository/sqlite/sqlite.go",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "no fmt.Sprintf/string concatenation found in the sqlite repository package; statements use database/sql placeholders"
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "api.spotify.com",
+        "file": "internal/spotify/client.go",
+        "access_type": "read_write"
+      },
+      {
+        "host": "accounts.spotify.com",
+        "file": "internal/spotify/auth.go",
+        "access_type": "write"
+      },
+      {
+        "host": "musicbrainz.org",
+        "file": "internal/musicbrainz/client.go",
+        "access_type": "read"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "internal/repository/sqlite/sqlite.go",
+        "detail": "SQLite database file and WAL files (default waxgrove.db, /data/waxgrove.db in Docker)",
+        "access_type": "read_write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "email, password (Argon2id hash), display name",
+        "file": "internal/repository/sqlite/users.go"
+      },
+      {
+        "field_or_variable": "Spotify client secret and OAuth tokens (encrypted)",
+        "file": "internal/repository/sqlite/credentials.go"
+      },
+      {
+        "field_or_variable": "email (privacy export / erasure)",
+        "file": "internal/httpapi/privacy.go"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": true,
+    "docker_findings": [
+      "multi-stage Dockerfile on a distroless image; USER nonroot:nonroot (uid 65532); EXPOSE 8080; HEALTHCHECK defined; amd64 only",
+      "compose.yaml: single service, volume for SQLite data, host port published on 127.0.0.1 only",
+      "Dockerfile sets WAXGROVE_ADDR=0.0.0.0:8080 inside the container (expected for containers)"
+    ],
+    "deploy_config_files": [
+      "Dockerfile",
+      "compose.yaml",
+      "Makefile",
+      ".github/workflows/ci.yml",
+      ".github/workflows/pages.yml"
+    ],
+    "environment_variables_referenced": [
+      "WAXGROVE_ADDR",
+      "WAXGROVE_DB",
+      "WAXGROVE_SECRET_KEY",
+      "WAXGROVE_BASE_URL",
+      "WAXGROVE_ENV",
+      "WAXGROVE_INVITE_ONLY",
+      "WAXGROVE_SPOTIFY",
+      "WAXGROVE_METADATA_SOURCE",
+      "WAXGROVE_CONTACT",
+      "WAXGROVE_DEV_SPOTIFY_API_URL",
+      "WAXGROVE_DEV_SPOTIFY_ACCOUNTS_URL",
+      "GOMEMLIMIT",
+      "WAXGROVE_HOST_PORT",
+      "VERSION"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Lets invited friends register and log in to a self-hosted web app, build playlists of songs identified by ISRC / MusicBrainz IDs, and share them with each other.",
+      "Searches song metadata from MusicBrainz (sends search text to musicbrainz.org) and stores songs platform-neutrally.",
+      "Connects a user's own Spotify developer app (user supplies client ID and secret, stored encrypted), imports Spotify playlists, and exports Waxgrove playlists to Spotify as background jobs.",
+      "Lets users rate, tag and comment on shared playlists, fork them, and export or erase their own data (JSPF export, privacy export, account deletion).",
+      "Serves its own React PWA from the Go binary."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "SQLite database (users, sessions, playlists, records, annotations, jobs, encrypted provider credentials)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Spotify Web API (api.spotify.com, accounts.spotify.com)",
+        "access": "read_write (reads playlists, creates/updates playlists; OAuth token exchange)",
+        "leaves_organization": true
+      },
+      {
+        "source": "MusicBrainz API (musicbrainz.org)",
+        "access": "read (search queries sent)",
+        "leaves_organization": true
+      }
+    ],
+    "who_can_reach_it": "Default bind is loopback; the compose deployment publishes only to host 127.0.0.1 and expects a TLS reverse proxy in front. All data routes require a session cookie; only health, instance, version, register (invite-only by default) and login are public. Reachability beyond localhost depends on the deployer's proxy, which is not in the repo.",
+    "unauthorized_action_red_flags": [
+      "Data leaves to third parties by design: users' Spotify playlist data and Spotify tokens flow to/from api.spotify.com, and search text goes to musicbrainz.org",
+      "POST /api/register is public (invite code required unless WAXGROVE_INVITE_ONLY is turned off; production refuses open registration per config.go check)"
+    ]
+  },
+  "summary": {
+    "top_findings": [
+      "No hardcoded secrets or committed secret files; secrets come from environment and are encrypted at rest (AES-256-GCM)",
+      "All data routes use authed middleware; only 5 public routes (health, instance, version, register, login)",
+      "SQL uses placeholders; no string-built queries found",
+      "Runs non-root in a distroless container with healthcheck; default bind loopback",
+      "Outbound data flows to Spotify and MusicBrainz by design"
+    ],
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 5
+    }
+  }
+}

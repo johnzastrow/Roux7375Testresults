@@ -1,0 +1,242 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:46:00Z",
+    "project_root": "https://github.com/johnzastrow/mapsplat4",
+    "languages_detected": [
+      "python",
+      "node",
+      "shell",
+      "powershell"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false) and not the author's working copy. MapSplat is a QGIS plugin (Python, runs inside QGIS) that exports a static web map bundle. It has no web framework; the only listening HTTP server is the serve.py helper that exporter.py writes into the export output (string template in exporter.py around lines 3040-3300). Shell (scripts/*.sh, Makefile), PowerShell (deploy.ps1) and one Node script (scripts/gen_basemap_styles.mjs) are present; full interface/data-access detection for those languages is out of scope for skill version 1.0 and they were only read for deps/hosts/secrets. Excluded: test fixtures (test/*.py sample paths such as C:/Users/me/...), the embedded PDF-writer JavaScript in exporter.py (false positive for Windows-path grep), generated/binary docs, and basemap_styles/*.json vendored Protomaps styles. Authenticated routes: none exist; the single route entry is the generated static file handler."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": []
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "setup.cfg",
+        "metadata.txt",
+        "Makefile"
+      ],
+      "package_manager": "none (plugin runs inside QGIS; dev tools run via 'uv run --no-project --with ...')",
+      "dependency_count": 0,
+      "findings": [
+        "No requirements.txt, pyproject.toml or lockfile: runtime dependencies (QGIS/PyQt, GDAL/ogr2ogr, pmtiles CLI) are provided by the host environment and are not declared in a manifest.",
+        "Dev tools (ruff, flake8, bandit, detect-secrets, pytest) are fetched unpinned by 'uv run --with' in Makefile and .github/workflows/ci.yml.",
+        "setup.cfg only holds flake8 settings."
+      ]
+    },
+    "node": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": [
+        "scripts/gen_basemap_styles.mjs requires @protomaps/basemaps but there is no package.json or lockfile (dev-time script only)."
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": ".secrets.baseline",
+        "mechanism": "detect-secrets baseline enforced in CI (.github/workflows/ci.yml) and pre-commit (.pre-commit-config.yaml)"
+      },
+      {
+        "file": ".gitignore",
+        "mechanism": ".env, .env.*, *.key, *.pem, *.p12, *.pfx, credentials.json, secrets.* are ignored"
+      },
+      {
+        "file": "SECURITY.md",
+        "mechanism": "states the plugin does not handle authentication or store credentials"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "qgis_plugin",
+        "framework": "QGIS classFactory / PyQt dock widget",
+        "file": "__init__.py"
+      },
+      {
+        "type": "cli",
+        "framework": "generated serve.py (argparse, http.server)",
+        "file": "exporter.py"
+      },
+      {
+        "type": "cli",
+        "framework": "shell build/test scripts",
+        "file": "scripts/build_plugin.sh"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/* (static files of the exported map directory; also OPTIONS and HTTP Range requests)",
+        "file": "exporter.py",
+        "line": 3077,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Template for serve.py written next to exported maps: SimpleHTTPRequestHandler subclass with Range support and 'Access-Control-Allow-Origin: *'. Binds 127.0.0.1 by default (--host default at exporter.py:3064); user may pass --host 0.0.0.0. Serves only the exported static map files; no application data or auth by design."
+      }
+    ],
+    "network_binding": "127.0.0.1 by default for generated serve.py (0.0.0.0 only via --host)",
+    "cors_wide_open": true
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite (MBTiles read)",
+        "credential_source": "not applicable (local file)",
+        "file": "exporter.py",
+        "access_type": "read",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "sqlite3 used only to read metadata from a user-chosen MBTiles file; no string-built SQL found."
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "unpkg.com (MapLibre GL JS and PMTiles JS bundles, downloaded for offline mode and referenced by exported viewer)",
+        "file": "exporter.py",
+        "access_type": "read"
+      },
+      {
+        "host": "build.protomaps.com / maps.protomaps.com / protomaps.github.io (basemap PMTiles and styles)",
+        "file": "basemap_helpers.py",
+        "access_type": "read"
+      },
+      {
+        "host": "tile.openstreetmap.org, basemaps.cartocdn.com, server.arcgisonline.com, a.tile.opentopomap.org (XYZ basemap tiles)",
+        "file": "mapsplat_dockwidget.py",
+        "access_type": "read"
+      },
+      {
+        "host": "user-supplied basemap/style URLs (HEAD/ranged GET probe, https/http only)",
+        "file": "mapsplat_dockwidget.py",
+        "access_type": "read"
+      },
+      {
+        "host": "raw.githubusercontent.com (Protomaps license text)",
+        "file": "scripts/gen_basemap_styles.mjs",
+        "access_type": "read"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "exporter.py",
+        "detail": "writes export bundle (index.html, style.json, PMTiles, lib/, serve.py, README.txt) to a user-chosen output folder; removes temporary GPKG files and temp dirs",
+        "access_type": "read_write"
+      },
+      {
+        "file": "config_manager.py",
+        "detail": "reads/writes plugin JSON config file",
+        "access_type": "read_write"
+      },
+      {
+        "file": "mapsplat_dockwidget.py",
+        "detail": "appends to a plugin log file",
+        "access_type": "write"
+      },
+      {
+        "file": "exporter.py",
+        "detail": "runs ogr2ogr / ogrinfo / pmtiles CLIs through subprocess.run with list arguments (no shell=True) on exported layer data",
+        "access_type": "read_write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "address (geocoding/layer attribute handling)",
+        "file": "exporter.py"
+      },
+      {
+        "field_or_variable": "latitude / gps (map coordinates)",
+        "file": "mapsplat_dockwidget.py"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml",
+      ".github/workflows/pages.yml",
+      ".github/dependabot.yml",
+      "Makefile",
+      "deploy.ps1",
+      "deploy.bat",
+      "scripts/build_plugin.sh"
+    ],
+    "environment_variables_referenced": [
+      "MAPSPLAT_QGIS_TEST",
+      "QT_QPA_PLATFORM"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Exports the layers, styling, labels and layer order of the open QGIS project into a self-contained static web map (PMTiles plus MapLibre GL JS).",
+      "Runs ogr2ogr/GDAL and the pmtiles command line tool on the user's own layer data to build tiles.",
+      "Optionally downloads MapLibre/PMTiles scripts and probes basemap URLs on the internet.",
+      "Writes a serve.py helper that starts a local static web server (127.0.0.1 by default) with CORS open to all origins to preview the exported map."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "QGIS project layers chosen by the user (files/databases already loaded in QGIS)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Output folder bundle on local disk or a static host the user copies it to",
+        "access": "write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Public basemap/tile hosts (Protomaps, OpenStreetMap, Carto, Esri, OpenTopoMap) and unpkg.com",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "MBTiles file (sqlite)",
+        "access": "read",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "A desktop QGIS plugin used by whoever runs QGIS. The optional generated serve.py binds to 127.0.0.1 by default and has no authentication; it is reachable from the network only if started with --host 0.0.0.0. Exported maps are static and intended to be published publicly if hosted.",
+    "unauthorized_action_red_flags": [
+      "Generated serve.py sends Access-Control-Allow-Origin: * and has no authentication (reachable beyond localhost if --host 0.0.0.0).",
+      "Exported viewer loads MapLibre and PMTiles from unpkg.com unless offline bundling is chosen.",
+      "Exported map bundles contain the user's layer data, which becomes public if the folder is hosted publicly."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 1
+    },
+    "top_findings": [
+      "No secrets or committed secret files; detect-secrets and bandit run in CI",
+      "Generated serve.py has open CORS and no auth (binds 127.0.0.1 by default)",
+      "No dependency manifest or lockfile; dev tools fetched unpinned"
+    ]
+  }
+}

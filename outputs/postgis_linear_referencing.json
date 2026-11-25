@@ -1,0 +1,121 @@
+{
+  "scan_metadata": {
+    "languages_detected": [
+      "sql"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. The repo is a single PostGIS SQL script (ObsToEvents.sql) plus a README, a sample shapefile (vertices.*) and images; SQL is outside the supported Python/Node scope of skill version 1.0, so the script was read in full and only deps, config, secrets patterns, hosts and DDL/DML operations were inventoried. There is no application code, no Python or Node files, and no database connection setup.",
+    "scan_date": "2026-11-25T19:37:18Z",
+    "schema_version": "1.0",
+    "project_root": "https://github.com/johnzastrow/postgis_linear_referencing"
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": false,
+    "gitignore_gaps": [
+      "no .gitignore file exists",
+      "static/Thumbs.db (Windows thumbnail cache) is committed"
+    ],
+    "commit_count_sampled": 16
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": []
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "sql_script",
+        "framework": "PostgreSQL/PostGIS (run manually in psql or a SQL client)",
+        "file": "ObsToEvents.sql"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none - no listener",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "postgresql (PostGIS)",
+        "credential_source": "none in repo (script contains no connection string; the operator's own client session supplies credentials)",
+        "file": "ObsToEvents.sql",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "static DDL/DML script with no dynamic SQL or user input; schema name 'greatpond' is hardcoded in every statement"
+        }
+      }
+    ],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "vertices.shp",
+        "detail": "sample point shapefile (with .dbf, .shx, .prj, .cpg, .qmd) committed as data",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": false
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Creates an observations table (greatpond.obs: name, desc, severity_int, size, point geometry in EPSG:6348) and a GIST index in a PostGIS database.",
+      "Matches each observation point to its nearest trail line within 200 m and computes its linear-referencing measure along the trail, then builds events, event_points and segments tables.",
+      "Drops and recreates the output tables greatpond.events, greatpond.event_points and greatpond.segments each time it is run (DROP TABLE IF EXISTS)."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "PostgreSQL/PostGIS schema 'greatpond': tables obs (input), trails (input), events, event_points, segments (outputs)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "sample shapefile vertices.shp in the repo",
+        "access": "read",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Not a running service: the script is executed manually by someone who already has database access. Access is governed entirely by the PostgreSQL role used, which is not specified in the repo.",
+    "unauthorized_action_red_flags": [
+      "Script drops and recreates tables in schema 'greatpond' without confirmation (destructive if the same names are used elsewhere)",
+      "No role or privilege handling is defined in the script"
+    ]
+  },
+  "summary": {
+    "top_findings": [
+      "No secrets, credentials, hosts or code beyond one SQL script",
+      "Script uses DROP TABLE IF EXISTS on output tables in a hardcoded schema",
+      "No .gitignore; Windows Thumbs.db committed",
+      "No dependency manifest or deployment documentation (none applicable)"
+    ],
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    }
+  }
+}

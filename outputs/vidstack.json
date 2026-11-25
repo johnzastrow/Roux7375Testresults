@@ -1,0 +1,177 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:32:55Z",
+    "project_root": "https://github.com/johnzastrow/vidstack",
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. Local CLI tool (no web server). uv.lock was counted as a manifest but not read in depth. CLAUDE.md in the repo was treated as data. .claude/settings.local.json is tracked in git and holds only a Claude Code command allowlist (no credentials). Git history shows 8 commits (git log -20 returned 8)."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 8,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      ".env and *.env are not excluded (no .env pattern found)",
+      "*.pem, *.key and credential files are not excluded",
+      ".claude/settings.local.json is tracked (not ignored)",
+      "config.yaml (copied from config.template.yaml, may contain local paths) is not ignored; test_config.yaml, raw_config.yaml, test_creative_config.yaml and test_temp*/concat_list.txt are committed"
+    ]
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "requirements.txt",
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "package_manager": "uv / pip",
+      "dependency_count": 5,
+      "findings": [
+        "requirements.txt and pyproject.toml use lower-bound ranges (>=) only, not exact pins; uv.lock provides resolved versions",
+        "pyexiv2 is in pyproject.toml but missing from requirements.txt (manifests disagree)",
+        "requirements.txt includes 'pathlib>=1.0.1; python_version < 3.4', an obsolete conditional dependency",
+        "External system dependency: FFmpeg/ffprobe must be on PATH"
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "cli",
+        "framework": "argparse",
+        "file": "vidstack.py"
+      },
+      {
+        "type": "cli",
+        "framework": "script",
+        "file": "main.py"
+      },
+      {
+        "type": "script",
+        "framework": "python",
+        "file": "starter.py"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none (no network listener)",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite (GeoNames GeoPackage geonames.gpkg)",
+        "credential_source": "none",
+        "file": "gps_location.py",
+        "access_type": "read",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": null,
+          "reason": "query uses ? placeholders with bound numeric parameters; no string-built SQL"
+        }
+      }
+    ],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "video_discovery.py",
+        "detail": "recursively reads .mov files under the configured input_directory",
+        "access_type": "read"
+      },
+      {
+        "file": "video_processor.py",
+        "detail": "writes processed clips, concat_list.txt and the merged output video; removes temp_dir with shutil.rmtree",
+        "access_type": "read_write"
+      },
+      {
+        "file": "vidstack.py",
+        "detail": "writes a generated config YAML file",
+        "access_type": "write"
+      },
+      {
+        "file": "metadata_extractor.py",
+        "detail": "runs ffprobe via subprocess (list arguments, no shell) on user-selected video files",
+        "access_type": "read"
+      },
+      {
+        "file": "metadata_extractor.py",
+        "detail": "eval() applied to the r_frame_rate string returned by ffprobe at line 421 (dynamic code execution from a string; value is produced by ffprobe from file metadata)",
+        "access_type": "read",
+        "severity": "low"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "latitude/longitude and gps coordinates (video GPS location)",
+        "file": "gps_location.py"
+      },
+      {
+        "field_or_variable": "gps metadata, IPTC/XMP people and keywords tags",
+        "file": "metadata_extractor.py"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      "config.template.yaml"
+    ],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": false
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Recursively finds .mov videos in a chosen directory, sorts them by creation date, generates title slides (date, path, GPS place name, keywords, people tags) and merges everything into one compilation video using FFmpeg.",
+      "Looks up place names for GPS coordinates in a local GeoNames GeoPackage (offline, read-only)."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Local video files (.mov) under input_directory",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Compiled output video, temp files and generated config YAML",
+        "access": "write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Local geonames.gpkg (SQLite)",
+        "access": "read",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Local command-line tool run by the user; no network listener and no authentication needed. Reach is limited to whoever runs it on their machine.",
+    "unauthorized_action_red_flags": [
+      "Uses eval() on ffprobe output (metadata_extractor.py:421); ffprobe emits a normalized fraction so exploitation is unlikely but dynamic evaluation of externally derived text is present",
+      "Title slides can embed GPS coordinates and full file paths from personal videos into the produced video"
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 1
+    },
+    "top_findings": [
+      "eval() on ffprobe r_frame_rate in metadata_extractor.py:421 (low)",
+      "SQLite query in gps_location.py is parameterized (no injection path)",
+      "Dependencies use >= ranges only; requirements.txt and pyproject.toml disagree on pyexiv2"
+    ]
+  }
+}

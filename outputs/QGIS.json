@@ -1,0 +1,215 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:35:29Z",
+    "project_root": "https://github.com/johnzastrow/QGIS",
+    "languages_detected": [
+      "batch",
+      "powershell",
+      "python",
+      "ini/config"
+    ],
+    "notes": "Fresh shallow clone of default branch (depth 20); has_uncommitted_changes reflects the clone (false), not the author's working copy. Repository is a partial OSGeo4W-style portable QGIS install tree for Windows (201 tracked files: ~54 .bat, 4 .ps1, 4 .py, ini/json/txt config, a 44 MB data.gpkg, QGIS profile ini files, PROJ data files). Languages are mostly Batch and PowerShell, which are out of scope for skill version 1.0: full interface, data-access and secret-flow detection for those languages was not performed; only file inventory, grep-based secret patterns, config files and the Python helper (tools/validate_runtime.py) were reviewed. A non-standard 'cpp' key was added under dependencies for qgis/vcpkg/vcpkg.json. The QGIS binaries themselves are not in the repo. Installed QGIS data (data.gpkg) was not opened beyond confirming it is a SQLite 3 file. Tracked files containing absolute paths with the author's Windows user name: bin/qgis-bin.env, .claude/settings.local.json, .vscode/settings.json, portable/TODO.md (pasted assistant chat transcript)."
+  },
+  "version_control": {
+    "remote_configured": true,
+    "has_gitignore": false,
+    "gitignore_gaps": [
+      "No .gitignore at all: .env, *.pem, *.key, credentials files, logs (var/log/setup.log.full) and local assistant settings (.claude/settings.local.json) are not excluded"
+    ],
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": [
+        "tools/validate_runtime.py uses only the standard library; no Python manifest exists",
+        "Bundled Python 3.12 and ~30 python3-* packages are installed via OSGeo4W (see etc/preremove and etc/postinstall .bat files) but are not pinned in a manifest in this repo"
+      ]
+    },
+    "node": {},
+    "cpp": {
+      "manifest_files": [
+        "qgis/vcpkg/vcpkg.json"
+      ],
+      "package_manager": "vcpkg",
+      "dependency_count": 5,
+      "findings": [
+        "vcpkg.json uses minimum-version constraints (gdal>=3.2.0, proj>=8.0.0, qt>=6.0.0, python>=3.12.0, boost>=1.75.0) with a gdal override of 3.4.0; qt>=6.0.0 does not match the PyQt5/qt5 packages present in etc/preremove"
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "tools/validate_runtime.py",
+        "mechanism": "os.environ.get('QGIS_ROOT') for a path setting (not a secret)"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "cli",
+        "framework": "batch wrapper",
+        "file": "RunQGIS.bat"
+      },
+      {
+        "type": "cli",
+        "framework": "batch wrapper",
+        "file": "OSGeo4W.bat"
+      },
+      {
+        "type": "cli",
+        "framework": "powershell",
+        "file": "portable/interactive_reinit.ps1"
+      },
+      {
+        "type": "cli",
+        "framework": "powershell",
+        "file": "portable/silent_reinit.ps1"
+      },
+      {
+        "type": "cli",
+        "framework": "powershell",
+        "file": "portable/check_env.ps1"
+      },
+      {
+        "type": "cli",
+        "framework": "python script",
+        "file": "tools/validate_runtime.py"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite (GeoPackage)",
+        "credential_source": "none",
+        "file": "data.gpkg",
+        "access_type": "unclear",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "Tracked 44 MB GeoPackage data file; no code in the repo queries it"
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "plugins.qgis.org",
+        "file": "Profiles/profiles/default/QGIS/QGIS3.ini",
+        "access_type": "read"
+      },
+      {
+        "host": "feed.qgis.org",
+        "file": "Profiles/profiles/default/QGIS/QGIS3.ini",
+        "access_type": "read"
+      },
+      {
+        "host": "tile.openstreetmap.org",
+        "file": "Profiles/profiles/default/QGIS/QGIS3.ini",
+        "access_type": "read"
+      },
+      {
+        "host": "s3.amazonaws.com (Mapzen terrain tiles)",
+        "file": "Profiles/profiles/default/QGIS/QGIS3.ini",
+        "access_type": "read"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "portable/interactive_reinit.ps1",
+        "detail": "rewrites generated environment files (bin/qgis-bin.env), makes .bak copies and writes logs under the install tree via Set-Content/Copy-Item/Out-File",
+        "access_type": "read_write"
+      },
+      {
+        "file": "portable/silent_reinit.ps1",
+        "detail": "same reinitialization workflow without prompts; calls bin/textreplace.exe to regenerate scripts with absolute paths",
+        "access_type": "read_write"
+      },
+      {
+        "file": "tools/validate_runtime.py",
+        "detail": "checks presence of required files under the QGIS root",
+        "access_type": "read"
+      },
+      {
+        "file": "bin/qgis-bin.env",
+        "detail": "hardcoded absolute paths under C:\\Users\\<author>\\DOWNLO~1\\QGIS_O~1 (machine-specific generated file, tracked)",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "password (QGIS profile setting 'password=' empty values for xyz connections; 'using-generated-random-password=true')",
+        "file": "Profiles/profiles/default/QGIS/QGIS3.ini"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [
+      "portable/interactive_reinit.ps1",
+      "portable/silent_reinit.ps1",
+      "RunQGIS.bat",
+      ".github/copilot-instructions.md"
+    ],
+    "environment_variables_referenced": [
+      "QGIS_ROOT"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Provides a copied/portable Windows QGIS installation tree plus scripts that regenerate embedded absolute paths after the tree is moved (reinitialize via PowerShell and bin/textreplace.exe).",
+      "Ships QGIS user profiles (default, Viewer, Viewer2) with plugin repository and basemap tile connection settings.",
+      "Includes a Python validator that checks the tree for required runtime files."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "data.gpkg (tracked GeoPackage, 44 MB)",
+        "access": "unclear",
+        "leaves_organization": false
+      },
+      {
+        "source": "QGIS plugin repository (plugins.qgis.org), QGIS news feed (feed.qgis.org), OpenStreetMap tiles, Mapzen terrain tiles on s3.amazonaws.com (configured in QGIS profile ini)",
+        "access": "read",
+        "leaves_organization": true
+      }
+    ],
+    "who_can_reach_it": "Desktop software run locally by whoever copies the tree; no network listener or authentication layer exists in the repo's own code.",
+    "unauthorized_action_red_flags": [
+      "No secrets found, but tracked files embed the author's Windows user name and local directory layout (bin/qgis-bin.env, .claude/settings.local.json, .vscode/settings.json, portable/TODO.md).",
+      "Without a .gitignore, nothing prevents credentials, logs or assistant settings from being committed.",
+      "QGIS profile ini files configure outbound requests to public plugin, news and tile services."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    },
+    "top_findings": [
+      "No .gitignore in the repository",
+      "Machine-specific absolute paths with the author's Windows user name committed (bin/qgis-bin.env, .claude/settings.local.json, .vscode/settings.json)",
+      "Batch/PowerShell content is out of scope for skill v1.0; only inventory and pattern checks were run",
+      "No hardcoded secrets or secret-shaped files found"
+    ]
+  }
+}

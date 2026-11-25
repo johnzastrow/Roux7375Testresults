@@ -1,0 +1,638 @@
+{
+ "scan_metadata": {
+  "schema_version": "1.0",
+  "scan_date": "2026-11-25T19:31:40Z",
+  "project_root": "https://github.com/johnzastrow/choreme",
+  "languages_detected": [
+   "go",
+   "typescript",
+   "vue",
+   "javascript",
+   "sql"
+  ],
+  "notes": "Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. Backend is Go (Gin); full interface/data-access detection for Go is out of scope for skill version 1.0, so routes, auth wiring, SQL and config were read manually from internal/api/server.go, internal/middleware, internal/config, internal/auth, internal/store and docker files; coverage is best-effort. A go dependency block is added under dependencies as an extra key (same shape as python/node). Routes with auth_detected true carry no severity (N/A per severity calibration) and are not counted. Excluded/not recorded: web/src-react-backup (legacy React copy, no secrets found), web/package-lock.json. Many /api/v1 handlers in internal/api/stubs.go are unimplemented stubs returning placeholder responses. Two ELF binaries (choreme 21 MB, migrate 11 MB) are tracked in git at the repo root. .github/workflows use secrets.CLAUDE_CODE_OAUTH_TOKEN (properly referenced, not hardcoded)."
+ },
+ "version_control": {
+  "is_git_repo": true,
+  "commit_count_sampled": 20,
+  "has_uncommitted_changes": false,
+  "remote_configured": true,
+  "has_gitignore": true,
+  "gitignore_gaps": [
+   "compiled binaries 'choreme' and 'migrate' at repo root are not ignored and are tracked (.gitignore only lists /bin/, *.exe)",
+   "*.pem, *.key and credentials.json are not excluded",
+   "node_modules is ignored only via web/.gitignore (root .gitignore does not list it)"
+  ]
+ },
+ "dependencies": {
+  "python": {},
+  "node": {
+   "manifest_files": [
+    "web/package.json",
+    "web/package-lock.json",
+    "package-lock.json"
+   ],
+   "package_manager": "npm",
+   "dependency_count": 18,
+   "findings": [
+    "web/package.json uses caret ranges (^) for all deps; lockfile present",
+    "root package-lock.json has no matching root package.json",
+    "web/package-react-backup.json and web/src-react-backup are a retained legacy React frontend"
+   ]
+  },
+  "go": {
+   "manifest_files": [
+    "go.mod",
+    "go.sum"
+   ],
+   "package_manager": "go modules",
+   "dependency_count": 9,
+   "findings": [
+    "direct deps: gin v1.10.0, golang-jwt v5.2.1, golang-migrate v4.17.1, shopspring/decimal, x/crypto v0.31.0, caarlos0/env v10, go-sql-driver/mysql, lib/pq, mattn/go-sqlite3; all pinned to exact versions in go.mod",
+    "Dockerfile final stage uses alpine:latest (unpinned tag)"
+   ]
+  }
+ },
+ "secrets_and_credentials": {
+  "committed_secret_files": [],
+  "hardcoded_secrets_in_source": [
+   {
+    "file": "internal/config/config.go",
+    "line": 34,
+    "variable_name": "JWT.Secret",
+    "redacted_snippet": "Secret string `env:\"SECRET\" envDefault:\"your***REDACTED***\"`",
+    "severity": "high"
+   },
+   {
+    "file": "docker-compose.yml",
+    "line": 12,
+    "variable_name": "JWT_SECRET",
+    "redacted_snippet": "JWT_SECRET=your***REDACTED*** (placeholder value)",
+    "severity": "low"
+   },
+   {
+    "file": "docker-compose.yml",
+    "line": 35,
+    "variable_name": "JWT_SECRET",
+    "redacted_snippet": "JWT_SECRET=your***REDACTED*** (placeholder value)",
+    "severity": "low"
+   },
+   {
+    "file": "docker-compose.yml",
+    "line": 71,
+    "variable_name": "JWT_SECRET",
+    "redacted_snippet": "JWT_SECRET=your***REDACTED*** (placeholder value)",
+    "severity": "low"
+   },
+   {
+    "file": "docker-compose.yml",
+    "line": 33,
+    "variable_name": "DB_PASS",
+    "redacted_snippet": "DB_PASS=pass***REDACTED*** (placeholder value)",
+    "severity": "low"
+   },
+   {
+    "file": "docker-compose.yml",
+    "line": 70,
+    "variable_name": "DB_PASS",
+    "redacted_snippet": "DB_PASS=pass***REDACTED*** (placeholder value)",
+    "severity": "low"
+   },
+   {
+    "file": "docker-compose.yml",
+    "line": 48,
+    "variable_name": "POSTGRES_PASSWORD",
+    "redacted_snippet": "POSTGRES_PASSWORD: pass***REDACTED***",
+    "severity": "low"
+   },
+   {
+    "file": "docker-compose.yml",
+    "line": 84,
+    "variable_name": "MYSQL_PASSWORD",
+    "redacted_snippet": "MYSQL_PASSWORD: pass***REDACTED***",
+    "severity": "low"
+   },
+   {
+    "file": "docker-compose.yml",
+    "line": 85,
+    "variable_name": "MYSQL_ROOT_PASSWORD",
+    "redacted_snippet": "MYSQL_ROOT_PASSWORD: root***REDACTED***",
+    "severity": "low"
+   }
+  ],
+  "proper_secret_handling_found": [
+   {
+    "file": "internal/config/config.go",
+    "mechanism": "caarlos0/env reads DB_PASS, JWT_SECRET, SMTP_PASS from environment variables (but JWT secret has a hardcoded default)"
+   },
+   {
+    "file": ".github/workflows/claude.yml",
+    "mechanism": "GitHub Actions secrets (CLAUDE_CODE_OAUTH_TOKEN)"
+   },
+   {
+    "file": "internal/auth/password.go",
+    "mechanism": "passwords hashed with bcrypt cost 12"
+   }
+  ],
+  "env_example_present": true
+ },
+ "interfaces": {
+  "entry_points": [
+   {
+    "type": "web_api",
+    "framework": "gin (Go)",
+    "file": "cmd/choreme/main.go"
+   },
+   {
+    "type": "cli",
+    "framework": "go (golang-migrate)",
+    "file": "cmd/migrate/main.go"
+   },
+   {
+    "type": "scheduled_job",
+    "framework": "internal scheduler (interest accrual, spending limit reset)",
+    "file": "internal/scheduler/scheduler.go"
+   },
+   {
+    "type": "web_ui",
+    "framework": "vue3 + vuetify (embedded build)",
+    "file": "web/src/main.ts"
+   }
+  ],
+  "routes": [
+   {
+    "method": "GET",
+    "path": "/health",
+    "file": "internal/api/server.go",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "returns health status only"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/auth/register",
+    "file": "internal/api/server.go",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "public self-registration creates a household and its first user; no data exposed"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/auth/login",
+    "file": "internal/api/server.go",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "public login; no rate limiting seen"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/households/join",
+    "file": "internal/api/server.go",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "public; requires an invite code in the request body"
+   },
+   {
+    "method": "GET",
+    "path": "/api",
+    "file": "internal/api/server.go",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "returns service name/version/endpoint list"
+   },
+   {
+    "method": "GET",
+    "path": "/* (embedded SPA catch-all)",
+    "file": "internal/api/server.go",
+    "auth_detected": false,
+    "severity": "low",
+    "note": "serves static embedded web UI (NoRoute handler)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/households/invite",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/users/me",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "PUT",
+    "path": "/api/v1/users/me",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/users",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/chores",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/chores",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/chores/:id",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "PUT",
+    "path": "/api/v1/chores/:id",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "DELETE",
+    "path": "/api/v1/chores/:id",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/assignments",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/assignments/:id",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "PATCH",
+    "path": "/api/v1/assignments/:id/progress",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "PATCH",
+    "path": "/api/v1/assignments/:id/complete",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "PATCH",
+    "path": "/api/v1/assignments/:id/approve",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "PATCH",
+    "path": "/api/v1/assignments/:id/reject",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/rewards",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/rewards",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/rewards/:id",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "PUT",
+    "path": "/api/v1/rewards/:id",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "DELETE",
+    "path": "/api/v1/rewards/:id",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/rewards/:id/redeem",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/redemptions",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "PATCH",
+    "path": "/api/v1/redemptions/:id/approve",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "PATCH",
+    "path": "/api/v1/redemptions/:id/reject",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/ledger",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/ledger/adjust",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/ledger/balance",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/accounts/deposit",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/accounts/withdraw",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/accounts/transfer",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/accounts/transfers",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/accounts/transfers/pending",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/accounts/transfers/:id/approve",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/accounts/spending-limit/check",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/accounts/spending-limits",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/accounts/spending-limits/:userID",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/accounts/spending-limits/:userID/reset",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/accounts/interest-rate",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/accounts/jobs/accrue-interest",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "POST",
+    "path": "/api/v1/accounts/jobs/reset-spending-limits",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/audit",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/reports/chores",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   },
+   {
+    "method": "GET",
+    "path": "/api/v1/reports/earnings",
+    "file": "internal/api/server.go",
+    "auth_detected": true,
+    "note": "JWT AuthMiddleware applied via protected route group (internal/api/server.go, internal/middleware/auth.go)"
+   }
+  ],
+  "network_binding": "default HOST=localhost (config.go); Dockerfile sets HOST=0.0.0.0 and exposes 8080; docker-compose publishes 8080/8081/8082; GIN_MODE defaults to debug outside Docker (Docker sets release)",
+  "cors_wide_open": true
+ },
+ "data_access": {
+  "databases": [
+   {
+    "type": "sqlite / postgresql / mysql (selected by DB_TYPE)",
+    "credential_source": "env_var (DB_PASS) with placeholder values in docker-compose.yml; sqlite needs none",
+    "file": "internal/config/config.go",
+    "access_type": "read_write",
+    "sql_injection_risk": {
+     "present": false,
+     "severity": "low",
+     "reason": "store layer in internal/store/*/ uses database/sql with bound parameters; no string-built SQL found in a manual review (full Go SQL analysis is out of scope for v1.0)"
+    }
+   }
+  ],
+  "external_apis": [
+   {
+    "host": "SMTP server from SMTP_HOST (example smtp.gmail.com in .env.example)",
+    "file": "internal/config/config.go",
+    "access_type": "write"
+   }
+  ],
+  "file_system_access": [
+   {
+    "file": "internal/config/config.go",
+    "detail": "SQLite database file at DB_NAME (/data/choreme.db in Docker volume choreme_data)",
+    "access_type": "read_write"
+   }
+  ],
+  "sensitive_data_indicators": [
+   {
+    "field_or_variable": "email, password (bcrypt hash), role, household membership",
+    "file": "internal/model/models.go"
+   },
+   {
+    "field_or_variable": "financial balances, transfers, spending limits (child savings accounts)",
+    "file": "internal/model/models.go"
+   }
+  ],
+  "office_and_collaboration_sources": []
+ },
+ "configuration_and_deployment": {
+  "containerized": true,
+  "docker_findings": [
+   "Dockerfile final stage runs as root (no USER instruction; WORKDIR /root)",
+   "final image alpine:latest unpinned; builder golang:1.22-alpine",
+   "CMD runs './migrate up && ./main' at container start",
+   "EXPOSE 8080 with HEALTHCHECK against /health",
+   "docker-compose.yml contains placeholder JWT/DB/MySQL passwords and publishes 8080, 8081, 8082; also defines postgres:17-alpine, mysql:9.1 and caddy:2.8.4-alpine services"
+  ],
+  "deploy_config_files": [
+   "Dockerfile",
+   "docker-compose.yml",
+   "Caddyfile",
+   "Makefile",
+   "scripts/build-with-ui.sh",
+   ".github/workflows/claude.yml",
+   ".github/workflows/claude-code-review.yml"
+  ],
+  "environment_variables_referenced": [
+   "PORT",
+   "HOST",
+   "GIN_MODE",
+   "DB_TYPE",
+   "DB_HOST",
+   "DB_PORT",
+   "DB_NAME",
+   "DB_USER",
+   "DB_PASS",
+   "DB_SSL_MODE",
+   "JWT_SECRET",
+   "MAX_IMAGE_SIZE_MB",
+   "MAX_IMAGE_DIMENSION_PX",
+   "SMTP_HOST",
+   "SMTP_PORT",
+   "SMTP_USER",
+   "SMTP_PASS",
+   "SMTP_FROM_EMAIL",
+   "SMTP_FROM_NAME"
+  ],
+  "readme_present": true,
+  "readme_describes_deployment": true
+ },
+ "capability_summary": {
+  "what_this_app_can_do": [
+   "Lets anyone who can reach the server register a new household and its first user, and log in to receive a 24-hour JWT.",
+   "Lets authenticated family members view and update their own profile, and (admin/manager roles) list household users and generate invites.",
+   "Manages family savings accounts: deposits, withdrawals, transfer requests with approval, spending limits and interest rates, with role checks in handlers; a scheduler accrues interest and resets limits.",
+   "Chore, assignment, reward, redemption, ledger, audit and report endpoints exist but are largely stubs returning placeholder responses."
+  ],
+  "data_sources_touched": [
+   {
+    "source": "Application database (SQLite file, PostgreSQL or MySQL) holding users, households, balances and transfers",
+    "access": "read_write",
+    "leaves_organization": false
+   },
+   {
+    "source": "SMTP server (configured, not yet clearly used by code)",
+    "access": "write (planned notification emails)",
+    "leaves_organization": true
+   }
+  ],
+  "who_can_reach_it": "HTTP server; binds to localhost by default but the Docker image binds 0.0.0.0:8080 and compose publishes ports. Registration, login and household join are unauthenticated; all other /api/v1 routes require a JWT. CORS allows any origin.",
+  "unauthorized_action_red_flags": [
+   "JWT signing secret falls back to the hardcoded default 'your-secret-key' when JWT_SECRET is unset (Dockerfile does not set it); anyone who knows the default could forge tokens with any role",
+   "docker-compose.yml ships placeholder JWT secret and weak DB passwords",
+   "Access-Control-Allow-Origin: * with Allow-Credentials: true on all responses",
+   "Docker container runs as root",
+   "Financial-style data (balances, transfers) of minors stored; no rate limiting seen on login"
+  ]
+ },
+ "summary": {
+  "finding_counts_by_severity": {
+   "critical": 0,
+   "high": 1,
+   "low": 14
+  },
+  "top_findings": [
+   "JWT secret defaults to a hardcoded value in internal/config/config.go if JWT_SECRET is unset (high)",
+   "Wildcard CORS with credentials; Docker image binds 0.0.0.0 and runs as root",
+   "Placeholder credentials in docker-compose.yml (low); compiled binaries tracked in git"
+  ]
+ }
+}

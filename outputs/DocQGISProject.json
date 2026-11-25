@@ -1,0 +1,110 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:33:27Z",
+    "project_root": "https://github.com/johnzastrow/DocQGISProject",
+    "languages_detected": ["python"],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. QGIS 4 plugin with a Processing provider, not a web service: no HTTP routes. The Makefile was skimmed only (shell/make is out of scope for full detection in skill version 1.0). Secret-pattern hits were all in tests/ (redaction test fixtures and one fixture builder) and are recorded as low placeholders; core/redact.py is code that removes credentials from output. Generated fixtures and images excluded. Interactive-looking matches such as os.system in tests/qgis/test_rebuild.py:213 are a hostile-input test string, not executed code."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [".env, .env.*, *.pem, *.key, credentials.json are not excluded", "*.zip and dist/ are excluded (build artifacts)"]
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": ["setup.cfg (flake8 configuration only)", "metadata.txt", "ruff.toml"],
+      "package_manager": "none (plugin zip built by scripts/build_plugin.py; CI uses uv ephemeral environments)",
+      "dependency_count": 0,
+      "findings": [
+        "No requirements/pyproject manifest; runtime depends only on the Python standard library plus QGIS 4 (DESIGN.md states no third-party dependencies)",
+        "CI installs pytest unpinned and jsonschema==4.23.0, detect-secrets unpinned, via uv --with"
+      ]
+    },
+    "node": {"manifest_files": [], "package_manager": "none", "dependency_count": 0, "findings": []}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [
+      {
+        "file": "tests/fixtures/make_fixtures.py",
+        "line": 718,
+        "variable_name": "password (in a synthetic datasource URI)",
+        "redacted_snippet": "... password='pg-P***REDACTED***' ...  # pragma: allowlist secret",
+        "severity": "low"
+      },
+      {
+        "file": "tests/unit/test_redact.py",
+        "line": 10,
+        "variable_name": "password (redaction test input)",
+        "redacted_snippet": "... password='p@ss***REDACTED***' ...  # pragma: allowlist secret",
+        "severity": "low"
+      }
+    ],
+    "proper_secret_handling_found": [
+      {"file": "core/redact.py", "mechanism": "credentials (passwords, tokens, Authorization headers, authcfg) are redacted from datasource URIs and project XML before output; redact option defaults on"},
+      {"file": ".github/workflows/ci.yml", "mechanism": "detect-secrets scan in CI and release workflows; # pragma: allowlist secret on fixtures"}
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {"type": "qgis_plugin", "framework": "QGIS plugin (classFactory)", "file": "__init__.py"},
+      {"type": "gui", "framework": "Qt dialog", "file": "docqgisproject.py"},
+      {"type": "processing_provider", "framework": "QGIS Processing (Document project, Rebuild project from JSON)", "file": "processing_provider"},
+      {"type": "cli", "framework": "argparse (build script)", "file": "scripts/build_plugin.py"}
+    ],
+    "routes": [],
+    "network_binding": "none observed (no listening socket and no outbound HTTP code in the plugin; web services and databases are not contacted by default)",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [],
+    "file_system_access": [
+      {"file": "core/safe_paths.py", "detail": "OutputFolder writes reports/JSON/images/QML/QPT into a user-chosen folder with a manifest and symlink/overwrite protections; never replaces files it did not write unless overwrite=true", "access_type": "write"},
+      {"file": "core/runner.py", "detail": "reads the open QGIS project or a .qgz/.qgs project file; opens local data for counts and extents (load_data default on)", "access_type": "read_write"},
+      {"file": "core/rebuild.py", "detail": "rebuild_project writes a new .qgz from project.json", "access_type": "write"}
+    ],
+    "sensitive_data_indicators": [
+      {"field_or_variable": "password / passwd (redaction logic)", "file": "core/redact.py"},
+      {"field_or_variable": "email (project metadata contact fields)", "file": "core/xmlwalk.py"}
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": ["none - no Dockerfile present"],
+    "deploy_config_files": [".github/workflows/ci.yml", ".github/workflows/release.yml", "Makefile", "plugin_build.conf"],
+    "environment_variables_referenced": ["DOCQGISPROJECT_QGIS_TEST", "QT_QPA_PLATFORM"],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Reads a QGIS project and writes Markdown, HTML, PDF and JSON documentation (layers, styles, layouts, settings) into a folder the user chooses, with credentials redacted by default.",
+      "Rebuilds a new QGIS project file from the generated JSON, optionally remapping data folders and attaching QGIS auth configs.",
+      "Optionally captures screenshots of QGIS dialogs, skipping pages that show data sources or logins."
+    ],
+    "data_sources_touched": [
+      {"source": "Local QGIS project files (.qgz/.qgs) and the datasets they reference (for counts and extents)", "access": "read", "leaves_organization": false},
+      {"source": "Output folder on local disk (reports, JSON, images, QML, QPT, rebuilt .qgz)", "access": "write", "leaves_organization": false}
+    ],
+    "who_can_reach_it": "Runs locally inside QGIS (dialog, Processing toolbox, Python console). No network listener or outbound network code found.",
+    "unauthorized_action_red_flags": [
+      "With redact=false or paths=absolute the generated reports/JSON could contain credentials or full home-folder paths; both default to safe values",
+      "Generated JSON embeds the project's data-source list, which could reveal internal server names"
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {"critical": 0, "high": 0, "low": 2},
+    "top_findings": [
+      "Two placeholder passwords in test fixtures (low, allowlisted for detect-secrets)",
+      ".gitignore does not exclude .env / key / credential files",
+      "No routes, no network code, no database access found; credentials are redacted from outputs by design"
+    ]
+  }
+}

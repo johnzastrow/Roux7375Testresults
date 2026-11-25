@@ -1,0 +1,2587 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:39:31Z",
+    "project_root": "https://github.com/johnzastrow/actalog",
+    "languages_detected": [
+      "go",
+      "javascript",
+      "vue",
+      "shell",
+      "python"
+    ],
+    "notes": "Fresh shallow clone of default branch (depth 20); has_uncommitted_changes reflects the clone (false), not the author's working copy. Primary backend language is Go (261 files), which is out of scope for skill version 1.0: routes were enumerated by reading cmd/actalog/main.go (chi router) and auth was determined from the middleware groups (middleware.Auth, AdminOnly, CoachOrAdmin) shown there, but full interface/data-access detection for Go was not performed beyond that and targeted reads. The Go dependency manifest (go.mod, 'go' key) was added under dependencies in addition to python/node. Frontend is Vue 3 (JavaScript) in web/, with a Playwright suite in e2e/ and two small Python helpers under site/scripts. Routes under the authenticated groups have severity null (not severity-tagged) because auth_detected is true; only the 23 unauthenticated routes carry severity 'low'. Excluded from findings: test fixtures and example values (web/src/**/*.test.js passwords, internal/**/_test.go, e2e default credentials listed separately as low), docs/, site/, screenshots, minified or vendored third-party code, and woff2/png/pdf assets. Personal data in tracked files: imports/user_workouts_export_2025-12-22.json contains the author's email and workout notes, and imports/Performance_fromWodify6Nov2025.csv is a gym performance export; these are noted under sensitive_data_indicators. The repo root entry 'actalog' is a broken symlink to bin/actalog. Roughly 1389 SQL write and 586 read call sites exist; SQL access was sampled in internal/service/data_quality_service.go and backup_service.go rather than read in full."
+  },
+  "version_control": {
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "No gap for .env, *.pem/*.key (excluded, with explicit exceptions for web/certs/localhost*.pem/key and *example*), node_modules, credentials.json",
+      "docker/.env.postgres and docker/.env.mariadb are tracked despite being env-shaped (they contain placeholders); the .gitignore patterns do not cover .env.<name> suffix files",
+      "*.db is ignored but imports/ and seeds/ data exports are tracked"
+    ],
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": [
+        "Python is used only for site/scripts/validate_seo.py and a CairoSVG icon helper; no Python manifest exists (imports cairosvg, html, sys, pathlib)"
+      ]
+    },
+    "node": {
+      "manifest_files": [
+        "web/package.json",
+        "web/package-lock.json",
+        "e2e/package.json",
+        "e2e/package-lock.json"
+      ],
+      "package_manager": "npm",
+      "dependency_count": 31,
+      "findings": [
+        "web/package.json: 12 runtime and 18 dev dependencies mostly with caret ranges (e.g. vue ^3.5.40) but axios pinned exactly at 1.20.0; package-lock.json committed; engines node >=24; an 'overrides' entry pins serialize-javascript 7.0.5",
+        "e2e/package.json: one dev dependency @playwright/test ^1.58.0 with its own lockfile",
+        "web/package.json version field says 1.3.4 while latest commit message says 1.3.8"
+      ]
+    },
+    "go": {
+      "manifest_files": [
+        "go.mod"
+      ],
+      "package_manager": "go modules",
+      "dependency_count": 34,
+      "findings": [
+        "go.mod: go 1.26.8; 10 direct dependencies (chi, mysql, jwt/v5, pgx/v5, godotenv, lib/pq, go-sqlite3, swaggo, x/crypto) and 24 indirect, all pinned to exact versions; go.sum present",
+        "CI runs govulncheck, npm audit and a Trivy image scan per .github/workflows/ci.yml and docs/ROADMAP.md"
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [
+      {
+        "file": "docker/.env.postgres",
+        "type": ".env.* (tracked)",
+        "severity": "low",
+        "note": "placeholder values only (your_secure_postgres_password_here, your_very_secure_jwt_secret_here_change_this); tracked env-shaped file not covered by .gitignore"
+      },
+      {
+        "file": "docker/.env.mariadb",
+        "type": ".env.* (tracked)",
+        "severity": "low",
+        "note": "placeholder values only (your_secure_mariadb_password_here, your_secure_root_password_here); tracked env-shaped file"
+      },
+      {
+        "file": "web/certs/localhost-key.pem",
+        "type": "private key (PEM)",
+        "severity": "low",
+        "note": "self-signed localhost development TLS key committed deliberately (.gitignore has an explicit exception for web/certs/localhost*); valid only for localhost, but a private key is tracked"
+      }
+    ],
+    "hardcoded_secrets_in_source": [
+      {
+        "file": "docker/trouble/docker-compose.yml",
+        "line": 22,
+        "variable_name": "MARIADB_ROOT_PASSWORD (default/error text of ${DB_ROOT_PASSWORD:?...})",
+        "redacted_snippet": "- MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD:?Sill***REDACTED***}",
+        "severity": "critical",
+        "note": "password-shaped string committed in the error-message slot of a compose variable; it is not used as the value but is credential-like and may be a real root password; tracked file, never gitignored"
+      },
+      {
+        "file": "e2e/tests/auth.spec.js",
+        "line": 4,
+        "variable_name": "PASS (default)",
+        "redacted_snippet": "const PASS = process.env.E2E_PASSWORD || 'Test***REDACTED***'",
+        "severity": "low",
+        "note": "default test account password for the e2e suite; overridable via E2E_PASSWORD"
+      },
+      {
+        "file": "e2e/global-setup.js",
+        "line": 23,
+        "variable_name": "PASS (default)",
+        "redacted_snippet": "const PASS = process.env.E2E_PASSWORD || 'Test***REDACTED***'",
+        "severity": "low",
+        "note": "same default test credential; used to self-register an e2e test user when E2E_REGISTER is not false"
+      }
+    ],
+    "proper_secret_handling_found": [
+      {
+        "file": "configs/config.go",
+        "mechanism": "os.Getenv via getEnv helpers for JWT_SECRET, DB_PASSWORD, SMTP_PASSWORD; JWT_SECRET required when APP_ENV=production"
+      },
+      {
+        "file": "docker/docker-compose.yml",
+        "mechanism": "${JWT_SECRET}, ${DB_PASSWORD}, ${SMTP_PASS} injected from the environment"
+      },
+      {
+        "file": "pkg/auth/password.go",
+        "mechanism": "bcrypt password hashing (golang.org/x/crypto/bcrypt)"
+      },
+      {
+        "file": "docker/Dockerfile",
+        "mechanism": "base images pinned by sha256 digest"
+      }
+    ],
+    "env_example_present": true
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "web_api",
+        "framework": "chi (Go) with JWT auth and embedded Swagger",
+        "file": "cmd/actalog/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "go main",
+        "file": "cmd/migrate/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "go main",
+        "file": "cmd/scheduler/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "go main",
+        "file": "cmd/check-schema/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "go main",
+        "file": "cmd/gen-protected-emails/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "go script",
+        "file": "scripts/retroactive_prs.go"
+      },
+      {
+        "type": "spa",
+        "framework": "vue3/vite PWA",
+        "file": "web/src/main.js"
+      },
+      {
+        "type": "scheduled",
+        "framework": "in-app scheduler (SCHEDULER_ENABLED) materializing class sessions",
+        "file": "cmd/scheduler/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "python script",
+        "file": "site/scripts/validate_seo.py"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/api/version",
+        "file": "cmd/actalog/main.go",
+        "line": 726,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public version info"
+      },
+      {
+        "method": "GET",
+        "path": "/api/docs/*",
+        "file": "cmd/actalog/main.go",
+        "line": 734,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Swagger UI (public API documentation)"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/register",
+        "file": "cmd/actalog/main.go",
+        "line": 739,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "rate-limited (5 per 15 min per IP); registration allowed by default (ALLOW_REGISTRATION=true)"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "file": "cmd/actalog/main.go",
+        "line": 740,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "rate-limited (5 per 15 min per IP)"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/forgot-password",
+        "file": "cmd/actalog/main.go",
+        "line": 741,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "rate-limited (3 per hour per IP)"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/reset-password",
+        "file": "cmd/actalog/main.go",
+        "line": 742,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "rate-limited (3 per hour per IP)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/auth/verify-email",
+        "file": "cmd/actalog/main.go",
+        "line": 743,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "token-based email verification"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/resend-verification",
+        "file": "cmd/actalog/main.go",
+        "line": 744,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "rate-limited"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/refresh",
+        "file": "cmd/actalog/main.go",
+        "line": 745,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "refresh-token exchange"
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/revoke",
+        "file": "cmd/actalog/main.go",
+        "line": 746,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "refresh-token revocation"
+      },
+      {
+        "method": "GET",
+        "path": "/api/movements",
+        "file": "cmd/actalog/main.go",
+        "line": 749,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public read-only catalog of movements/WODs/templates (standard library items)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/movements/search",
+        "file": "cmd/actalog/main.go",
+        "line": 750,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public read-only catalog of movements/WODs/templates (standard library items)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/movements/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 751,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public read-only catalog of movements/WODs/templates (standard library items)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/wods",
+        "file": "cmd/actalog/main.go",
+        "line": 754,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public read-only catalog of movements/WODs/templates (standard library items)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/wods/standard",
+        "file": "cmd/actalog/main.go",
+        "line": 755,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public read-only catalog of movements/WODs/templates (standard library items)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/wods/search",
+        "file": "cmd/actalog/main.go",
+        "line": 756,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public read-only catalog of movements/WODs/templates (standard library items)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/wods/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 757,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public read-only catalog of movements/WODs/templates (standard library items)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/templates",
+        "file": "cmd/actalog/main.go",
+        "line": 760,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public read-only catalog of movements/WODs/templates (standard library items)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/templates/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 761,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public read-only catalog of movements/WODs/templates (standard library items)"
+      },
+      {
+        "method": "GET",
+        "path": "/api/users/profile",
+        "file": "cmd/actalog/main.go",
+        "line": 773,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/users/profile",
+        "file": "cmd/actalog/main.go",
+        "line": 774,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/users/avatar",
+        "file": "cmd/actalog/main.go",
+        "line": 775,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/users/avatar",
+        "file": "cmd/actalog/main.go",
+        "line": 776,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/users/settings",
+        "file": "cmd/actalog/main.go",
+        "line": 779,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/users/settings",
+        "file": "cmd/actalog/main.go",
+        "line": 780,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/users/password",
+        "file": "cmd/actalog/main.go",
+        "line": 781,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/users/me/audit-logs",
+        "file": "cmd/actalog/main.go",
+        "line": 784,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/sessions",
+        "file": "cmd/actalog/main.go",
+        "line": 787,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/sessions/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 788,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/sessions/revoke-all",
+        "file": "cmd/actalog/main.go",
+        "line": 789,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/subscriptions/status",
+        "file": "cmd/actalog/main.go",
+        "line": 792,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/users/me/reservations/upcoming",
+        "file": "cmd/actalog/main.go",
+        "line": 795,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/users/me/documents",
+        "file": "cmd/actalog/main.go",
+        "line": 798,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/users/me/waitlist",
+        "file": "cmd/actalog/main.go",
+        "line": 799,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/users/me/notifications",
+        "file": "cmd/actalog/main.go",
+        "line": 800,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/coaches/me/sessions",
+        "file": "cmd/actalog/main.go",
+        "line": 805,
+        "auth_detected": true,
+        "severity": null,
+        "note": "CoachOrAdmin middleware inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/coaches/sessions/{session_id}/roster",
+        "file": "cmd/actalog/main.go",
+        "line": 806,
+        "auth_detected": true,
+        "severity": null,
+        "note": "CoachOrAdmin middleware inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/coaches/sessions/{session_id}/check-in/{reservation_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 807,
+        "auth_detected": true,
+        "severity": null,
+        "note": "CoachOrAdmin middleware inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/coaches/sessions/{session_id}/no-show/{reservation_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 808,
+        "auth_detected": true,
+        "severity": null,
+        "note": "CoachOrAdmin middleware inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/coaches/sessions/{session_id}/complete",
+        "file": "cmd/actalog/main.go",
+        "line": 809,
+        "auth_detected": true,
+        "severity": null,
+        "note": "CoachOrAdmin middleware inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/notifications",
+        "file": "cmd/actalog/main.go",
+        "line": 813,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/notifications/unread",
+        "file": "cmd/actalog/main.go",
+        "line": 814,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/notifications/count",
+        "file": "cmd/actalog/main.go",
+        "line": 815,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/notifications/{id}/read",
+        "file": "cmd/actalog/main.go",
+        "line": 816,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/notifications/read-all",
+        "file": "cmd/actalog/main.go",
+        "line": 817,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/notifications/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 818,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/notifications/{id}/likes",
+        "file": "cmd/actalog/main.go",
+        "line": 819,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/movements",
+        "file": "cmd/actalog/main.go",
+        "line": 830,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/movements/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 831,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/movements/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 832,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/notifications/{id}/like",
+        "file": "cmd/actalog/main.go",
+        "line": 835,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/notifications/{id}/like",
+        "file": "cmd/actalog/main.go",
+        "line": 836,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/templates",
+        "file": "cmd/actalog/main.go",
+        "line": 839,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workouts/my-templates",
+        "file": "cmd/actalog/main.go",
+        "line": 840,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/templates/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 841,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/templates/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 842,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/workouts",
+        "file": "cmd/actalog/main.go",
+        "line": 845,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workouts",
+        "file": "cmd/actalog/main.go",
+        "line": 846,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workouts/standard",
+        "file": "cmd/actalog/main.go",
+        "line": 847,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workouts/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 848,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/workouts/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 849,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/workouts/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 850,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workouts/stats/monthly",
+        "file": "cmd/actalog/main.go",
+        "line": 851,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/workouts/personal-records",
+        "file": "cmd/actalog/main.go",
+        "line": 852,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/workouts/retroactive-flag-prs",
+        "file": "cmd/actalog/main.go",
+        "line": 853,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/wods/my-wods",
+        "file": "cmd/actalog/main.go",
+        "line": 856,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/wods",
+        "file": "cmd/actalog/main.go",
+        "line": 857,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/wods/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 858,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/wods/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 859,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/templates/{workout_id}/wods",
+        "file": "cmd/actalog/main.go",
+        "line": 862,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/templates/{workout_id}/wods",
+        "file": "cmd/actalog/main.go",
+        "line": 863,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/templates/wods/{workout_wod_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 864,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/templates/wods/{workout_wod_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 865,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/templates/wods/{workout_wod_id}/toggle-pr",
+        "file": "cmd/actalog/main.go",
+        "line": 866,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/prs",
+        "file": "cmd/actalog/main.go",
+        "line": 869,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/pr-movements",
+        "file": "cmd/actalog/main.go",
+        "line": 870,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/movements/toggle-pr",
+        "file": "cmd/actalog/main.go",
+        "line": 871,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/performance/search",
+        "file": "cmd/actalog/main.go",
+        "line": 874,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/performance/movements/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 875,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/performance/wods/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 876,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/leaderboards/movements/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 879,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/leaderboards/wods/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 880,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/consistency/stats",
+        "file": "cmd/actalog/main.go",
+        "line": 883,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/stats/active-users-this-month",
+        "file": "cmd/actalog/main.go",
+        "line": 886,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/export/wods",
+        "file": "cmd/actalog/main.go",
+        "line": 889,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/export/movements",
+        "file": "cmd/actalog/main.go",
+        "line": 890,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/export/user-workouts",
+        "file": "cmd/actalog/main.go",
+        "line": 891,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/import/wods/preview",
+        "file": "cmd/actalog/main.go",
+        "line": 894,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/import/wods/confirm",
+        "file": "cmd/actalog/main.go",
+        "line": 895,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/import/movements/preview",
+        "file": "cmd/actalog/main.go",
+        "line": 896,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/import/movements/confirm",
+        "file": "cmd/actalog/main.go",
+        "line": 897,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/import/user-workouts/preview",
+        "file": "cmd/actalog/main.go",
+        "line": 898,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/import/user-workouts/confirm",
+        "file": "cmd/actalog/main.go",
+        "line": 899,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/import/wodify/preview",
+        "file": "cmd/actalog/main.go",
+        "line": 900,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/import/wodify/confirm",
+        "file": "cmd/actalog/main.go",
+        "line": 901,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/benchmark",
+        "file": "cmd/actalog/main.go",
+        "line": 904,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/benchmark/status",
+        "file": "cmd/actalog/main.go",
+        "line": 905,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/sessions/{session_id}/reserve",
+        "file": "cmd/actalog/main.go",
+        "line": 908,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/sessions/{session_id}/reserve",
+        "file": "cmd/actalog/main.go",
+        "line": 909,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/sessions/{session_id}/waitlist",
+        "file": "cmd/actalog/main.go",
+        "line": 912,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/sessions/{session_id}/waitlist",
+        "file": "cmd/actalog/main.go",
+        "line": 913,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/sessions/{session_id}/waitlist",
+        "file": "cmd/actalog/main.go",
+        "line": 917,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/sessions/{session_id}/waitlist/position",
+        "file": "cmd/actalog/main.go",
+        "line": 918,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/sessions",
+        "file": "cmd/actalog/main.go",
+        "line": 923,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/sessions/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 924,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/locations",
+        "file": "cmd/actalog/main.go",
+        "line": 925,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/locations/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 926,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/templates",
+        "file": "cmd/actalog/main.go",
+        "line": 927,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/documents",
+        "file": "cmd/actalog/main.go",
+        "line": 930,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/documents/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 931,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/packages",
+        "file": "cmd/actalog/main.go",
+        "line": 932,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/packages/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 933,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/users/me/documents",
+        "file": "cmd/actalog/main.go",
+        "line": 934,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/users/me/documents/pending",
+        "file": "cmd/actalog/main.go",
+        "line": 935,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/users/me/credits",
+        "file": "cmd/actalog/main.go",
+        "line": 936,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/gyms/{gym_id}/users/me/credits/available",
+        "file": "cmd/actalog/main.go",
+        "line": 937,
+        "auth_detected": true,
+        "severity": null,
+        "note": "middleware.Auth (JWT bearer validation) applied to group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/metrics",
+        "file": "cmd/actalog/main.go",
+        "line": 946,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/user-management/import/preview",
+        "file": "cmd/actalog/main.go",
+        "line": 950,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/user-management/import/confirm",
+        "file": "cmd/actalog/main.go",
+        "line": 951,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/user-management/export",
+        "file": "cmd/actalog/main.go",
+        "line": 952,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/user-management/filter",
+        "file": "cmd/actalog/main.go",
+        "line": 953,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/user-management/batch-password-reset",
+        "file": "cmd/actalog/main.go",
+        "line": 954,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/backups",
+        "file": "cmd/actalog/main.go",
+        "line": 958,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/backups",
+        "file": "cmd/actalog/main.go",
+        "line": 959,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/backups/upload",
+        "file": "cmd/actalog/main.go",
+        "line": 960,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/backups/{filename}",
+        "file": "cmd/actalog/main.go",
+        "line": 961,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/backups/{filename}/metadata",
+        "file": "cmd/actalog/main.go",
+        "line": 962,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/backups/{filename}",
+        "file": "cmd/actalog/main.go",
+        "line": 963,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/backups/{filename}/restore",
+        "file": "cmd/actalog/main.go",
+        "line": 964,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/email/config",
+        "file": "cmd/actalog/main.go",
+        "line": 968,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/email/test",
+        "file": "cmd/actalog/main.go",
+        "line": 969,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/email-logs",
+        "file": "cmd/actalog/main.go",
+        "line": 974,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/email-logs/stats",
+        "file": "cmd/actalog/main.go",
+        "line": 975,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/email-logs/failures",
+        "file": "cmd/actalog/main.go",
+        "line": 976,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/email-logs/cleanup",
+        "file": "cmd/actalog/main.go",
+        "line": 977,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/email-logs/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 978,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/notifications/announce",
+        "file": "cmd/actalog/main.go",
+        "line": 982,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/data-cleanup/wod-mismatches",
+        "file": "cmd/actalog/main.go",
+        "line": 985,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/data-cleanup/wod-mismatches",
+        "file": "cmd/actalog/main.go",
+        "line": 986,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/data-cleanup/wod-record/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 987,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/data-quality/full-scan",
+        "file": "cmd/actalog/main.go",
+        "line": 991,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/data-quality/duplicates",
+        "file": "cmd/actalog/main.go",
+        "line": 992,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/data-quality/duplicates/summary",
+        "file": "cmd/actalog/main.go",
+        "line": 993,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/data-quality/duplicates/{entity}",
+        "file": "cmd/actalog/main.go",
+        "line": 994,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/data-quality/duplicates/merge/preview",
+        "file": "cmd/actalog/main.go",
+        "line": 995,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/data-quality/duplicates/merge/confirm",
+        "file": "cmd/actalog/main.go",
+        "line": 996,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/data-quality/issues",
+        "file": "cmd/actalog/main.go",
+        "line": 997,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/benchmark/data",
+        "file": "cmd/actalog/main.go",
+        "line": 1001,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/audit-logs",
+        "file": "cmd/actalog/main.go",
+        "line": 1004,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/audit-logs/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1005,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/audit-logs/cleanup",
+        "file": "cmd/actalog/main.go",
+        "line": 1006,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/data-change-logs",
+        "file": "cmd/actalog/main.go",
+        "line": 1009,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/data-change-logs/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1010,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/data-change-logs/entity/{entity_type}/{entity_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1011,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/data-change-logs/cleanup",
+        "file": "cmd/actalog/main.go",
+        "line": 1012,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/users",
+        "file": "cmd/actalog/main.go",
+        "line": 1016,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/users",
+        "file": "cmd/actalog/main.go",
+        "line": 1017,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/users/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1039,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PATCH",
+        "path": "/api/admin/users/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1040,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/users/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1041,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/users/{id}/unlock",
+        "file": "cmd/actalog/main.go",
+        "line": 1042,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/users/{id}/disable",
+        "file": "cmd/actalog/main.go",
+        "line": 1043,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/users/{id}/enable",
+        "file": "cmd/actalog/main.go",
+        "line": 1044,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/users/{id}/role",
+        "file": "cmd/actalog/main.go",
+        "line": 1045,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/users/{id}/toggle-email-verification",
+        "file": "cmd/actalog/main.go",
+        "line": 1046,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/users/{id}/force-password-reset",
+        "file": "cmd/actalog/main.go",
+        "line": 1047,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/users/{id}/password",
+        "file": "cmd/actalog/main.go",
+        "line": 1048,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/user-created/wods",
+        "file": "cmd/actalog/main.go",
+        "line": 1052,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/user-created/wods/{id}/copy-to-standard",
+        "file": "cmd/actalog/main.go",
+        "line": 1053,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/user-created/movements",
+        "file": "cmd/actalog/main.go",
+        "line": 1054,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/user-created/movements/{id}/copy-to-standard",
+        "file": "cmd/actalog/main.go",
+        "line": 1055,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/user-created/workouts",
+        "file": "cmd/actalog/main.go",
+        "line": 1056,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/user-created/workouts/{id}/copy-to-standard",
+        "file": "cmd/actalog/main.go",
+        "line": 1057,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/organizations",
+        "file": "cmd/actalog/main.go",
+        "line": 1060,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/organizations",
+        "file": "cmd/actalog/main.go",
+        "line": 1061,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/organizations/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1062,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/organizations/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1063,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/organizations/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1064,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/locations",
+        "file": "cmd/actalog/main.go",
+        "line": 1069,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/gyms/{gym_id}/locations/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1070,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/gyms/{gym_id}/locations/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1071,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/templates",
+        "file": "cmd/actalog/main.go",
+        "line": 1074,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/sessions",
+        "file": "cmd/actalog/main.go",
+        "line": 1077,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/gyms/{gym_id}/sessions/batch-workout",
+        "file": "cmd/actalog/main.go",
+        "line": 1078,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/gyms/{gym_id}/sessions/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1079,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/sessions/{id}/cancel",
+        "file": "cmd/actalog/main.go",
+        "line": 1080,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/coaches",
+        "file": "cmd/actalog/main.go",
+        "line": 1083,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/gyms/{gym_id}/coaches",
+        "file": "cmd/actalog/main.go",
+        "line": 1084,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/gyms/{gym_id}/coaches/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1085,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/documents",
+        "file": "cmd/actalog/main.go",
+        "line": 1088,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/gyms/{gym_id}/documents/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1089,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/gyms/{gym_id}/documents/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1090,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/packages",
+        "file": "cmd/actalog/main.go",
+        "line": 1093,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/gyms/{gym_id}/packages/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1094,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/gyms/{gym_id}/packages/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1095,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/user-documents/{id}/complete",
+        "file": "cmd/actalog/main.go",
+        "line": 1098,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/users/{user_id}/documents/init",
+        "file": "cmd/actalog/main.go",
+        "line": 1099,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/gyms/{gym_id}/users/{user_id}/credits",
+        "file": "cmd/actalog/main.go",
+        "line": 1102,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/scheduling/templates/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1106,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/scheduling/templates/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1107,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/scheduling/templates/{id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1108,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/scheduling/templates/{id}/preview-schedule",
+        "file": "cmd/actalog/main.go",
+        "line": 1109,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/scheduling/templates/{id}/slots",
+        "file": "cmd/actalog/main.go",
+        "line": 1111,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/scheduling/templates/{id}/slots",
+        "file": "cmd/actalog/main.go",
+        "line": 1112,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/admin/scheduling/templates/{id}/slots/{slot_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1113,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/scheduling/templates/{id}/slots/{slot_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1114,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/scheduling/templates/{id}/coaches",
+        "file": "cmd/actalog/main.go",
+        "line": 1118,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/scheduling/templates/{id}/coaches",
+        "file": "cmd/actalog/main.go",
+        "line": 1119,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/scheduling/templates/{id}/coaches/{user_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1120,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/sessions/{session_id}/roster",
+        "file": "cmd/actalog/main.go",
+        "line": 1123,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/sessions/{session_id}/check-in/{reservation_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1124,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/sessions/{session_id}/no-show/{reservation_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1125,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/sessions/{session_id}/complete",
+        "file": "cmd/actalog/main.go",
+        "line": 1126,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/sessions/{session_id}/coaches",
+        "file": "cmd/actalog/main.go",
+        "line": 1129,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/sessions/{session_id}/coaches",
+        "file": "cmd/actalog/main.go",
+        "line": 1130,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/sessions/{session_id}/coaches/{user_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1131,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/users/{id}/organization",
+        "file": "cmd/actalog/main.go",
+        "line": 1134,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/admin/users/{id}/organization/{org_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1135,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/users/{id}/organizations",
+        "file": "cmd/actalog/main.go",
+        "line": 1136,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/organizations/{id}/users",
+        "file": "cmd/actalog/main.go",
+        "line": 1137,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/subscriptions/users",
+        "file": "cmd/actalog/main.go",
+        "line": 1142,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/subscriptions/organizations",
+        "file": "cmd/actalog/main.go",
+        "line": 1143,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/subscriptions/users/expiring",
+        "file": "cmd/actalog/main.go",
+        "line": 1146,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/subscriptions/users/expired",
+        "file": "cmd/actalog/main.go",
+        "line": 1147,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/subscriptions/organizations/expiring",
+        "file": "cmd/actalog/main.go",
+        "line": 1148,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/subscriptions/organizations/expired",
+        "file": "cmd/actalog/main.go",
+        "line": 1149,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/subscriptions/user",
+        "file": "cmd/actalog/main.go",
+        "line": 1152,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/subscriptions/user/{user_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1153,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/subscriptions/user/{id}/mark-paid",
+        "file": "cmd/actalog/main.go",
+        "line": 1154,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/subscriptions/user/{id}/cancel",
+        "file": "cmd/actalog/main.go",
+        "line": 1155,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/subscriptions/user/{id}/set-permanent",
+        "file": "cmd/actalog/main.go",
+        "line": 1156,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/subscriptions/organization",
+        "file": "cmd/actalog/main.go",
+        "line": 1159,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/api/admin/subscriptions/organization/{org_id}",
+        "file": "cmd/actalog/main.go",
+        "line": 1160,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/subscriptions/organization/{id}/mark-paid",
+        "file": "cmd/actalog/main.go",
+        "line": 1161,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/subscriptions/organization/{id}/cancel",
+        "file": "cmd/actalog/main.go",
+        "line": 1162,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "POST",
+        "path": "/api/admin/subscriptions/organization/{id}/set-permanent",
+        "file": "cmd/actalog/main.go",
+        "line": 1163,
+        "auth_detected": true,
+        "severity": null,
+        "note": "AdminOnly middleware (role == admin) inside Auth group"
+      },
+      {
+        "method": "GET",
+        "path": "/*",
+        "file": "cmd/actalog/main.go",
+        "line": 1173,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "serves built SPA static files, falls back to index.html"
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "file": "cmd/actalog/main.go",
+        "line": 683,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "returns status and version only"
+      },
+      {
+        "method": "GET",
+        "path": "/uploads/*",
+        "file": "cmd/actalog/main.go",
+        "line": 1238,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "public static file server for uploaded avatars (http.FileServer over the uploads directory)"
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "file": "cmd/actalog/main.go",
+        "line": 712,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "only registered when the frontend directory is absent (API-only mode); returns welcome JSON"
+      }
+    ],
+    "network_binding": "0.0.0.0 (default SERVER_HOST in configs/config.go; Docker publishes 8080)",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite / postgresql / mysql-mariadb (selected by DB_DRIVER)",
+        "credential_source": "env_var",
+        "file": "configs/config.go",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": true,
+          "severity": "low",
+          "reason": "internal/service/data_quality_service.go builds IN-clauses with fmt.Sprintf from IDs formatted by strconv.FormatInt (makeInClause), and backup_service.go interpolates table names from an internal list and column names filtered against target columns; no user-controlled string reaches the query text in the sampled code, so these are latent, not active. All other sampled queries use placeholders"
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "SMTP server configured via SMTP_HOST (net/smtp, email verification, password reset, announcements)",
+        "file": "pkg/email/email.go",
+        "access_type": "write"
+      },
+      {
+        "host": "youtube.com (video links/embeds entered on WOD and movement forms)",
+        "file": "web/src/views/WODCreateView.vue",
+        "access_type": "read"
+      },
+      {
+        "host": "OTEL_EXPORTER_OTLP_ENDPOINT (referenced only in docker/docker-compose.yml)",
+        "file": "docker/docker-compose.yml",
+        "access_type": "write"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "cmd/actalog/main.go",
+        "detail": "serves uploaded avatar files from the uploads directory publicly at /uploads/* and the built SPA from web/dist (FRONTEND_DIR)",
+        "access_type": "read"
+      },
+      {
+        "file": "internal/service/backup_service.go",
+        "detail": "creates, uploads, restores and deletes zip backups of the whole database (including users) and uploads; restore clears tables and re-imports",
+        "access_type": "read_write"
+      },
+      {
+        "file": "pkg/logger/logger.go",
+        "detail": "writes and rotates log files (os.Remove of old backups) when LOG_FILE_ENABLED",
+        "access_type": "write"
+      },
+      {
+        "file": "internal/service/benchmark_service.go",
+        "detail": "exec.Command for uname, lsb_release, sw_vers, cmd /c ver (fixed arguments) to report system info",
+        "access_type": "read"
+      },
+      {
+        "file": "scripts/retroactive_prs.go",
+        "detail": "opens ./actalog.db directly with sqlite3",
+        "access_type": "read_write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "email, password (bcrypt hash), role",
+        "file": "internal/service/user_service.go"
+      },
+      {
+        "field_or_variable": "email addresses of protected admin users",
+        "file": "cmd/gen-protected-emails/main.go"
+      },
+      {
+        "field_or_variable": "body weight and workout weights",
+        "file": "internal/repository/user_workout_movement_repository.go"
+      },
+      {
+        "field_or_variable": "user_email and workout notes in a committed export file",
+        "file": "imports/user_workouts_export_2025-12-22.json"
+      },
+      {
+        "field_or_variable": "customer/location names in a committed gym export",
+        "file": "imports/Performance_fromWodify6Nov2025.csv"
+      },
+      {
+        "field_or_variable": "audit_logs, data_change_logs, email_logs (IP addresses, user ids)",
+        "file": "internal/service/audit_log_service.go"
+      }
+    ],
+    "office_and_collaboration_sources": [
+      {
+        "type": "csv",
+        "file": "internal/handler/import_handler.go",
+        "location_or_host": "user-uploaded CSV files (WODs, movements, user workouts, Wodify performance export) via /api/import/*; seeds from seeds/ and docs/seeds/*.csv",
+        "credential_source": "unclear",
+        "access_type": "read_write"
+      },
+      {
+        "type": "csv",
+        "file": "internal/handler/export_handler.go",
+        "location_or_host": "CSV/JSON downloads via /api/export/*",
+        "credential_source": "unclear",
+        "access_type": "write"
+      },
+      {
+        "type": "email_mailbox",
+        "file": "pkg/email/email.go",
+        "location_or_host": "outbound SMTP via SMTP_HOST (no mailbox read)",
+        "credential_source": "env_var",
+        "access_type": "write"
+      }
+    ]
+  },
+  "configuration_and_deployment": {
+    "containerized": true,
+    "docker_findings": [
+      "docker/Dockerfile: multi-stage build, base images pinned by sha256 (node:24-alpine, golang:1.26-alpine, alpine:latest@sha256), USER actalog (non-root), EXPOSE 8080, HEALTHCHECK on /health, ENV DB_DRIVER=sqlite3 default",
+      "docker/docker-compose.yml: publishes 8080 on all interfaces, secrets via ${VAR} interpolation, healthcheck wget /health, named volumes for data and uploads; ADMIN_EMAIL/ADMIN_PASSWORD optional env vars for auto seed",
+      "docker/trouble/docker-compose.yml: MARIADB_ROOT_PASSWORD contains a password-shaped string in an error-message default (see critical finding); also uses version: '3.8' and the :latest image tag",
+      "Default configuration allows an empty JWT_SECRET unless APP_ENV=production (configs/config.go:185); default APP_ENV is 'development'",
+      "ALLOW_REGISTRATION defaults to true and REQUIRE_EMAIL_VERIFICATION defaults to false"
+    ],
+    "deploy_config_files": [
+      "docker/Dockerfile",
+      "docker/docker-compose.yml",
+      "docker/docker-compose.postgres.yml",
+      "docker/docker-compose.mariadb.yml",
+      "docker/trouble/docker-compose.yml",
+      "Makefile",
+      ".github/workflows/ci.yml",
+      ".github/workflows/docker-build.yml",
+      ".github/workflows/publish-site.yml",
+      ".github/workflows/validate-site.yml",
+      ".github/workflows/ci-failure-notify.yml"
+    ],
+    "environment_variables_referenced": [
+      "ACCOUNT_LOCKOUT_DURATION",
+      "ACTALOG_SKIP_PROTECTED_INVARIANT",
+      "ALLOW_REGISTRATION",
+      "APP_ENV",
+      "APP_URL",
+      "CORS_ORIGINS",
+      "DB_CONN_MAX_LIFETIME",
+      "DB_DRIVER",
+      "DB_HOST",
+      "DB_MAX_IDLE_CONNS",
+      "DB_MAX_OPEN_CONNS",
+      "DB_NAME",
+      "DB_PASSWORD",
+      "DB_PORT",
+      "DB_SCHEMA",
+      "DB_SSLMODE",
+      "DB_USER",
+      "EMAIL_ENABLED",
+      "EMAIL_FROM",
+      "EMAIL_FROM_NAME",
+      "FRONTEND_DIR",
+      "JWT_EXPIRATION",
+      "JWT_ISSUER",
+      "JWT_REFRESH_DURATION",
+      "JWT_SECRET",
+      "LOG_FILE_ENABLED",
+      "LOG_FILE_PATH",
+      "LOG_FORMAT",
+      "LOG_LEVEL",
+      "LOG_MAX_BACKUPS",
+      "LOG_MAX_SIZE_MB",
+      "LOGO_VARIANT",
+      "MAX_LOGIN_ATTEMPTS",
+      "MIN_PASSWORD_LENGTH",
+      "REQUIRE_EMAIL_VERIFICATION",
+      "REQUIRE_PASSWORD_LOWERCASE",
+      "REQUIRE_PASSWORD_NUMBER",
+      "REQUIRE_PASSWORD_SPECIAL",
+      "REQUIRE_PASSWORD_UPPERCASE",
+      "SCHEDULER_DAYS_AHEAD",
+      "SCHEDULER_ENABLED",
+      "SCHEDULER_INTERVAL",
+      "SCHEDULER_RUN_ON_STARTUP",
+      "SERVER_HOST",
+      "SERVER_IDLE_TIMEOUT",
+      "SERVER_PORT",
+      "SERVER_READ_TIMEOUT",
+      "SERVER_WRITE_TIMEOUT",
+      "SMTP_HOST",
+      "SMTP_PASSWORD",
+      "SMTP_PORT",
+      "SMTP_USER"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Lets registered users log CrossFit workouts, track personal records, view progress charts, performance history, calendars and leaderboards, and import/export their data as CSV or JSON (authenticated; subscription required for write operations).",
+      "Lets anyone without a login register (when enabled), log in, reset a password, and browse the public catalog of standard movements, WODs and workout templates.",
+      "Lets admins manage users (create, disable, change role, force or set passwords, unlock), organizations, subscriptions, class scheduling, packages and documents, audit and email logs, data quality merges, announcements, and create/download/restore full database backups.",
+      "Lets coaches or admins view session rosters and check in or mark no-shows for class sessions.",
+      "Serves uploaded avatar files publicly at /uploads/* and public Swagger API documentation at /api/docs/*."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Application database (SQLite by default; PostgreSQL or MariaDB/MySQL selectable) holding users, workouts, WODs, movements, subscriptions, audit logs",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Uploaded avatars and backup zips on local volumes (uploads, backups)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "SMTP server (SMTP_HOST) used to send verification, reset and announcement emails",
+        "access": "write",
+        "leaves_organization": true
+      },
+      {
+        "source": "User-uploaded CSV imports (including a Wodify performance export) and CSV/JSON exports",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "youtube.com video links stored with WOD/movement entries",
+        "access": "read",
+        "leaves_organization": true
+      }
+    ],
+    "who_can_reach_it": "Binds to 0.0.0.0:8080 by default and is designed to be reachable by any user who can reach the host (optionally behind a Caddy reverse proxy). Most routes require a JWT; the public routes are login/registration/password reset, version, Swagger docs, the standard movement/WOD/template catalog, /health and /uploads/*.",
+    "unauthorized_action_red_flags": [
+      "docker/trouble/docker-compose.yml contains a password-shaped string tied to MARIADB_ROOT_PASSWORD in a tracked file.",
+      "Swagger UI (/api/docs/*) and the standard catalog are served without authentication.",
+      "JWT secret may be empty in non-production APP_ENV (default), which would make tokens forgeable if left unset.",
+      "Admin backup download/restore and user password-set endpoints exist (admin-only); a compromised admin account exposes the full database.",
+      "Tracked data exports contain personal data (author email and workout notes; a gym customer name)."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 1,
+      "high": 0,
+      "low": 29
+    },
+    "top_findings": [
+      "Critical: password-shaped string committed in docker/trouble/docker-compose.yml:22 (MARIADB_ROOT_PASSWORD error-message default), tracked and not gitignored",
+      "Low: tracked docker/.env.postgres, docker/.env.mariadb (placeholders) and web/certs/localhost-key.pem (dev key)",
+      "217 of 236 /api routes sit behind JWT middleware (120 admin-only); 19 public API routes plus /health, /uploads/*, / are recorded as low",
+      "JWT_SECRET may be empty unless APP_ENV=production; default bind 0.0.0.0; registration enabled by default"
+    ]
+  }
+}

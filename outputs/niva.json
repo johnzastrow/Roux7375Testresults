@@ -1,0 +1,141 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:31:26Z",
+    "project_root": "https://github.com/johnzastrow/niva",
+    "languages_detected": ["python", "node"],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. Node is limited to a small VS Code extension (.vscode/niva, JavaScript LSP client); Shell scripts (install.sh, tests/integration/run.sh, fetch_testdata.sh) were skimmed only; full interface/data-access detection for shell is out of scope for skill version 1.0. Custom .niva flow files are a project DSL, not scanned as code. Binary/test data (gpkg, geojson, kmz, tif, png, pdf) excluded. This is a CLI/library/QGIS plugin, not a web service: no HTTP routes exist."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": ["*.pem, *.key and credentials.json patterns are not explicitly listed (only .env, .envrc and .streamlit/secrets.toml are); node_modules is not explicitly confirmed in root .gitignore"]
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": ["pyproject.toml", "plugin/metadata.txt"],
+      "package_manager": "pip / hatchling (uv used by the author; uv.lock is gitignored)",
+      "dependency_count": 0,
+      "findings": [
+        "Runtime dependencies = [] by design (relies on QGIS's own Python); no lock file committed",
+        "Optional extras unpinned/lower-bounded: dev = pytest, ruff (no version); cli = prompt_toolkit>=3.0, rich>=13.0, textual>=0.60",
+        "requires-python >=3.12 in pyproject.toml while README badge says python 3.9+ (documentation inconsistency)"
+      ]
+    },
+    "node": {
+      "manifest_files": [".vscode/niva/package.json", ".vscode/niva/package-lock.json"],
+      "package_manager": "npm",
+      "dependency_count": 1,
+      "findings": ["vscode-languageclient ^8.1.0 (caret range, lock file present)"]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [
+      {
+        "file": ".github/workflows/ci.yml",
+        "line": 70,
+        "variable_name": "NIVA_TEST_PG",
+        "redacted_snippet": "NIVA_TEST_PG: \"host=postgres port=5432 dbname=niva user=niva password=niva***REDACTED***\"",
+        "severity": "low"
+      }
+    ],
+    "proper_secret_handling_found": [
+      {"file": "niva/credentials.py", "mechanism": "environment variable override, else QGIS encrypted auth store (QgsAuthManager); never logged, never prompts"},
+      {"file": "niva/utilities.py", "mechanism": "os.environ (NIVA_SMTP_*, NIVA_NTFY_*); credentials never taken from flow text"},
+      {"file": ".github/workflows/publish-pypi.yml", "mechanism": "PyPI Trusted Publishing (OIDC), no stored API token"},
+      {"file": ".pre-commit-config.yaml / .secrets.baseline", "mechanism": "detect-secrets pre-commit config and baseline"}
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {"type": "cli", "framework": "argparse-style custom CLI (project.scripts niva = niva.cli.main:main)", "file": "niva/cli/main.py"},
+      {"type": "qgis_plugin", "framework": "QGIS plugin (classFactory)", "file": "plugin/__init__.py"},
+      {"type": "language_server", "framework": "LSP over stdio (`niva lsp`)", "file": "niva/cli"},
+      {"type": "vscode_extension", "framework": "vscode-languageclient", "file": ".vscode/niva/extension.js"}
+    ],
+    "routes": [],
+    "network_binding": "none observed (no listening socket in scanned code; LSP uses stdio)",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite (GeoPackage) via stdlib sqlite3",
+        "credential_source": "none (local file)",
+        "file": "niva/engine/pyqgis.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {"present": false, "severity": "low", "reason": "writes use bound parameters (?); no web input reaches queries"}
+      },
+      {
+        "type": "PostgreSQL/PostGIS and other databases via named QGIS connections (`sql @conn`, `load @conn.table`, `save @conn.table`)",
+        "credential_source": "QGIS connection store / QGIS encrypted auth store (credentials never leave QGIS per README)",
+        "file": "niva/engine/pyqgis.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {"present": false, "severity": "low", "reason": "the `sql` verb deliberately executes SQL authored by the local user; no untrusted/remote input path observed"}
+      }
+    ],
+    "external_apis": [
+      {"host": "ntfy.sh (default; NIVA_NTFY_SERVER overridable)", "file": "niva/utilities.py", "access_type": "write"},
+      {"host": "user-configured SMTP host (smtp.gmail.com default for gmail senders)", "file": "niva/utilities.py", "access_type": "write"},
+      {"host": "user-supplied WFS/WMS/ArcGIS REST/XYZ URLs (read only, http/https only)", "file": "niva/remote.py", "access_type": "read"},
+      {"host": "github.com (marimo on-ramp release zip download)", "file": "niva/setup/marimo.py", "access_type": "read"},
+      {"host": "micro.mamba.pm (install hint text only)", "file": "niva/pdal_doctor.py", "access_type": "read"}
+    ],
+    "file_system_access": [
+      {"file": "niva/engine/pyqgis.py", "detail": "reads and writes user-specified geospatial files (gpkg, shp, csv, rasters, point clouds) and project files", "access_type": "read_write"},
+      {"file": "niva/utilities.py", "detail": "reads user-specified attachment path for email; writes catalog Markdown reports", "access_type": "read_write"},
+      {"file": "niva/setup (pathenv)", "detail": "setup command can append niva bin directory to PATH / shell rc files", "access_type": "write"}
+    ],
+    "sensitive_data_indicators": [
+      {"field_or_variable": "password / smtp password / ntfy token", "file": "niva/credentials.py"},
+      {"field_or_variable": "email / address", "file": "niva/utilities.py"},
+      {"field_or_variable": "password, email", "file": "plugin/dock.py"}
+    ],
+    "office_and_collaboration_sources": [
+      {"type": "email_mailbox", "file": "niva/utilities.py", "location_or_host": "SMTP host from NIVA_SMTP_HOST (send only, optional attachment)", "credential_source": "env_var", "access_type": "write"},
+      {"type": "csv", "file": "niva/engine/pyqgis.py", "location_or_host": "user-specified .csv/.tsv/.txt files loaded and joined", "credential_source": "unclear", "access_type": "read_write"}
+    ]
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": ["none - no Dockerfile present (CI uses a throwaway postgres service container)"],
+    "deploy_config_files": [".github/workflows/ci.yml", ".github/workflows/publish-pypi.yml", "docs/development/templates/Makefile", ".pre-commit-config.yaml"],
+    "environment_variables_referenced": ["APPDATA","CPL_TMPDIR","LOCALAPPDATA","NIVA_COLOR","NIVA_LOG","NIVA_NTFY_SERVER","NIVA_NTFY_TOKEN","NIVA_NTFY_TOPIC","NIVA_OTB_FOLDER","NIVA_PDAL_WRENCH","NIVA_PG_DB","NIVA_PG_HOST","NIVA_PG_PASSWORD","NIVA_PG_PORT","NIVA_QGIS_PROFILE","NIVA_QGIS_PYTHONPATH","NIVA_SAGA_CMD","NIVA_SMTP_FROM","NIVA_SMTP_HOST","NIVA_SMTP_PASSWORD","NIVA_SMTP_PORT","NIVA_SMTP_USER","NIVA_TEMPLATES","NIVA_TMPDIR","NO_COLOR","OSGEO4W_ROOT","QGIS_AUTH_DB_DIR_PATH","QGIS_PREFIX_PATH","QGIS_PYTHON_PATH","QGIS_WRENCH_EXECUTABLE","XDG_CONFIG_HOME","XDG_DATA_HOME"],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Runs geoprocessing pipelines written in a text grammar by translating them into QGIS Processing algorithm calls, reading and writing local geospatial files and database tables the user points it at.",
+      "Can send an ntfy push notification (default server ntfy.sh) and send SMTP email with an optional file attachment from the user's configured account.",
+      "Can write to databases through named QGIS connections, including server-side CREATE TABLE AS SELECT, when the user's flow requests it.",
+      "Can inventory a directory of geospatial datasets into a Markdown report and fetch layer listings from remote WFS/WMS/ArcGIS REST URLs.",
+      "Setup command can modify the user's PATH / shell rc files and download a marimo release from GitHub."
+    ],
+    "data_sources_touched": [
+      {"source": "Local geospatial files (gpkg, shp, geojson, csv, rasters, point clouds)", "access": "read_write", "leaves_organization": false},
+      {"source": "Databases via named QGIS connections (PostGIS, SQLite/GeoPackage)", "access": "read_write", "leaves_organization": false},
+      {"source": "ntfy.sh (or configured ntfy server)", "access": "write (sends user-authored notification text)", "leaves_organization": true},
+      {"source": "SMTP server (user-configured, Gmail default for Gmail senders)", "access": "write (email body and optional attachment)", "leaves_organization": true},
+      {"source": "Remote OGC/ArcGIS/XYZ services and GitHub downloads", "access": "read", "leaves_organization": false}
+    ],
+    "who_can_reach_it": "Local tool run by the user (CLI, QGIS plugin, LSP over stdio). No network listener or web routes were found, so it is reachable only by whoever runs it on their own machine.",
+    "unauthorized_action_red_flags": [
+      "notify and email verbs can send data off the machine to ntfy.sh / an SMTP host chosen by the user; attachments can be any readable file path",
+      "sql verb executes arbitrary user-authored SQL, including writes, against configured database connections"
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {"critical": 0, "high": 0, "low": 1},
+    "top_findings": [
+      "CI workflow contains a throwaway test-container Postgres password (.github/workflows/ci.yml:70), marked allowlist in detect-secrets",
+      "notify/email verbs can send data to external hosts (ntfy.sh, SMTP)",
+      "No web routes, no network listener; secrets resolved from env or QGIS encrypted auth store"
+    ]
+  }
+}

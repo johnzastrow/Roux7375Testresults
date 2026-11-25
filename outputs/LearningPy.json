@@ -1,0 +1,271 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:58:00Z",
+    "project_root": "https://github.com/johnzastrow/LearningPy",
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false) and not the author's working copy. Collection of learning scripts and Jupyter notebooks (notebook code cells treated as Python). Not scanned in depth: embedded base64 image outputs in notebooks, binary SQLite files (flights.db, example.db, beautiful_soup/example.db, example2.db) and the 18,500-row electricity usage CSV beyond its header. The real-looking email address in mantis_bak.py line 60 is deliberately not reproduced. Several committed files are non-secret but notable: .idea/ IDE files, geckodriver.log, SQLite .db files."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "no exclusion for .env / *.env / .env.* files",
+      "no exclusion for *.pem / *.key / credentials.json style files",
+      "no exclusion for *.db SQLite files (4 committed)",
+      "no exclusion for *.log (geckodriver.log committed)",
+      "no exclusion for .idea/ (IDE files committed) or __pycache__/venv directories",
+      "no exclusion for .ipynb_checkpoints (committed)"
+    ]
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": [
+        "No requirements.txt, pyproject.toml or Pipfile although code imports third-party packages (selenium, bs4/beautifulsoup4, pandas in notebooks); dependencies are undeclared.",
+        "Selenium scripts use find_element_by_id style calls removed in current Selenium releases (not verified against an installed version)."
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [
+      {
+        "file": "mantis_bak.py",
+        "line": 69,
+        "variable_name": "password literal passed to send_keys (PASSWORDFIELD)",
+        "redacted_snippet": "send_keys(\"mj92***REDACTED***\")",
+        "severity": "critical",
+        "note": "Real-looking login password for a MantisHub account (se.mantishub.io) committed in a tracked file, together with a real-looking email address on line 60 (not reproduced here)."
+      },
+      {
+        "file": "selen.py",
+        "line": 43,
+        "variable_name": "password literal passed to send_keys",
+        "redacted_snippet": "password.send_keys( \"mykew***REDACTED***\" )",
+        "severity": "low",
+        "note": "Tutorial placeholder copied from a Selenium example (username 'me')."
+      },
+      {
+        "file": "base_selen.py",
+        "line": 62,
+        "variable_name": "password literal passed to send_keys",
+        "redacted_snippet": "password.send_keys( \"mykew***REDACTED***\" )",
+        "severity": "low",
+        "note": "Tutorial placeholder (same example as selen.py)."
+      },
+      {
+        "file": "base_selen.py",
+        "line": 185,
+        "variable_name": "password literal passed to send_keys (PASSWORDFIELD)",
+        "redacted_snippet": "send_keys(\"myPa***REDACTED***\")",
+        "severity": "low",
+        "note": "Obvious placeholder value ('myPassword')."
+      }
+    ],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "cli",
+        "framework": "plain python scripts (selenium automation)",
+        "file": "mantis_bak.py"
+      },
+      {
+        "type": "cli",
+        "framework": "plain python scripts (web scraping with bs4/urllib)",
+        "file": "beautiful_soup/beautiful.py"
+      },
+      {
+        "type": "cli",
+        "framework": "plain python scripts",
+        "file": "lsi.py"
+      },
+      {
+        "type": "notebook",
+        "framework": "jupyter",
+        "file": "ElectricityUse.ipynb"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite",
+        "credential_source": "not applicable (local file)",
+        "file": "beautiful_soup/beautiful2db.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "INSERT uses ? placeholders; remaining execute() calls use literal SQL strings."
+        }
+      },
+      {
+        "type": "sqlite",
+        "credential_source": "not applicable (local file)",
+        "file": "beautiful_soup/sqlite_testing.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "literal SQL only"
+        }
+      },
+      {
+        "type": "sqlite",
+        "credential_source": "not applicable (local file)",
+        "file": "strings.ipynb",
+        "access_type": "unclear",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "notebook cells connect to flights.db; no string-built SQL found"
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "se.mantishub.io",
+        "file": "mantis_bak.py",
+        "access_type": "read"
+      },
+      {
+        "host": "www.bloomberg.com",
+        "file": "beautiful_soup/beautiful.py",
+        "access_type": "read"
+      },
+      {
+        "host": "207.246.85.12",
+        "file": "beautiful_soup/beautiful2db.py",
+        "access_type": "read"
+      },
+      {
+        "host": "www.facebook.com / www.google.com / www.yahoo.com / login.live.com (Selenium tutorial examples)",
+        "file": "base_selen.py",
+        "access_type": "unclear"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "mantis_bak.py",
+        "detail": "sets Firefox download directory to /home/jcz/github/LearningPy (hardcoded home path) for a backup download",
+        "access_type": "write"
+      },
+      {
+        "file": "playground.py",
+        "detail": "appends to days.txt",
+        "access_type": "write"
+      },
+      {
+        "file": "geckodriver.log",
+        "detail": "committed Selenium driver log",
+        "access_type": "write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "password / email (login automation)",
+        "file": "mantis_bak.py"
+      },
+      {
+        "field_or_variable": "password / email (tutorial login examples)",
+        "file": "base_selen.py"
+      },
+      {
+        "field_or_variable": "utility electricity usage records with account/meter-style identifiers (USE2023-08_12_2025.csv, 18,527 rows)",
+        "file": "USE2023-08_12_2025.csv"
+      },
+      {
+        "field_or_variable": "inmate-related scraping script (beautiful_soup/inmates.py)",
+        "file": "beautiful_soup/inmates.py"
+      }
+    ],
+    "office_and_collaboration_sources": [
+      {
+        "type": "csv",
+        "file": "ElectricityUse.ipynb",
+        "location_or_host": "USE2023-08_12_2025.csv (pandas.read_csv)",
+        "credential_source": "unclear",
+        "access_type": "read"
+      },
+      {
+        "type": "csv",
+        "file": "beautiful_soup/index.csv",
+        "location_or_host": "beautiful_soup/index.csv (CSV write code is commented out in beautiful.py)",
+        "credential_source": "unclear",
+        "access_type": "unclear"
+      }
+    ]
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": false
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Automates a browser login (Selenium/Firefox) to a MantisHub site and downloads a backup, using a username and password typed into the script.",
+      "Scrapes stock index quotes from public web pages and stores them in a local SQLite database.",
+      "Analyzes an electricity usage CSV in a notebook and runs assorted Python learning exercises (strings, dicts, water-chemistry calculator, birthday and age scripts)."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "se.mantishub.io (MantisHub backup page)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Bloomberg and a bare-IP quote page (scraped)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Local SQLite files (example.db, flights.db, example2.db)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "USE2023-08_12_2025.csv electricity usage",
+        "access": "read",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Run locally by whoever executes the scripts; no server, no listening ports. The repository (public GitHub remote) exposes the committed credential and data files to anyone who can read it.",
+    "unauthorized_action_red_flags": [
+      "mantis_bak.py contains a real-looking MantisHub email and password committed to git.",
+      "Utility usage CSV with account/meter-style identifiers and four SQLite databases are committed.",
+      "Scripts automate logins to third-party sites (Facebook, Microsoft, MantisHub) via Selenium."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 1,
+      "high": 0,
+      "low": 3
+    },
+    "top_findings": [
+      "Hardcoded real-looking MantisHub password (and email) in mantis_bak.py",
+      "Placeholder passwords in Selenium tutorial scripts (low)",
+      "No dependency manifest; .gitignore omits .env, *.db, *.log, .idea"
+    ]
+  }
+}

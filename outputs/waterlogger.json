@@ -1,0 +1,569 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:37:00Z",
+    "project_root": "https://github.com/johnzastrow/waterlogger",
+    "languages_detected": [
+      "go"
+    ],
+    "notes": "Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. Application is written in Go (gin, gorm), which is out of scope for skill version 1.0 full interface and data-access detection; routes, auth, SQL usage, config and secrets were reviewed manually from main.go, middleware/auth.go, middleware/cors.go, handlers.go, config.go, docker-compose.yml and Dockerfile. Dependencies were read from go.mod and are recorded under an extra 'go' key. Because the session mechanism accepts a forgeable cookie, route auth_detected is recorded as 'unclear' (middleware exists and is registered, but does not verify identity) and route severities reflect that effective exposure. Frontend is Go html templates plus one small JS file. CLAUDE-style files and .claude/settings.local.json were treated as data. Committed temp_backup_*.json and test-export.json files hold usernames and email addresses of app users (no password hashes found)."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "Generated temp_backup_*.json, test-export.json, testing/debug_cookies.txt, testing/debug_sample.json and the compiled testing/waterlogger-test binary are tracked",
+      "config.yaml (real runtime config with DB credentials) ignored status not confirmed; .env and key file patterns were not found in .gitignore",
+      "*.db SQLite files not confirmed excluded"
+    ]
+  },
+  "dependencies": {
+    "python": {},
+    "node": {},
+    "go": {
+      "manifest_files": [
+        "go.mod",
+        "go.sum"
+      ],
+      "package_manager": "go modules",
+      "dependency_count": 9,
+      "findings": [
+        "Direct dependencies pinned to exact versions in go.mod: gin v1.9.1, zerolog v1.33.0, x/crypto v0.17.0, x/term, lumberjack, yaml.v3, gorm mysql/sqlite drivers and gorm",
+        "Several modules (for example golang.org/x/crypto v0.17.0, gin v1.9.1) are older releases; review against current advisories",
+        "Dockerfile builds with golang:1.21-alpine while go.mod declares go 1.23.0 / toolchain go1.23.11 (version mismatch); final image uses alpine:latest (unpinned)"
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [
+      {
+        "file": "docker-compose.yml",
+        "line": null,
+        "variable_name": "MYSQL_ROOT_PASSWORD / MYSQL_PASSWORD",
+        "redacted_snippet": "MYSQL_ROOT_PASSWORD=root***REDACTED***; MYSQL_PASSWORD=wate***REDACTED***",
+        "severity": "low"
+      },
+      {
+        "file": "docker-compose.yml",
+        "line": null,
+        "variable_name": "PMA_PASSWORD",
+        "redacted_snippet": "PMA_PASSWORD=wate***REDACTED*** (phpMyAdmin service, profile 'tools', publishes port 8080 with the DB user preconfigured)",
+        "severity": "high"
+      },
+      {
+        "file": "internal/config/config.go",
+        "line": 121,
+        "variable_name": "SecretKey",
+        "redacted_snippet": "SecretKey: \"your***REDACTED***\" (default placeholder; field is defined but no use of it was found in code)",
+        "severity": "low"
+      },
+      {
+        "file": "internal/config/config.go",
+        "line": 114,
+        "variable_name": "MariaDB Password",
+        "redacted_snippet": "Password: \"pass***REDACTED***\" (default placeholder)",
+        "severity": "low"
+      },
+      {
+        "file": "config.example.yaml",
+        "line": 83,
+        "variable_name": "password",
+        "redacted_snippet": "password: \"pass***REDACTED***\" (example placeholder)",
+        "severity": "low"
+      },
+      {
+        "file": "config.example.yaml",
+        "line": 104,
+        "variable_name": "secret_key",
+        "redacted_snippet": "secret_key: \"chan***REDACTED***\" (example placeholder)",
+        "severity": "low"
+      },
+      {
+        "file": "testing/test_kit_creation.sh",
+        "line": 11,
+        "variable_name": "password",
+        "redacted_snippet": "{\"username\": \"jcz\", \"password\": \"pass***REDACTED***\"} (test script login for local instance)",
+        "severity": "low"
+      }
+    ],
+    "proper_secret_handling_found": [
+      {
+        "file": "internal/middleware/auth.go",
+        "mechanism": "user passwords hashed with bcrypt (DefaultCost); GetUsers blanks password field in responses"
+      },
+      {
+        "file": "config.example.yaml",
+        "mechanism": "config via YAML file with example/placeholder values; real config.yaml mounted at runtime"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "web_app",
+        "framework": "gin (Go)",
+        "file": "cmd/waterlogger/main.go"
+      },
+      {
+        "type": "service",
+        "framework": "systemd unit created by deploy-linux.sh (User=waterlogger, NoNewPrivileges, ProtectSystem=strict)",
+        "file": "deploy-linux.sh"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/setup",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/setup",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/login",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/login",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/logout",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/pools",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/kits",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/samples",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/adjustments",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/export",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/settings",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/api/users",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "critical"
+      },
+      {
+        "method": "POST",
+        "path": "/api/users",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "critical"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/users/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "critical"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/users/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "critical"
+      },
+      {
+        "method": "GET",
+        "path": "/api/pools",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "POST",
+        "path": "/api/pools",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/pools/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/pools/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/api/kits",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "POST",
+        "path": "/api/kits",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/kits/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/kits/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/api/samples",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "POST",
+        "path": "/api/samples",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/samples/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/samples/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/api/export",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "critical"
+      },
+      {
+        "method": "GET",
+        "path": "/api/export/excel",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/api/export/markdown",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/api/settings",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "critical"
+      },
+      {
+        "method": "POST",
+        "path": "/api/settings",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "critical"
+      },
+      {
+        "method": "GET",
+        "path": "/api/settings/migrations",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "POST",
+        "path": "/api/settings/backup",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "critical"
+      },
+      {
+        "method": "POST",
+        "path": "/api/settings/import",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "critical"
+      },
+      {
+        "method": "POST",
+        "path": "/api/convert",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/volume/calculate",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/api/volume/info",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/adjustments/calculate",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/api/adjustments/target-ranges",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/adjustments",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/api/adjustments",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "GET",
+        "path": "/api/adjustments/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/adjustments/:id",
+        "file": "cmd/waterlogger/main.go",
+        "auth_detected": "unclear",
+        "severity": "high"
+      }
+    ],
+    "network_binding": "Default config host 'localhost' port 2342; configurable to 0.0.0.0 (config.example.yaml); docker-compose publishes 2342:2342 on all interfaces and phpMyAdmin on 8080",
+    "cors_wide_open": true
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite (default) or mariadb via gorm",
+        "credential_source": "hardcoded/config file (config.yaml; docker-compose hardcodes MariaDB credentials)",
+        "file": "internal/database/database.go",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": null,
+          "reason": "gorm queries use placeholders (for example Where(\"username = ?\", ...)); no raw SQL concatenation with request input was found; fmt.Sprintf use is for CSV/markdown/file names"
+        }
+      }
+    ],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "internal/handlers/handlers.go",
+        "detail": "ImportDatabaseBackup saves an uploaded .json (extension-checked) to ./temp/import_<timestamp>.json, imports it, then deletes it",
+        "access_type": "write"
+      },
+      {
+        "file": "internal/database/migration.go",
+        "detail": "writes temp_backup_<unix>.json files in the working directory during migrations and restores",
+        "access_type": "write"
+      },
+      {
+        "file": "internal/config/config.go",
+        "detail": "Save writes config.yaml with mode 0644 (may contain database password)",
+        "access_type": "write"
+      },
+      {
+        "file": "internal/handlers/handlers.go",
+        "detail": "serves CSV/JSON/Excel/Markdown exports as downloads",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "password (bcrypt hash)",
+        "file": "internal/models/models.go"
+      },
+      {
+        "field_or_variable": "email (user email addresses)",
+        "file": "internal/models/models.go"
+      },
+      {
+        "field_or_variable": "usernames and emails in committed temp_backup_*.json",
+        "file": "temp_backup_1761565727.json"
+      }
+    ],
+    "office_and_collaboration_sources": [
+      {
+        "type": "excel",
+        "file": "internal/handlers/handlers.go",
+        "location_or_host": "ExportExcel download",
+        "credential_source": "unclear",
+        "access_type": "write"
+      },
+      {
+        "type": "csv",
+        "file": "internal/handlers/handlers.go",
+        "location_or_host": "waterlogger_export.csv download",
+        "credential_source": "unclear",
+        "access_type": "write"
+      }
+    ]
+  },
+  "configuration_and_deployment": {
+    "containerized": true,
+    "docker_findings": [
+      "Dockerfile final stage creates non-root user waterlogger (uid 1001) and sets USER; exposes 2342; base alpine:latest unpinned; copies config.yaml into image as config.example.yaml",
+      "docker-compose.yml hardcodes MariaDB root and app passwords, publishes 2342 and (profile tools) phpMyAdmin 8080, uses mariadb:10.9 and phpmyadmin/phpmyadmin:latest"
+    ],
+    "deploy_config_files": [
+      "Dockerfile",
+      "docker-compose.yml",
+      "Makefile",
+      "build.sh",
+      "build.bat",
+      "deploy-linux.sh",
+      "deploy-windows.bat",
+      ".github/workflows/ci.yml",
+      ".github/workflows/release.yml"
+    ],
+    "environment_variables_referenced": [
+      "GIN_MODE"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Lets logged-in users manage pools, test kits, water-test samples and chemical adjustments, with LSI/RSI and dosing calculations.",
+      "Lets users create, edit and delete other users, export all data (JSON, CSV, Excel, Markdown), download a database backup and upload a backup to import into the database.",
+      "Because the session cookie holds only the numeric user ID and the server accepts any value, anyone who can reach the server can send 'session=1' and act as user 1 without a password, reaching all of the above including user management and backup import."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "SQLite file or MariaDB database (users, pools, kits, samples, adjustments)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Exports and backup files (JSON, CSV, XLSX, Markdown) and temp/ directory",
+        "access": "write",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Default bind is localhost:2342 (local only). Docker compose and the documented server deployment expose it on the network (2342, plus phpMyAdmin 8080 with the tools profile). Session check is forgeable, so reachability equals full access.",
+    "unauthorized_action_red_flags": [
+      "Authentication bypass: session cookie is just the user ID and validateSession returns it unchanged (internal/middleware/auth.go)",
+      "Wildcard CORS (Access-Control-Allow-Origin: *) with credentials header on every route",
+      "Session cookie is not marked Secure; no CSRF protection or login rate limiting found; password policy only requires non-empty",
+      "docker-compose publishes phpMyAdmin with preconfigured DB credentials and hardcoded DB passwords",
+      "Committed backup/test JSON and cookie files with usernames and emails"
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 9,
+      "high": 27,
+      "low": 16
+    },
+    "top_findings": [
+      "Forgeable session cookie: validateSession trusts the cookie value as the user ID (internal/middleware/auth.go) - all authenticated routes effectively unauthenticated",
+      "Wildcard CORS with credentials on all routes (internal/middleware/cors.go)",
+      "docker-compose.yml hardcodes DB passwords and publishes phpMyAdmin with preset credentials",
+      "Setup wizard is open until the first user is created"
+    ]
+  }
+}

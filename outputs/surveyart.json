@@ -1,0 +1,126 @@
+{
+  "scan_metadata": {
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy; the repo has a single commit. Single-file Python CLI (artwork.py, 1101 lines) read in full for subprocess usage, file writes and XML parsing. The raw 'SQL write ops: 1' hit is a false positive (no database code exists). Docs (README, INDEX, QUICK_REFERENCE, FEATURE_EXAMPLES, CONSOLIDATION_SUMMARY) were used for purpose only.",
+    "scan_date": "2026-11-25T19:36:52Z",
+    "schema_version": "1.0",
+    "project_root": "https://github.com/johnzastrow/surveyart"
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "no .env, *.pem, *.key or credentials.json patterns (none present; the tool uses no secrets)"
+    ],
+    "commit_count_sampled": 1
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": [
+        "no requirements.txt or pyproject.toml; Pillow is an optional third-party import (PIL, guarded by try/except) documented only in README as 'pip install Pillow'",
+        "external programs invoked and not declared in any manifest: Inkscape, ImageMagick (montage), optional svgo and scour"
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "cli",
+        "framework": "argparse (subcommands convert, colors, montage, palette, style guide, optimize)",
+        "file": "artwork.py"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none - no listener",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "artwork.py",
+        "detail": "reads vector and image files from a user-supplied directory (default current working directory), recursively by default",
+        "access_type": "read"
+      },
+      {
+        "file": "artwork.py",
+        "detail": "writes converted files, color lists, palettes (JSON/CSS), HTML style guides and optimized SVGs to output paths (open(...,'w') at lines 235, 458, 462, 473, 569, 843)",
+        "access_type": "write"
+      },
+      {
+        "file": "artwork.py",
+        "detail": "runs external programs via subprocess.run with argument lists (no shell=True): inkscape (lines 71, 94), ImageMagick montage (line 306), svgo/scour (lines 516, 539); paths and options come from command-line arguments and interactive prompts",
+        "access_type": "write"
+      },
+      {
+        "file": "artwork.py",
+        "detail": "hardcoded Inkscape install locations under C:\\\\Program Files and scoop, /usr/bin, /opt (lines 32-39) used only to locate the program",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Batch-converts vector files (SVG, PDF, EPS, AI and others) to other formats by calling Inkscape on files in a chosen folder tree.",
+      "Extracts hex color values from SVG files, and generates color palettes from images or SVGs as JSON, CSS or palette files.",
+      "Builds image contact-sheet montages by calling ImageMagick.",
+      "Generates HTML style guides and optimizes SVG files using svgo, scour or built-in compression."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "Local image and vector files in user-chosen directories",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Output files written to user-chosen locations (converted images, JSON/CSS, HTML, SVG)",
+        "access": "write",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Runs only as a command-line tool by whoever executes it on their own machine; no network listener and no authentication.",
+    "unauthorized_action_red_flags": [
+      "none found - no credentials, no network calls and no external data flows; the tool executes locally installed programs (Inkscape, ImageMagick, svgo, scour) with file names derived from the scanned folder"
+    ]
+  },
+  "summary": {
+    "top_findings": [
+      "No findings with severity: no secrets, no network access, no database",
+      "Dependencies are undeclared (no manifest): Pillow plus external programs Inkscape and ImageMagick",
+      "Subprocess calls use argument lists (no shell), but file names and options from the filesystem and command line reach external programs",
+      "Single commit; no tests or CI present"
+    ],
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 0
+    }
+  }
+}

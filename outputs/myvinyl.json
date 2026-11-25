@@ -1,0 +1,829 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:38:09Z",
+    "project_root": "https://github.com/johnzastrow/myvinyl",
+    "languages_detected": [
+      "python"
+    ],
+    "notes": "Fresh shallow clone of default branch (depth 20); has_uncommitted_changes reflects the clone (false), not the author's working copy. FastAPI/Jinja2 server-rendered app; routes were enumerated from decorators in src/myvinyl/main.py (65 decorated routes plus the /static mount). Routes under the signed-in router and the admin router have severity null (not severity-tagged) because auth_detected is true and no other issue was found; only the 7 public routes carry a 'low' severity. Test fixtures (tests/*.py passwords such as the NEW_PASSWORD and PASSWORD constants) were excluded as test values and not recorded. SQL built by f-string in src/myvinyl/db.py (lines 307, 311, 625, 1198, 1208, 1273, 1291) uses allowlisted column names/clauses with bound parameters for all values, so sql_injection_risk is recorded as not present. tools/clean_audio.py (OBS recording audio cleanup helper) was reviewed by pattern only. Personal path C:/Users/br8kw appears in a tools/clean_audio.py usage docstring. Repo has no .github workflows."
+  },
+  "version_control": {
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "*.pem, *.key and credentials.json patterns are not excluded (.env, *.db, data/, backups/, covers/ and .venv are excluded)"
+    ],
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "pyproject.toml",
+        "uv.lock"
+      ],
+      "package_manager": "uv",
+      "dependency_count": 9,
+      "findings": [
+        "Runtime dependencies in pyproject.toml use minimum-version ranges (>=), e.g. fastapi>=0.115, uvicorn>=0.32; exact versions are pinned in the committed uv.lock and the Dockerfile uses 'uv sync --locked'",
+        "4 dev dependencies (pytest, httpx2, ruff, pytest-cov) are not counted in dependency_count",
+        "Dockerfile base image python:3.13-slim is not pinned by digest (TODO.md lists pinning as planned work, issue #7)"
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "src/myvinyl/config.py",
+        "mechanism": "os.environ for MYVINYL_SECRET_KEY (min 32 chars enforced), MYVINYL_PASSWORD_HASH (must be argon2id), MYVINYL_TOKEN_KEY, MYVINYL_DISCOGS_TOKEN"
+      },
+      {
+        "file": "src/myvinyl/credentials.py",
+        "mechanism": "getpass prompts to generate an Argon2id hash; helper for key generation"
+      },
+      {
+        "file": "src/myvinyl/tokens.py",
+        "mechanism": "per-user Discogs tokens encrypted at rest with AES-256-GCM (cryptography AESGCM)"
+      },
+      {
+        "file": "compose.yaml",
+        "mechanism": "env_file: .env (gitignored) with deploy/env.template providing blank placeholders"
+      }
+    ],
+    "env_example_present": true
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "web_app",
+        "framework": "fastapi",
+        "file": "src/myvinyl/main.py"
+      },
+      {
+        "type": "cli",
+        "framework": "argparse (uvicorn launcher, default host 127.0.0.1)",
+        "file": "src/myvinyl/__main__.py"
+      },
+      {
+        "type": "cli",
+        "framework": "python module",
+        "file": "src/myvinyl/credentials.py"
+      },
+      {
+        "type": "cli",
+        "framework": "python script",
+        "file": "tools/clean_audio.py"
+      },
+      {
+        "type": "scheduled",
+        "framework": "in-process background jobs (hourly Discogs refresh, daily backups, trash purge)",
+        "file": "src/myvinyl/main.py"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/favicon.ico",
+        "file": "src/myvinyl/main.py",
+        "line": 635,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "static icon"
+      },
+      {
+        "method": "GET",
+        "path": "/healthz",
+        "file": "src/myvinyl/main.py",
+        "line": 639,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "returns \"ok\" only"
+      },
+      {
+        "method": "GET",
+        "path": "/login",
+        "file": "src/myvinyl/main.py",
+        "line": 643,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "login form; POST is CSRF-checked and rate-limited per IP and username with Argon2 verification"
+      },
+      {
+        "method": "POST",
+        "path": "/login",
+        "file": "src/myvinyl/main.py",
+        "line": 649,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "login form; POST is CSRF-checked and rate-limited per IP and username with Argon2 verification"
+      },
+      {
+        "method": "GET",
+        "path": "/link/{token}",
+        "file": "src/myvinyl/main.py",
+        "line": 682,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "invite/reset link page: token-gated (hashed token lookup), POST is CSRF-checked and rate-limited per IP"
+      },
+      {
+        "method": "POST",
+        "path": "/link/{token}",
+        "file": "src/myvinyl/main.py",
+        "line": 690,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "invite/reset link page: token-gated (hashed token lookup), POST is CSRF-checked and rate-limited per IP"
+      },
+      {
+        "method": "POST",
+        "path": "/logout",
+        "file": "src/myvinyl/main.py",
+        "line": 758,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/account/discogs-token",
+        "file": "src/myvinyl/main.py",
+        "line": 776,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/account/discogs-token/delete",
+        "file": "src/myvinyl/main.py",
+        "line": 812,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/account",
+        "file": "src/myvinyl/main.py",
+        "line": 826,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/account/identity",
+        "file": "src/myvinyl/main.py",
+        "line": 830,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/account/sign-out-everywhere",
+        "file": "src/myvinyl/main.py",
+        "line": 856,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/account/profile",
+        "file": "src/myvinyl/main.py",
+        "line": 864,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/account",
+        "file": "src/myvinyl/main.py",
+        "line": 874,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "file": "src/myvinyl/main.py",
+        "line": 915,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/report",
+        "file": "src/myvinyl/main.py",
+        "line": 929,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/stats",
+        "file": "src/myvinyl/main.py",
+        "line": 939,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/export.csv",
+        "file": "src/myvinyl/main.py",
+        "line": 949,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/albums/new",
+        "file": "src/myvinyl/main.py",
+        "line": 1064,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums",
+        "file": "src/myvinyl/main.py",
+        "line": 1068,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/albums/{album_id}",
+        "file": "src/myvinyl/main.py",
+        "line": 1104,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/covers/{album_id}",
+        "file": "src/myvinyl/main.py",
+        "line": 1138,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/albums/{album_id}/edit",
+        "file": "src/myvinyl/main.py",
+        "line": 1151,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}",
+        "file": "src/myvinyl/main.py",
+        "line": 1157,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/lookup",
+        "file": "src/myvinyl/main.py",
+        "line": 1199,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/pressing",
+        "file": "src/myvinyl/main.py",
+        "line": 1207,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/cover",
+        "file": "src/myvinyl/main.py",
+        "line": 1223,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/cover/upload",
+        "file": "src/myvinyl/main.py",
+        "line": 1237,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/cover/reset",
+        "file": "src/myvinyl/main.py",
+        "line": 1260,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/review",
+        "file": "src/myvinyl/main.py",
+        "line": 1269,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/notes",
+        "file": "src/myvinyl/main.py",
+        "line": 1280,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/notes/{note_id}/delete",
+        "file": "src/myvinyl/main.py",
+        "line": 1290,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/albums/{album_id}/tracks",
+        "file": "src/myvinyl/main.py",
+        "line": 1298,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/tracks",
+        "file": "src/myvinyl/main.py",
+        "line": 1310,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/albums/{album_id}/delete",
+        "file": "src/myvinyl/main.py",
+        "line": 1325,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/help",
+        "file": "src/myvinyl/main.py",
+        "line": 1335,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/trash",
+        "file": "src/myvinyl/main.py",
+        "line": 1342,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/trash/{album_id}/restore",
+        "file": "src/myvinyl/main.py",
+        "line": 1351,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/trash/{album_id}/purge",
+        "file": "src/myvinyl/main.py",
+        "line": 1358,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/trash/empty",
+        "file": "src/myvinyl/main.py",
+        "line": 1367,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/discogs/sync",
+        "file": "src/myvinyl/main.py",
+        "line": 1436,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/discogs/sync/{run_id}/resume",
+        "file": "src/myvinyl/main.py",
+        "line": 1455,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/discogs/review",
+        "file": "src/myvinyl/main.py",
+        "line": 1471,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/discogs/review/{item_id}",
+        "file": "src/myvinyl/main.py",
+        "line": 1505,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/discogs/review-all",
+        "file": "src/myvinyl/main.py",
+        "line": 1515,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/import",
+        "file": "src/myvinyl/main.py",
+        "line": 1528,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/import",
+        "file": "src/myvinyl/main.py",
+        "line": 1532,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/wishlist",
+        "file": "src/myvinyl/main.py",
+        "line": 1556,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/wishlist",
+        "file": "src/myvinyl/main.py",
+        "line": 1569,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/wishlist/import",
+        "file": "src/myvinyl/main.py",
+        "line": 1588,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/wishlist/{wish_id}/refresh",
+        "file": "src/myvinyl/main.py",
+        "line": 1599,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/wishlist/{wish_id}/delete",
+        "file": "src/myvinyl/main.py",
+        "line": 1607,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "POST",
+        "path": "/wishlist/{wish_id}/got",
+        "file": "src/myvinyl/main.py",
+        "line": 1614,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Router-level Depends(load_user) requires a live, enabled account with a current session (main.py:756, 563); POST routes also check a CSRF token via checked_form"
+      },
+      {
+        "method": "GET",
+        "path": "/admin",
+        "file": "src/myvinyl/main.py",
+        "line": 1665,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/invite",
+        "file": "src/myvinyl/main.py",
+        "line": 1669,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users/{user_id}/reset",
+        "file": "src/myvinyl/main.py",
+        "line": 1685,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users/{user_id}/disable",
+        "file": "src/myvinyl/main.py",
+        "line": 1705,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users/{user_id}/enable",
+        "file": "src/myvinyl/main.py",
+        "line": 1716,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users/{user_id}/role",
+        "file": "src/myvinyl/main.py",
+        "line": 1723,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users/{user_id}/identity",
+        "file": "src/myvinyl/main.py",
+        "line": 1734,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/users/{user_id}/discogs-token/clear",
+        "file": "src/myvinyl/main.py",
+        "line": 1751,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/links/{link_id}/revoke",
+        "file": "src/myvinyl/main.py",
+        "line": 1761,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/view/{user_id}",
+        "file": "src/myvinyl/main.py",
+        "line": 1767,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/view-mine",
+        "file": "src/myvinyl/main.py",
+        "line": 1774,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "POST",
+        "path": "/admin/backup",
+        "file": "src/myvinyl/main.py",
+        "line": 1780,
+        "auth_detected": true,
+        "severity": null,
+        "note": "Admin router: Depends(require_admin) returns 404 for non-admins (main.py:1647)"
+      },
+      {
+        "method": "GET",
+        "path": "/static/*",
+        "file": "src/myvinyl/main.py",
+        "line": 542,
+        "auth_detected": false,
+        "severity": "low",
+        "note": "StaticFiles mount for CSS, logo, guide screenshots; no sensitive data"
+      }
+    ],
+    "network_binding": "127.0.0.1 by default (src/myvinyl/__main__.py); container CMD binds 0.0.0.0:8000 (Dockerfile) but compose.yaml publishes only 127.0.0.1:${MYVINYL_HOST_PORT:-8085}; production fronted by Caddy with HSTS (deploy/Caddyfile.myvinyl)",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite",
+        "credential_source": "none (local file path from MYVINYL_DB)",
+        "file": "src/myvinyl/db.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "values are bound parameters; the few f-string SQL fragments use allowlisted column/order/where text (db.py 307, 311, 625, 1198, 1208, 1273, 1291)"
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "api.discogs.com",
+        "file": "src/myvinyl/discogs.py",
+        "access_type": "read"
+      },
+      {
+        "host": "i.discogs.com",
+        "file": "src/myvinyl/discogs.py",
+        "access_type": "read"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "src/myvinyl/storage.py",
+        "detail": "writes cover images (uploaded or fetched from i.discogs.com) and SQLite online backups into the data directory next to the database; extension and image-type checks, 5 MB cap",
+        "access_type": "write"
+      },
+      {
+        "file": "src/myvinyl/main.py",
+        "detail": "GET /export.csv streams the signed-in user's collection as CSV (formula-injection neutralized via csv_safe)",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "password_hash (Argon2id), session_version",
+        "file": "src/myvinyl/db.py"
+      },
+      {
+        "field_or_variable": "email (optional profile field)",
+        "file": "src/myvinyl/db.py"
+      },
+      {
+        "field_or_variable": "Discogs personal access tokens (encrypted at rest)",
+        "file": "src/myvinyl/tokens.py"
+      },
+      {
+        "field_or_variable": "user collection data: values (value_cents), condition, notes, reviews",
+        "file": "src/myvinyl/db.py"
+      }
+    ],
+    "office_and_collaboration_sources": [
+      {
+        "type": "csv",
+        "file": "src/myvinyl/main.py",
+        "location_or_host": "CSV export download (/export.csv) and Discogs-collection import via the Discogs API",
+        "credential_source": "env_var",
+        "access_type": "write"
+      }
+    ]
+  },
+  "configuration_and_deployment": {
+    "containerized": true,
+    "docker_findings": [
+      "Dockerfile: multi-stage build, non-root user myvinyl (uid 10001) via USER instruction, EXPOSE 8000, HEALTHCHECK on /healthz, base images python:3.13-slim and uv 0.11.20 (python image not digest-pinned)",
+      "compose.yaml: read_only root filesystem with tmpfs /tmp, cap_drop ALL, no-new-privileges, mem_limit 512m, pids_limit 200, port published on 127.0.0.1 only; FORWARDED_ALLOW_IPS='*' is set with a comment explaining it is safe only because of the loopback-only publish"
+    ],
+    "deploy_config_files": [
+      "Dockerfile",
+      "compose.yaml",
+      "deploy/Caddyfile.myvinyl",
+      "deploy/env.template",
+      "deploy/DEPLOY.md",
+      "deploy/OPERATIONS.md"
+    ],
+    "environment_variables_referenced": [
+      "MYVINYL_ADMIN_USER",
+      "MYVINYL_BACKUP_HOURS",
+      "MYVINYL_BACKUP_KEEP",
+      "MYVINYL_BASE_URL",
+      "MYVINYL_DB",
+      "MYVINYL_DISCOGS_TOKEN",
+      "MYVINYL_PASSWORD_HASH",
+      "MYVINYL_REFRESH_DAYS",
+      "MYVINYL_SECRET_KEY",
+      "MYVINYL_TOKEN_KEY",
+      "MYVINYL_TRASH_DAYS",
+      "MYVINYL_HOST_PORT (compose/env.template)",
+      "FORWARDED_ALLOW_IPS (compose)"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Lets invited users sign in and keep a private vinyl record collection and wishlist (add, edit, soft-delete and restore albums, notes, ratings, covers, track ratings), with stats and printable reports.",
+      "Looks up albums on Discogs with each user's own access token, stores release details, prices and value history, and syncs a user's Discogs collection through a review queue (read-only calls to Discogs).",
+      "Lets a signed-in user export their own collection as CSV.",
+      "Lets admins invite users via one-time links, reset passwords, disable accounts, change roles, clear stored Discogs tokens, view another user's collection and trigger database backups."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "SQLite database myvinyl.db (users, albums, wishlist, sync tables, value history)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Cover image files and backups in the data directory",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Discogs API (api.discogs.com, i.discogs.com)",
+        "access": "read (search queries, release ids, barcodes and the user's token are sent out)",
+        "leaves_organization": true
+      }
+    ],
+    "who_can_reach_it": "Bound to loopback by default; the documented deployment publishes 127.0.0.1 only behind Caddy with HTTPS at a public hostname, so it is reachable by anyone on the internet who can reach that hostname, but every page except login, invite/reset links, favicon, health and static assets requires an authenticated session; there is no open sign-up.",
+    "unauthorized_action_red_flags": [
+      "Collection metadata (artist, title, barcode search terms) and each user's Discogs token are sent to Discogs, an external third party, by design.",
+      "Admins can view and edit any user's collection (documented feature).",
+      "Public routes exist (login, invite/reset link pages) and are the internet-facing attack surface; they are CSRF-checked and rate-limited per the code."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 7
+    },
+    "top_findings": [
+      "No severity-tagged findings above low: 7 public routes recorded as low (login, link token pages, health, static)",
+      "Discogs API (external) receives search terms and users' access tokens by design; tokens stored AES-256-GCM encrypted",
+      "Runtime dependency versions use >= ranges in pyproject.toml (locked in uv.lock); Docker base image not digest-pinned",
+      "Strong baseline observed: Argon2id, CSRF tokens, rate limiting, CSP, non-root read-only container"
+    ]
+  }
+}

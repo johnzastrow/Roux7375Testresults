@@ -1,0 +1,1119 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:35:00Z",
+    "project_root": "https://github.com/johnzastrow/mydocmost",
+    "languages_detected": [
+      "node"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false) and not the author's working copy. Repository is a fork of the open-source Docmost wiki (TypeScript: NestJS/Fastify server, React/Vite client, pnpm/Nx monorepo). Language is TypeScript (treated as Node.js). Scan excluded pnpm-lock.yaml and i18n/locale and vendored patches from content findings. Authenticated routes (JwtAuthGuard on the controller or handler) carry severity null because no finding applies; only unauthenticated routes are severity-tagged. Route paths are prefixed with the global 'api' prefix set in apps/server/src/main.ts. Commented 'ee' (enterprise) code referenced by imports (apps/server/src/ee, apps/client/src/ee) is largely absent or license-restricted; only packages/ee/LICENSE and client ee files were present, so enterprise routes (SSO, MFA, AI, audit) were not enumerated. Dependency counts are direct dependencies + devDependencies across root, apps/server and apps/client package.json."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "*.pem / *.key / credentials.json style files are not excluded (only .env, .env.dev, .env.prod, data are)",
+      "wildcard '.env.*' / '*.env' is not used; e.g. .env.local or .env.test would not be ignored",
+      "no explicit exclusion of .pnpm-store"
+    ]
+  },
+  "dependencies": {
+    "python": {},
+    "node": {
+      "manifest_files": [
+        "package.json",
+        "apps/server/package.json",
+        "apps/client/package.json",
+        "packages/editor-ext/package.json",
+        "pnpm-lock.yaml"
+      ],
+      "package_manager": "pnpm",
+      "dependency_count": 249,
+      "findings": [
+        "Lockfile pnpm-lock.yaml present and Dockerfile uses --frozen-lockfile.",
+        "Most versions use caret ranges (^); core Tiptap/Hocuspocus/axios are pinned exactly (axios 1.13.5 pinned for supply-chain mitigation per latest commit).",
+        "docker-compose.yml uses image docmost/docmost:latest (unpinned image tag).",
+        "No wildcard '*' or 'latest' dependency versions in package.json files.",
+        "Depends on third-party AI SDKs (ai, @ai-sdk/openai, @ai-sdk/google, ai-sdk-ollama, @langchain/core), posthog-js, stripe-related env vars, @aws-sdk/client-s3, @clickhouse/client."
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [
+      {
+        "file": "docker-compose.yml",
+        "line": 9,
+        "variable_name": "APP_SECRET",
+        "redacted_snippet": "APP_SECRET: 'REPL***REDACTED***'",
+        "severity": "low",
+        "note": "Obvious placeholder (REPLACE_WITH_LONG_SECRET) in tracked sample compose file."
+      },
+      {
+        "file": "docker-compose.yml",
+        "line": 10,
+        "variable_name": "DATABASE_URL",
+        "redacted_snippet": "DATABASE_URL: 'postgresql://docmost:STRO***REDACTED***@db:5432/docmost'",
+        "severity": "low",
+        "note": "Placeholder password (STRONG_DB_PASSWORD) in tracked sample compose file."
+      },
+      {
+        "file": "docker-compose.yml",
+        "line": 23,
+        "variable_name": "POSTGRES_PASSWORD",
+        "redacted_snippet": "POSTGRES_PASSWORD: STRO***REDACTED***",
+        "severity": "low",
+        "note": "Placeholder password in tracked sample compose file."
+      }
+    ],
+    "proper_secret_handling_found": [
+      {
+        "file": "apps/server/src/integrations/environment/environment.service.ts",
+        "mechanism": "@nestjs/config environment variables (APP_SECRET, DATABASE_URL, REDIS_URL, AWS_S3_*, SMTP_*, OPENAI_API_KEY, GEMINI_API_KEY, STRIPE_*, TYPESENSE_API_KEY, POSTMARK_TOKEN) validated in environment.validation.ts"
+      },
+      {
+        "file": "apps/server/src/database/migrate.ts",
+        "mechanism": "process.env.DATABASE_URL"
+      },
+      {
+        "file": "apps/server/src/ws/adapter/ws-redis.adapter.ts",
+        "mechanism": "process.env.REDIS_URL"
+      },
+      {
+        "file": "apps/server/src/common/helpers/utils.ts",
+        "mechanism": "passwords hashed with bcrypt"
+      },
+      {
+        "file": ".github/workflows/release.yml",
+        "mechanism": "GitHub Actions secrets (DOCKERHUB_USERNAME, DOCKERHUB_TOKEN, BUILD_APP_ID, BUILD_APP_PRIVATE_KEY)"
+      }
+    ],
+    "env_example_present": true
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "web_api",
+        "framework": "nestjs (fastify)",
+        "file": "apps/server/src/main.ts"
+      },
+      {
+        "type": "web_api",
+        "framework": "nestjs (hocuspocus collaboration server, websocket)",
+        "file": "apps/server/src/collaboration/server/collab-main.ts"
+      },
+      {
+        "type": "web_api",
+        "framework": "socket.io websocket gateway",
+        "file": "apps/server/src/ws/ws.gateway.ts"
+      },
+      {
+        "type": "web_frontend",
+        "framework": "react/vite",
+        "file": "apps/client/package.json"
+      },
+      {
+        "type": "scheduled_job",
+        "framework": "@nestjs/schedule (telemetry interval)",
+        "file": "apps/server/src/integrations/telemetry/telemetry.service.ts"
+      },
+      {
+        "type": "cli",
+        "framework": "tsx migration runner",
+        "file": "apps/server/src/database/migrate.ts"
+      }
+    ],
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/api/pages/info",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/create",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/update",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/delete",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/restore",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/recent",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/trash",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/history",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/history/info",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/sidebar-pages",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/move-to-space",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/duplicate",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/move",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/breadcrumbs",
+        "file": "apps/server/src/core/page/page.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/watch",
+        "file": "apps/server/src/core/watcher/watcher.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/unwatch",
+        "file": "apps/server/src/core/watcher/watcher.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/watch-status",
+        "file": "apps/server/src/core/watcher/watcher.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/users/me",
+        "file": "apps/server/src/core/user/user.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/users/update",
+        "file": "apps/server/src/core/user/user.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/notifications",
+        "file": "apps/server/src/core/notification/notification.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/notifications/unread-count",
+        "file": "apps/server/src/core/notification/notification.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/notifications/mark-read",
+        "file": "apps/server/src/core/notification/notification.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/notifications/mark-all-read",
+        "file": "apps/server/src/core/notification/notification.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/groups",
+        "file": "apps/server/src/core/group/group.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/groups/info",
+        "file": "apps/server/src/core/group/group.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/groups/create",
+        "file": "apps/server/src/core/group/group.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/groups/update",
+        "file": "apps/server/src/core/group/group.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/groups/members",
+        "file": "apps/server/src/core/group/group.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/groups/members/add",
+        "file": "apps/server/src/core/group/group.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/groups/members/remove",
+        "file": "apps/server/src/core/group/group.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/groups/delete",
+        "file": "apps/server/src/core/group/group.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces",
+        "file": "apps/server/src/core/space/space.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces/info",
+        "file": "apps/server/src/core/space/space.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces/create",
+        "file": "apps/server/src/core/space/space.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces/update",
+        "file": "apps/server/src/core/space/space.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces/delete",
+        "file": "apps/server/src/core/space/space.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces/members",
+        "file": "apps/server/src/core/space/space.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces/members/add",
+        "file": "apps/server/src/core/space/space.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces/members/remove",
+        "file": "apps/server/src/core/space/space.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces/members/change-role",
+        "file": "apps/server/src/core/space/space.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/comments",
+        "file": "apps/server/src/core/comment/comment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/comments/create",
+        "file": "apps/server/src/core/comment/comment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/comments/info",
+        "file": "apps/server/src/core/comment/comment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/comments/update",
+        "file": "apps/server/src/core/comment/comment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/comments/delete",
+        "file": "apps/server/src/core/comment/comment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/search",
+        "file": "apps/server/src/core/search/search.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/search/suggest",
+        "file": "apps/server/src/core/search/search.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/shares",
+        "file": "apps/server/src/core/share/share.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/shares/for-page",
+        "file": "apps/server/src/core/share/share.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/shares/create",
+        "file": "apps/server/src/core/share/share.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/shares/update",
+        "file": "apps/server/src/core/share/share.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/shares/delete",
+        "file": "apps/server/src/core/share/share.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/info",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/entitlements",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/update",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/members",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/members/deactivate",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/members/activate",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/members/delete",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/members/change-role",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/invites",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/invites/create",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/invites/resend",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/invites/revoke",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/invites/link",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/export",
+        "file": "apps/server/src/integrations/export/export.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/spaces/export",
+        "file": "apps/server/src/integrations/export/export.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/import",
+        "file": "apps/server/src/integrations/import/import.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/pages/import-zip",
+        "file": "apps/server/src/integrations/import/import.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/file-tasks",
+        "file": "apps/server/src/integrations/import/file-task.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/file-tasks/info",
+        "file": "apps/server/src/integrations/import/file-task.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/version",
+        "file": "apps/server/src/integrations/security/version.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/files/upload",
+        "file": "apps/server/src/core/attachment/attachment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/attachments/upload-image",
+        "file": "apps/server/src/core/attachment/attachment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/files/info",
+        "file": "apps/server/src/core/attachment/attachment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/attachments/remove-icon",
+        "file": "apps/server/src/core/attachment/attachment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "GET",
+        "path": "/api/files/:fileId/:fileName",
+        "file": "apps/server/src/core/attachment/attachment.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/change-password",
+        "file": "apps/server/src/core/auth/auth.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/collab-token",
+        "file": "apps/server/src/core/auth/auth.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/logout",
+        "file": "apps/server/src/core/auth/auth.controller.ts",
+        "auth_detected": true,
+        "severity": null
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/login",
+        "file": "apps/server/src/core/auth/auth.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); login endpoint; exposes no data. No rate limiting/throttler found in source."
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/setup",
+        "file": "apps/server/src/core/auth/auth.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Guarded by SetupGuard (not JwtAuthGuard): only allowed while zero workspaces exist, so reachable unauthenticated on a fresh install (first-run admin creation)."
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/forgot-password",
+        "file": "apps/server/src/core/auth/auth.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); sends reset email; no data returned."
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/password-reset",
+        "file": "apps/server/src/core/auth/auth.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); requires reset token."
+      },
+      {
+        "method": "POST",
+        "path": "/api/auth/verify-token",
+        "file": "apps/server/src/core/auth/auth.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); verifies a reset token."
+      },
+      {
+        "method": "POST",
+        "path": "/api/shares/page-info",
+        "file": "apps/server/src/core/share/share.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); returns a shared page; scoped to one share, requires share id; public sharing feature."
+      },
+      {
+        "method": "POST",
+        "path": "/api/shares/info",
+        "file": "apps/server/src/core/share/share.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); returns share metadata for a share id."
+      },
+      {
+        "method": "POST",
+        "path": "/api/shares/tree",
+        "file": "apps/server/src/core/share/share.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); returns page tree of a shared page; requires share id."
+      },
+      {
+        "method": "POST",
+        "path": "/api/search/share-search",
+        "file": "apps/server/src/core/search/search.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); search within a public share."
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/public",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); public workspace info for login page."
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/invites/info",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); invitation info by invitation id."
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/invites/accept",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); accepts an invitation (creates account) with invitation token."
+      },
+      {
+        "method": "POST",
+        "path": "/api/workspace/check-hostname",
+        "file": "apps/server/src/core/workspace/controllers/workspace.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); hostname availability check (cloud feature)."
+      },
+      {
+        "method": "GET",
+        "path": "/api/share/:shareId/p/:pageSlug",
+        "file": "apps/server/src/core/share/share-seo.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); server-rendered SEO view of a shared page."
+      },
+      {
+        "method": "GET",
+        "path": "/api/files/public/:fileId/:fileName",
+        "file": "apps/server/src/core/attachment/attachment.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "No JwtAuthGuard; handler verifies a signed jwt query parameter bound to attachment id, workspace and page before serving."
+      },
+      {
+        "method": "GET",
+        "path": "/api/attachments/img/:attachmentType/:fileName",
+        "file": "apps/server/src/core/attachment/attachment.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Publicly reachable by design (@Public / no guard); serves workspace logos/avatars; file attachment type rejected."
+      },
+      {
+        "method": "GET",
+        "path": "/api",
+        "file": "apps/server/src/app.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Returns a hello string."
+      },
+      {
+        "method": "GET",
+        "path": "/api/robots.txt",
+        "file": "apps/server/src/integrations/security/robots.txt.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Static robots.txt."
+      },
+      {
+        "method": "GET",
+        "path": "/api/health",
+        "file": "apps/server/src/integrations/health/health.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Returns Postgres and Redis health status; no data."
+      },
+      {
+        "method": "GET",
+        "path": "/api/health/live",
+        "file": "apps/server/src/integrations/health/health.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Returns 'ok'."
+      },
+      {
+        "method": "GET",
+        "path": "/api/collab/stats",
+        "file": "apps/server/src/collaboration/server/collaboration.controller.ts",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "Unauthenticated; returns live websocket connection and open-document counts from the collaboration server (separate process, COLLAB_PORT 3001 default, bound to HOST/0.0.0.0)."
+      }
+    ],
+    "network_binding": "0.0.0.0 (HOST env default; main app PORT 3000, collab server COLLAB_PORT 3001)",
+    "cors_wide_open": true
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "postgresql",
+        "credential_source": "env_var",
+        "file": "apps/server/src/database/database.module.ts",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "Kysely query builder with bound parameters; the few sql`` template uses (e.g. group.repo.ts, workspace.repo.ts) interpolate values as bound parameters, not string concatenation."
+        }
+      },
+      {
+        "type": "redis",
+        "credential_source": "env_var",
+        "file": "apps/server/src/ws/adapter/ws-redis.adapter.ts",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "Not a SQL store."
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "tel.docmost.com",
+        "file": "apps/server/src/integrations/telemetry/telemetry.service.ts",
+        "access_type": "write"
+      },
+      {
+        "host": "api.github.com",
+        "file": "apps/server/src/integrations/security/version.service.ts",
+        "access_type": "read"
+      },
+      {
+        "host": "configurable OpenAI / OpenAI-compatible / Gemini / Ollama endpoint (AI_DRIVER, OPENAI_API_URL)",
+        "file": "apps/server/src/integrations/environment/environment.validation.ts",
+        "access_type": "write"
+      },
+      {
+        "host": "configurable S3 endpoint (AWS_S3_ENDPOINT)",
+        "file": "apps/server/package.json",
+        "access_type": "read_write"
+      },
+      {
+        "host": "SMTP/Postmark (MAIL_DRIVER)",
+        "file": "apps/server/src/integrations/mail/drivers/smtp.driver.ts",
+        "access_type": "write"
+      },
+      {
+        "host": "login.microsoftonline.com / accounts.google.com (SSO references)",
+        "file": "apps/client/src",
+        "access_type": "unclear"
+      },
+      {
+        "host": "embed.diagrams.net (draw.io embed, DRAWIO_URL)",
+        "file": "apps/client/src/features/editor",
+        "access_type": "read"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "apps/server/src/integrations/static/static.module.ts",
+        "detail": "writes transformed index.html into the client dist directory at startup",
+        "access_type": "write"
+      },
+      {
+        "file": "Dockerfile",
+        "detail": "local file storage under /app/data/storage (volume) when STORAGE_DRIVER is local; also handles user file uploads/imports/exports (zip, markdown, html)",
+        "access_type": "read_write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "password / password hash",
+        "file": "apps/server/src/core/auth/services/auth.service.ts"
+      },
+      {
+        "field_or_variable": "email",
+        "file": "apps/server/src/core/user/user.service.ts"
+      },
+      {
+        "field_or_variable": "email (invitations)",
+        "file": "apps/server/src/core/workspace/services/workspace-invitation.service.ts"
+      },
+      {
+        "field_or_variable": "password",
+        "file": "apps/server/src/common/helpers/utils.ts"
+      }
+    ],
+    "office_and_collaboration_sources": [
+      {
+        "type": "email_mailbox",
+        "file": "apps/server/src/integrations/mail/drivers/smtp.driver.ts",
+        "location_or_host": "SMTP_HOST (configurable) via nodemailer; outbound only",
+        "credential_source": "env_var",
+        "access_type": "write"
+      },
+      {
+        "type": "csv",
+        "file": "apps/server/src/integrations/import/services/import-attachment.service.ts",
+        "location_or_host": "user-uploaded import files (.csv listed as importable attachment type)",
+        "credential_source": "unclear",
+        "access_type": "read"
+      }
+    ]
+  },
+  "configuration_and_deployment": {
+    "containerized": true,
+    "docker_findings": [
+      "Dockerfile: multi-stage node:22-slim build; runs as non-root (USER node); EXPOSE 3000; VOLUME /app/data/storage.",
+      "docker-compose.yml: docmost (image docmost/docmost:latest), postgres:18, redis:8; maps 3000:3000; sample placeholder secrets inline.",
+      "docker-compose.yml Redis has no password configured."
+    ],
+    "deploy_config_files": [
+      "Dockerfile",
+      "docker-compose.yml",
+      ".github/workflows/release.yml",
+      "nx.json",
+      "pnpm-workspace.yaml",
+      "crowdin.yml"
+    ],
+    "environment_variables_referenced": [
+      "AI_COMPLETION_MODEL",
+      "AI_DRIVER",
+      "AI_EMBEDDING_DIMENSION",
+      "AI_EMBEDDING_MODEL",
+      "APP_SECRET",
+      "APP_URL",
+      "AWS_S3_ACCESS_KEY_ID",
+      "AWS_S3_BUCKET",
+      "AWS_S3_ENDPOINT",
+      "AWS_S3_FORCE_PATH_STYLE",
+      "AWS_S3_REGION",
+      "AWS_S3_SECRET_ACCESS_KEY",
+      "AWS_S3_URL",
+      "BILLING_TRIAL_DAYS",
+      "CLICKHOUSE_URL",
+      "CLOUD",
+      "COLLAB_DISABLE_REDIS",
+      "COLLAB_PORT",
+      "COLLAB_SHOW_STATS",
+      "COLLAB_URL",
+      "DATABASE_MAX_POOL",
+      "DATABASE_URL",
+      "DEBUG_DB",
+      "DEBUG_MODE",
+      "DISABLE_TELEMETRY",
+      "DRAWIO_URL",
+      "EVENT_STORE_DRIVER",
+      "FILE_IMPORT_SIZE_LIMIT",
+      "FILE_UPLOAD_SIZE_LIMIT",
+      "GEMINI_API_KEY",
+      "HOST",
+      "JWT_TOKEN_EXPIRES_IN",
+      "LOG_HTTP",
+      "MAIL_DRIVER",
+      "MAIL_FROM_ADDRESS",
+      "MAIL_FROM_NAME",
+      "NODE_ENV",
+      "OPENAI_API_KEY",
+      "OPENAI_API_URL",
+      "PORT",
+      "POSTHOG_HOST",
+      "POSTHOG_KEY",
+      "POSTMARK_TOKEN",
+      "REDIS_URL",
+      "SEARCH_DRIVER",
+      "SMTP_HOST",
+      "SMTP_IGNORETLS",
+      "SMTP_PASSWORD",
+      "SMTP_PORT",
+      "SMTP_SECURE",
+      "SMTP_USERNAME",
+      "STORAGE_DRIVER",
+      "STRIPE_PUBLISHABLE_KEY",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET",
+      "SUBDOMAIN_HOST",
+      "TYPESENSE_API_KEY",
+      "TYPESENSE_LOCALE",
+      "TYPESENSE_URL"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Hosts a collaborative wiki: authenticated users create, edit (real-time via websocket), move, duplicate, version, comment on and search pages organised in spaces, with groups and role-based membership.",
+      "Lets authenticated users upload files and images, import pages (markdown/html/zip) and export pages or whole spaces.",
+      "Lets users publish a page to the public through a share link; anyone with the share id can read the shared page, its tree and search within it without logging in.",
+      "Handles user sign-up, login, invitations, password reset and email notifications through a configured SMTP/Postmark server.",
+      "Optionally sends prompts/page content to a configured AI provider (OpenAI, OpenAI-compatible, Gemini or Ollama) when AI features are enabled by environment variables."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "PostgreSQL database (DATABASE_URL)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Redis (REDIS_URL)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "Local disk or S3-compatible storage for attachments (STORAGE_DRIVER)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "SMTP / Postmark mail service",
+        "access": "write (sends emails with user addresses)",
+        "leaves_organization": true
+      },
+      {
+        "source": "tel.docmost.com telemetry",
+        "access": "write (instance hash, version, user/page/space/workspace counts; production, self-hosted, unless DISABLE_TELEMETRY is true)",
+        "leaves_organization": true
+      },
+      {
+        "source": "api.github.com release check",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "Configured AI provider (OpenAI/Gemini/Ollama/compatible)",
+        "access": "write (sends prompt and page content when AI is enabled)",
+        "leaves_organization": true
+      }
+    ],
+    "who_can_reach_it": "Server binds to 0.0.0.0 on port 3000 (collaboration server on 3001) by default and CORS is enabled with no restrictions (app.enableCors()). Almost all API routes require a JWT session; a small set of routes (login, setup, share pages, health, collab/stats) are reachable without login. Reachable by anyone on the network that can reach the host.",
+    "unauthorized_action_red_flags": [
+      "Anonymous telemetry (counts of users/pages/spaces) is posted to tel.docmost.com in production unless DISABLE_TELEMETRY=true.",
+      "GET /api/collab/stats is unauthenticated and reveals live connection and document counts.",
+      "CORS is enabled with no origin restriction (apps/server/src/main.ts:94).",
+      "No rate limiting / throttling library was found in the server source, including on /api/auth/login.",
+      "Public share routes expose page content to anyone holding a share id.",
+      "Optional AI features can send page content and prompts to external AI services."
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 24
+    },
+    "top_findings": [
+      "Placeholder secrets (APP_SECRET, DB password) in tracked docker-compose.yml (low)",
+      "CORS enabled without restrictions and server binds 0.0.0.0 by default",
+      "Unauthenticated routes: login/setup/share/health and GET /api/collab/stats",
+      "Telemetry to tel.docmost.com enabled by default in production; optional external AI providers",
+      "No rate limiting detected"
+    ]
+  }
+}

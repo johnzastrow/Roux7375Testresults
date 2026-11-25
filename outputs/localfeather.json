@@ -1,0 +1,458 @@
+{
+  "scan_metadata": {
+    "schema_version": "1.0",
+    "scan_date": "2026-11-25T19:34:13Z",
+    "project_root": "https://github.com/johnzastrow/localfeather",
+    "languages_detected": [
+      "python",
+      "cpp",
+      "shell",
+      "sql"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. Python Flask server in server/ scanned fully. ESP32 firmware (C++/PlatformIO, firmware/) , shell scripts (deploy.sh, setup_database.sh), SQL schema and the systemd unit were scanned for secrets, config and obvious hosts only; full interface/data-access detection for C++, shell and SQL is out of scope for skill version 1.0. Web routes with auth_detected=true are tagged low with a note (CSRF/lockout observations) so counts stay literal; extra key interfaces.debug_mode_findings was added for the Flask debug finding. README says the server is 'Planned' while server code exists in the repo (documentation lag). Docs (.md), HTML templates and generated files excluded."
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "commit_count_sampled": 20,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "root .gitignore is a Go template: it excludes .env but not *.pem/*.key/credentials.json (server/.gitignore does exclude config.ini, *.ini and .env variants)"
+    ]
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [
+        "server/requirements.txt"
+      ],
+      "package_manager": "pip",
+      "dependency_count": 14,
+      "findings": [
+        "all 14 pinned with ==",
+        "gunicorn is used by localfeather.service but is not listed in requirements.txt",
+        "firmware libraries (PlatformIO lib_deps) use caret ranges: WiFiManager@^2.0.16-rc.2 (release candidate), ArduinoJson@^6.21.3, Adafruit BME280@^2.2.2"
+      ]
+    },
+    "node": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": []
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [
+      {
+        "file": "server/app/__init__.py",
+        "line": 30,
+        "variable_name": "SECRET_KEY",
+        "redacted_snippet": "SECRET_KEY=os.environ.get('SECRET_KEY', 'dev-***REDACTED***')",
+        "severity": "high",
+        "note": "falls back to a known default Flask signing key when SECRET_KEY is unset; localfeather.service and deploy.sh do not set SECRET_KEY, so a default deployment signs sessions with a public key"
+      },
+      {
+        "file": "server/database/seed_data.py",
+        "line": 33,
+        "variable_name": "admin password",
+        "redacted_snippet": "password_hash=generate_password_hash('admi***REDACTED***')",
+        "severity": "high",
+        "note": "seed script creates an admin account with a known password and prints it (line 51, 373); severity assumes the script may be run on a real server"
+      },
+      {
+        "file": "server/database/seed_data.py",
+        "line": 43,
+        "variable_name": "viewer password",
+        "redacted_snippet": "password_hash=generate_password_hash('view***REDACTED***')",
+        "severity": "low",
+        "note": "read-only viewer account with known password in a seed script"
+      }
+    ],
+    "proper_secret_handling_found": [
+      {
+        "file": "server/app/__init__.py",
+        "mechanism": "os.environ.get('SECRET_KEY') (but with insecure default)"
+      },
+      {
+        "file": "server/app/database.py",
+        "mechanism": "database credentials read from gitignored config.ini (config.example.ini with placeholders is committed)"
+      },
+      {
+        "file": "server/app/api/readings.py",
+        "mechanism": "device API keys generated with secrets.token_hex(32) and stored bcrypt-hashed"
+      },
+      {
+        "file": "server/create_user.py",
+        "mechanism": "getpass prompt for user passwords; bcrypt/werkzeug hashing"
+      }
+    ],
+    "env_example_present": true
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "web_api",
+        "framework": "flask",
+        "file": "server/app/__init__.py"
+      },
+      {
+        "type": "web_ui",
+        "framework": "flask + jinja2 templates",
+        "file": "server/app/web"
+      },
+      {
+        "type": "dev_server",
+        "framework": "flask run.py",
+        "file": "server/run.py"
+      },
+      {
+        "type": "cli",
+        "framework": "script",
+        "file": "server/create_user.py"
+      },
+      {
+        "type": "cli",
+        "framework": "script",
+        "file": "server/check_devices.py"
+      },
+      {
+        "type": "service",
+        "framework": "gunicorn via systemd",
+        "file": "server/localfeather.service"
+      },
+      {
+        "type": "device_firmware",
+        "framework": "ESP32 Arduino (C++)",
+        "file": "firmware/src/main.cpp"
+      }
+    ],
+    "routes": [
+      {
+        "method": "POST",
+        "path": "/api/readings",
+        "file": "server/app/api/readings.py",
+        "auth_detected": "unclear",
+        "severity": "low",
+        "note": "Per-device bcrypt API key checked for known devices and unapproved devices are rejected, but first-contact registration is open to any caller (creates an unapproved device row and returns a key); rate limit key is attacker-chosen device_id"
+      },
+      {
+        "method": "GET",
+        "path": "/api/readings",
+        "file": "server/app/api/readings.py",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "returns up to 1000 sensor readings (values, sensors, timestamps), no auth"
+      },
+      {
+        "method": "GET",
+        "path": "/api/devices",
+        "file": "server/app/api/devices.py",
+        "auth_detected": false,
+        "severity": "high",
+        "note": "lists all devices including ip_address, mac_address, name, location, firmware; no auth"
+      },
+      {
+        "method": "GET",
+        "path": "/api/devices/<device_id>",
+        "file": "server/app/api/devices.py",
+        "auth_detected": false,
+        "severity": "high",
+        "note": "single device detail with network info; no auth"
+      },
+      {
+        "method": "POST",
+        "path": "/api/devices/<device_id>/approve",
+        "file": "server/app/api/devices.py",
+        "auth_detected": false,
+        "severity": "critical",
+        "note": "docstring says 'admin only - auth to be added'; anyone can approve a device, bypassing the approval control that gates data ingestion"
+      },
+      {
+        "method": "PUT",
+        "path": "/api/devices/<device_id>",
+        "file": "server/app/api/devices.py",
+        "auth_detected": false,
+        "severity": "high",
+        "note": "unauthenticated modification of name, location, notes and reading_interval"
+      },
+      {
+        "method": "DELETE",
+        "path": "/api/devices/<device_id>",
+        "file": "server/app/api/devices.py",
+        "auth_detected": false,
+        "severity": "critical",
+        "note": "docstring says 'auth to be added'; unauthenticated deletion of a device and cascaded data"
+      },
+      {
+        "method": "GET",
+        "path": "/api/ota/check",
+        "file": "server/app/api/ota.py",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "only device_id existence is checked, no API key; returns firmware version/URL"
+      },
+      {
+        "method": "GET",
+        "path": "/api/ota/download/<version>",
+        "file": "server/app/api/ota.py",
+        "auth_detected": false,
+        "severity": "high",
+        "note": "unauthenticated firmware binary download; no checksum/signature handling seen; file path currently placeholder /tmp/firmware"
+      },
+      {
+        "method": "POST",
+        "path": "/api/ota/status",
+        "file": "server/app/api/ota.py",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "unauthenticated write of OTA status records"
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "file": "server/app/__init__.py",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "returns status and database connected/disconnected only"
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "file": "server/app/__init__.py",
+        "auth_detected": false,
+        "severity": "low",
+        "note": "redirect to dashboard"
+      },
+      {
+        "method": "GET/POST",
+        "path": "/login",
+        "file": "server/app/web/auth.py",
+        "auth_detected": "unclear",
+        "severity": "low",
+        "note": "public login form by design; bcrypt password check, inactive users blocked; no CSRF token or per-login lockout beyond default rate limits seen"
+      },
+      {
+        "method": "GET",
+        "path": "/logout",
+        "file": "server/app/web/auth.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required; state change via GET"
+      },
+      {
+        "method": "GET",
+        "path": "/dashboard",
+        "file": "server/app/web/dashboard.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required"
+      },
+      {
+        "method": "GET",
+        "path": "/dashboard/stats",
+        "file": "server/app/web/dashboard.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required"
+      },
+      {
+        "method": "GET",
+        "path": "/dashboard/devices",
+        "file": "server/app/web/dashboard.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required"
+      },
+      {
+        "method": "GET",
+        "path": "/devices",
+        "file": "server/app/web/devices.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required"
+      },
+      {
+        "method": "GET",
+        "path": "/devices/<int:device_id>",
+        "file": "server/app/web/devices.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required"
+      },
+      {
+        "method": "POST",
+        "path": "/devices/<int:device_id>/approve",
+        "file": "server/app/web/devices.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required plus is_admin() check; no CSRF token found for this cookie-session POST"
+      },
+      {
+        "method": "POST",
+        "path": "/devices/<int:device_id>/rename",
+        "file": "server/app/web/devices.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required plus is_admin() check; no CSRF token found for this cookie-session POST"
+      },
+      {
+        "method": "POST",
+        "path": "/devices/<int:device_id>/delete",
+        "file": "server/app/web/devices.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required plus is_admin() check; no CSRF token found for this cookie-session POST"
+      },
+      {
+        "method": "POST",
+        "path": "/devices/<int:device_id>/regenerate-key",
+        "file": "server/app/web/devices.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required plus is_admin() check; no CSRF token found for this cookie-session POST"
+      },
+      {
+        "method": "POST",
+        "path": "/devices/<int:device_id>/update-location",
+        "file": "server/app/web/devices.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required plus is_admin() check; no CSRF token found for this cookie-session POST"
+      },
+      {
+        "method": "POST",
+        "path": "/devices/<int:device_id>/update-notes",
+        "file": "server/app/web/devices.py",
+        "auth_detected": true,
+        "severity": "low",
+        "note": "@login_required plus is_admin() check; no CSRF token found for this cookie-session POST"
+      }
+    ],
+    "network_binding": "0.0.0.0:5000 (server/run.py:43 and gunicorn --bind 0.0.0.0:5000 in server/localfeather.service); no TLS configured",
+    "cors_wide_open": false,
+    "debug_mode_findings": [
+      {
+        "file": "server/run.py",
+        "line": 45,
+        "detail": "app.run(host='0.0.0.0', port=5000, debug=True, use_reloader=True) exposes the Werkzeug debugger on all interfaces when run.py is used",
+        "severity": "high"
+      }
+    ]
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "mariadb/mysql (pymysql via SQLAlchemy)",
+        "credential_source": "config file (server/database/config.ini, gitignored; example committed)",
+        "file": "server/app/database.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "SQLAlchemy ORM / select() with bound values; only literal text() statements found"
+        }
+      },
+      {
+        "type": "sqlite (development fallback)",
+        "credential_source": "none (local file)",
+        "file": "server/app/database.py",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "same ORM layer"
+        }
+      }
+    ],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "server/app/api/ota.py",
+        "detail": "serves firmware files from placeholder path /tmp/firmware/<filename>",
+        "access_type": "read"
+      },
+      {
+        "file": "server/app/__init__.py",
+        "detail": "logging to ../logs (access/error logs configured in systemd unit)",
+        "access_type": "write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "password_hash, email (users table)",
+        "file": "server/app/models.py"
+      },
+      {
+        "field_or_variable": "ip_address, mac_address, wifi_ssid (device network info)",
+        "file": "server/app/api/readings.py"
+      },
+      {
+        "field_or_variable": "api_key (device keys, bcrypt hashed)",
+        "file": "server/app/models.py"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present (README mentions docker-compose but none exists)"
+    ],
+    "deploy_config_files": [
+      "server/localfeather.service",
+      "server/deploy.sh",
+      "server/database/setup_database.sh",
+      "firmware/platformio.ini"
+    ],
+    "environment_variables_referenced": [
+      "SECRET_KEY"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Accepts temperature/humidity/pressure readings from ESP32 devices over HTTP and stores them in MariaDB; unknown devices self-register and wait for approval.",
+      "Lets anyone who can reach the server approve, edit or delete devices through /api/devices endpoints with no login.",
+      "Returns the full device inventory (IP and MAC addresses, names, locations) and recent readings to any unauthenticated caller.",
+      "Provides a login-protected web dashboard where admins approve, rename, delete devices, regenerate API keys and edit location/notes.",
+      "Distributes ESP32 firmware over HTTP (OTA) to any caller who knows a version string; no signature or checksum handling seen."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "MariaDB localfeather database (users, devices, readings, firmware, updates)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "SQLite development database (optional)",
+        "access": "read_write",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Bound to 0.0.0.0:5000 over plain HTTP, so reachable by anyone on the network (or internet if forwarded). The web UI requires login, but the device-management API, readings list and OTA endpoints have no authentication.",
+    "unauthorized_action_red_flags": [
+      "POST /api/devices/<id>/approve and DELETE /api/devices/<id> have no authentication (code comments say auth to be added)",
+      "GET /api/devices exposes IP and MAC addresses and locations without login",
+      "Default Flask SECRET_KEY fallback and admin123/viewer123 seed credentials",
+      "run.py runs Flask debug=True on 0.0.0.0",
+      "OTA firmware download is unauthenticated and no integrity verification is visible",
+      "No CSRF protection or TLS found"
+    ]
+  },
+  "summary": {
+    "finding_counts_by_severity": {
+      "critical": 2,
+      "high": 7,
+      "low": 20
+    },
+    "top_findings": [
+      "Unauthenticated device approve/delete/update API endpoints (server/app/api/devices.py)",
+      "Default SECRET_KEY fallback in server/app/__init__.py:30",
+      "Seed script creates admin/admin123 account",
+      "Flask debug=True bound to 0.0.0.0 in server/run.py",
+      "Unauthenticated device inventory (IP/MAC) and OTA firmware download"
+    ]
+  }
+}

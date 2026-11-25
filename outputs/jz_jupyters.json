@@ -1,0 +1,407 @@
+{
+  "scan_metadata": {
+    "languages_detected": [
+      "python",
+      "jupyter"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. Jupyter .ipynb files (47) were treated as Python; embedded base64 image outputs in notebooks were ignored. The repo is a collection of tutorial scripts and notebooks; there is no application server, so interfaces are limited to script entry points. Severity judgement: the same MySQL password for user 'jcz' is hardcoded in 19 places (tracked files), pointing at localhost or a private LAN address (192.168.1.110); rated critical per skill rules (live-looking DB credential committed to a tracked file), although reachability is limited to the author's network. One placeholder template URL in pandas/21_sql/pandas_sql.ipynb is rated low; the same notebook also uses a root user with an empty password on localhost (not recorded as a secret). Scope: matpltlib/ and Basics/ contain Windows-style hardcoded paths in tutorial code.",
+    "scan_date": "2026-11-25T19:34:02Z",
+    "schema_version": "1.0",
+    "project_root": "https://github.com/johnzastrow/jz_jupyters"
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "tracked binary data files exist despite a comprehensive Python .gitignore: matpltlib/map_data.db, population.db, population_orig.db, weather.4Sept2019.db.zip, data.csv, petals.xlsx and several weather*.csv",
+      "pylustrator1.py.tmp is present in the tree although *.tmp is listed in .gitignore (verify whether tracked)",
+      "db.sqlite3 and .env are ignored; *.db is not ignored"
+    ],
+    "commit_count_sampled": 20
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": [
+        "no requirements.txt, pyproject.toml or Pipfile; code imports matplotlib, pandas, numpy, sqlalchemy (with pymysql driver), tkinter, pylustrator, mpl_toolkits - none declared",
+        "missing manifest: code clearly requires third-party packages but nothing declares or pins them"
+      ]
+    },
+    "node": {}
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [
+      {
+        "file": "sql2pandaframe.ipynb",
+        "line": 30,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "simpledbmatplot.ipynb",
+        "line": 149,
+        "variable_name": "database password in SQLAlchemy URL (user jcz) - commented-out line",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "simpledbmatplot.ipynb",
+        "line": 150,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "simple2.ipynb",
+        "line": 15,
+        "variable_name": "database password in SQLAlchemy URL (user jcz) - commented-out line",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "simple2.ipynb",
+        "line": 16,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "pandas/21_sql/pandas_sql.ipynb",
+        "line": 39,
+        "variable_name": "SQLAlchemy URL template",
+        "redacted_snippet": "mysql+pymysql://username:pass***REDACTED***@host:port/database_name",
+        "severity": "low"
+      },
+      {
+        "file": "matpltlib/weekly_temps.py",
+        "line": 14,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/two_y_axis.py",
+        "line": 14,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/single_day_temp.py",
+        "line": 13,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@192.168.1.110:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/pandas_and_db_simple.py",
+        "line": 6,
+        "variable_name": "database password in SQLAlchemy URL (user jcz) - commented-out line",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/pandas_and_db_simple.py",
+        "line": 7,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/pandas_and_db_more_complex.py",
+        "line": 9,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/monthly_elec_usage.py",
+        "line": 9,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/date_axis.py",
+        "line": 10,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/daily_temps_day_of_year.py",
+        "line": 12,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/daily_temps.py",
+        "line": 10,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/daily_mysql_data.py",
+        "line": 10,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "matpltlib/compare_daily_temp_last_year.py",
+        "line": 12,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@192.168.1.110:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "df_exploration.py",
+        "line": 9,
+        "variable_name": "database password in SQLAlchemy URL (user jcz) - commented-out line",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      },
+      {
+        "file": "df_exploration.py",
+        "line": 10,
+        "variable_name": "database password in SQLAlchemy URL (user jcz)",
+        "redacted_snippet": "create_engine('mysql+pymysql://jcz:yub.***REDACTED***@localhost:3306/weather')",
+        "severity": "critical"
+      }
+    ],
+    "proper_secret_handling_found": [],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "cli",
+        "framework": "plain python scripts",
+        "file": "matpltlib/ (about 55 .py files in total across the repo)"
+      },
+      {
+        "type": "cli",
+        "framework": "python",
+        "file": "Basics/area.py"
+      },
+      {
+        "type": "notebook",
+        "framework": "jupyter",
+        "file": "sql2pandaframe.ipynb"
+      },
+      {
+        "type": "gui",
+        "framework": "tkinter",
+        "file": "matpltlib/tkinter_read_excel.py"
+      }
+    ],
+    "routes": [],
+    "network_binding": "none - no server or listener",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "mysql",
+        "credential_source": "hardcoded",
+        "file": "matpltlib/daily_temps.py",
+        "access_type": "read",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "queries are static SQL strings or pd.read_sql_table on named views (e.g. v_e1248_daily, v_monthly_utilities); no user input reaches them"
+        }
+      },
+      {
+        "type": "mysql",
+        "credential_source": "hardcoded",
+        "file": "sql2pandaframe.ipynb",
+        "access_type": "read",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "static queries only"
+        }
+      },
+      {
+        "type": "mysql",
+        "credential_source": "hardcoded",
+        "file": "matpltlib/single_day_temp.py",
+        "access_type": "read",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "static queries; host is private LAN address 192.168.1.110"
+        }
+      },
+      {
+        "type": "mysql",
+        "credential_source": "hardcoded (root, empty password)",
+        "file": "pandas/21_sql/pandas_sql.ipynb",
+        "access_type": "unclear",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "tutorial notebook; reads and writes not traced"
+        }
+      },
+      {
+        "type": "sqlite",
+        "credential_source": "none (local file)",
+        "file": "matpltlib/pandas_sqlite.py",
+        "access_type": "read",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "static SELECT; INSERT/CREATE statements are commented out"
+        }
+      }
+    ],
+    "external_apis": [
+      {
+        "host": "api.github.com",
+        "file": "matpltlib/timeline.py",
+        "access_type": "read"
+      }
+    ],
+    "file_system_access": [
+      {
+        "file": "matpltlib/ (many scripts)",
+        "detail": "savefig writes PNG charts into the working directory",
+        "access_type": "write"
+      },
+      {
+        "file": "Basics/address.py",
+        "detail": "writes c://data//book.txt (hardcoded Windows path)",
+        "access_type": "write"
+      },
+      {
+        "file": "Basics/14_json_addressbook.py",
+        "detail": "writes C:\\\\data\\\\book.txt (hardcoded Windows path)",
+        "access_type": "write"
+      },
+      {
+        "file": "Basics/13_read_write_file.py",
+        "detail": "reads C:\\\\Code\\\\Py\\\\Basics\\\\input.txt (hardcoded Windows path)",
+        "access_type": "read"
+      },
+      {
+        "file": "Basics/myprogram.py",
+        "detail": "appends C:\\\\Code to sys.path",
+        "access_type": "read"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "database password in connection URLs",
+        "file": "matpltlib/daily_temps.py"
+      },
+      {
+        "field_or_variable": "token/api_key mentions (tutorial text, not verified as credentials)",
+        "file": "Chartify Tutorial.ipynb"
+      }
+    ],
+    "office_and_collaboration_sources": [
+      {
+        "type": "excel",
+        "file": "matpltlib/reading_excel.py",
+        "location_or_host": "petals.xlsx (relative path)",
+        "credential_source": "unclear",
+        "access_type": "read"
+      },
+      {
+        "type": "excel",
+        "file": "matpltlib/tkinter_read_excel.py",
+        "location_or_host": "user-selected file via tkinter dialog",
+        "credential_source": "unclear",
+        "access_type": "read"
+      },
+      {
+        "type": "csv",
+        "file": "matpltlib/matplotlibtut_bars_csvfiles_w_pandas.py",
+        "location_or_host": "data.csv (relative path)",
+        "credential_source": "unclear",
+        "access_type": "read"
+      },
+      {
+        "type": "csv",
+        "file": "pandas/1_intro/pandas_intro.py",
+        "location_or_host": "nyc_weather.csv (relative path)",
+        "credential_source": "unclear",
+        "access_type": "read"
+      }
+    ]
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile present"
+    ],
+    "deploy_config_files": [],
+    "environment_variables_referenced": [],
+    "readme_present": true,
+    "readme_describes_deployment": false
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Reads weather, gas and electric-utility views from a MySQL 'weather' database on localhost or 192.168.1.110 using a hardcoded username and password, and plots them as charts saved to PNG files.",
+      "Reads local CSV, Excel and SQLite files and plots or prints the contents (tutorial examples).",
+      "Fetches the Matplotlib release list from the public GitHub API to draw a timeline chart.",
+      "Includes tutorial notebooks and scripts for pandas, matplotlib, bokeh, and Python basics; some write to hardcoded C:\\ paths."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "MySQL database 'weather' (localhost:3306 and 192.168.1.110:3306)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "MySQL 'application' database on localhost (root, empty password) in a tutorial notebook",
+        "access": "unclear",
+        "leaves_organization": false
+      },
+      {
+        "source": "SQLite files (matpltlib/population.db and similar)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "CSV and Excel files in the repo (data.csv, petals.xlsx, weather*.csv)",
+        "access": "read",
+        "leaves_organization": false
+      },
+      {
+        "source": "GitHub REST API (api.github.com)",
+        "access": "read (public release list)",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "Nothing is served: scripts run only for whoever executes them locally and connect out to a local or private-LAN MySQL server. Because the repo is on GitHub, the hardcoded database credentials are visible to anyone who can read the repository.",
+    "unauthorized_action_red_flags": [
+      "Same MySQL password for user 'jcz' hardcoded in 19 tracked files (scripts and notebooks), including a private LAN host address",
+      "Hardcoded Windows paths (C:\\data, C:\\Code) in tutorial code",
+      "Binary database and data files (.db, .xlsx, .csv, .zip) committed to the repo"
+    ]
+  },
+  "summary": {
+    "top_findings": [
+      "Hardcoded MySQL password (user jcz) repeated across 15 tracked scripts and notebooks (19 occurrences)",
+      "No dependency manifest despite pandas, matplotlib, sqlalchemy, numpy usage",
+      "Committed binary data files (SQLite .db, xlsx, csv, zip)",
+      "No server or routes - tutorial/exploration code only"
+    ],
+    "finding_counts_by_severity": {
+      "critical": 19,
+      "high": 0,
+      "low": 1
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "scan_metadata": {"schema_version":"1.0","scan_date":"2026-11-25T19:31:41Z","project_root":"https://github.com/johnzastrow/ms","languages_detected":["python"],
+   "notes":"Fresh shallow clone of default branch (depth 20), so has_uncommitted_changes reflects the clone (false) not the author's working copy. Repo contains only Jupyter notebooks (Python code cells) and Markdown; no .py files. Notebooks scanned as Python. Network binding is taken from a JupyterHub config snippet in RUN_ON_VPS.md (documentation, not executable config). No dependency manifest exists; packages are installed via pip commands inside notebooks/docs."},
+  "version_control": {"is_git_repo":true,"commit_count_sampled":13,"has_uncommitted_changes":false,"remote_configured":true,"has_gitignore":false,"gitignore_gaps":["No .gitignore present: .env, credential/key files, __pycache__, venv, kafka logs and model artifacts are not excluded"]},
+  "dependencies": {
+   "python": {"manifest_files":[],"package_manager":"none (inline pip install in notebooks and docs)","dependency_count":0,"findings":["No requirements.txt/pyproject.toml although code imports tensorflow, keras, kafka-python, numpy, matplotlib, pillow, tqdm, scikit-learn, seaborn, scipy, pandas","Packages installed via unpinned 'pip install' commands in notebook cells and README"]},
+   "node": {}
+  },
+  "secrets_and_credentials": {"committed_secret_files":[],"hardcoded_secrets_in_source":[],"proper_secret_handling_found":[],"env_example_present":false},
+  "interfaces": {
+   "entry_points":[
+    {"type":"notebook","framework":"jupyter","file":"image_classification/image_class.ipynb"},
+    {"type":"notebook","framework":"jupyter","file":"image_classification/stage1_image_class.ipynb"},
+    {"type":"notebook","framework":"jupyter","file":"image_classification/stage2_image_class.ipynb"},
+    {"type":"background_agents","framework":"kafka-python consumers/producers run in threads inside notebooks","file":"image_classification/stage2_image_class.ipynb"}
+   ],
+   "routes":[],
+   "network_binding":"Not set in code. RUN_ON_VPS.md documents JupyterHub bind_url http://0.0.0.0:8000 (all interfaces); Kafka client targets localhost:9092 (plaintext, no auth configured)",
+   "cors_wide_open":false
+  },
+  "data_access": {
+   "databases":[],
+   "external_apis":[
+    {"host":"archive.apache.org","file":"image_classification/image_class.ipynb","access_type":"read"},
+    {"host":"CIFAR-10 download via keras.datasets.cifar10.load_data (upstream dataset host, not named in code)","file":"image_classification/stage2_image_class.ipynb","access_type":"read"},
+    {"host":"localhost:9092 (Apache Kafka broker, local)","file":"image_classification/stage2_image_class.ipynb","access_type":"read_write"}
+   ],
+   "file_system_access":[
+    {"file":"image_classification/image_class.ipynb","detail":"saves models to /content/drive/MyDrive/*.keras (Google Colab Drive mount); writes kafka.log and zookeeper.log","access_type":"write"},
+    {"file":"image_classification/stage1_image_class.ipynb","detail":"saves trained CNN and ResNet models to CNN_PATH / RESNET_PATH","access_type":"write"},
+    {"file":"image_classification/stage2_image_class.ipynb","detail":"saves CNN, ResNet and MobileNet models; writes classification_results.csv","access_type":"write"}
+   ],
+   "sensitive_data_indicators":[],
+   "office_and_collaboration_sources":[
+    {"type":"csv","file":"image_classification/stage2_image_class.ipynb","location_or_host":"classification_results.csv (relative path, output)","credential_source":"unclear","access_type":"write"}
+   ]
+  },
+  "configuration_and_deployment": {"containerized":false,"docker_findings":["none - no Dockerfile present"],"deploy_config_files":[],"environment_variables_referenced":[],"readme_present":true,"readme_describes_deployment":true},
+  "capability_summary": {
+   "what_this_app_can_do":["Downloads the public CIFAR-10 image dataset, trains CNN, ResNet and (stage 2) MobileNet classifiers, and runs them as Kafka-connected agents that classify 500 test images and compare accuracy against a Judge ensemble result.","Downloads and starts a local Apache Kafka 3.5.0 and ZooKeeper from archive.apache.org via shell commands inside the notebook.","Documentation describes installing JupyterHub on an Ubuntu VPS bound to 0.0.0.0:8000 and opening port 8000 in the firewall."],
+   "data_sources_touched":[
+    {"source":"CIFAR-10 public dataset (keras download)","access":"read","leaves_organization":false},
+    {"source":"Local Apache Kafka broker localhost:9092","access":"read_write","leaves_organization":false},
+    {"source":"archive.apache.org (Kafka tarball)","access":"read","leaves_organization":false},
+    {"source":"classification_results.csv and saved .keras model files","access":"write","leaves_organization":false}
+   ],
+   "who_can_reach_it":"Notebook project with no server of its own. Reachable by whoever runs the notebook; if the documented JupyterHub setup is followed it is exposed on all interfaces of the VPS on port 8000, protected only by JupyterHub Linux-user login.",
+   "unauthorized_action_red_flags":["Documented JupyterHub configuration binds to 0.0.0.0:8000 and instructs opening the firewall port; JupyterHub gives users code execution on the host","Notebook cells run shell commands (curl, tar, subprocess) that download and execute Kafka binaries without checksum verification","Kafka broker configured without authentication or TLS (plaintext localhost)"]
+  },
+  "summary": {"finding_counts_by_severity":{"critical":0,"high":0,"low":0},"top_findings":["No dependency manifest or .gitignore; packages installed via unpinned inline pip commands","Docs show JupyterHub bound to 0.0.0.0:8000 (documentation only, not severity-tagged)","Notebooks download and run Kafka tarball from archive.apache.org without checksum verification"]}
+}

@@ -1,0 +1,449 @@
+{
+  "scan_metadata": {
+    "languages_detected": [
+      "go",
+      "rust",
+      "python",
+      "javascript"
+    ],
+    "notes": "Fresh shallow clone of the default branch (depth 20), so has_uncommitted_changes reflects the clone (false), not the author's working copy. Primary languages are Go and Rust; full interface/data-access detection for these languages is out of scope for skill version 1.0, so routes, databases and auth were identified by reading route registration, serve and store code manually plus the pre-gathered grep evidence. Python appears only in e2e/screenshot helper scripts and JavaScript only in one small static web client and Go WASM boot loaders. Extra dependency ecosystems (go, rust) are reported as additional keys under dependencies. Excluded: binary gif/png assets and *.tape recordings. Secret-grep hits (password: \"new-...\", UI label strings such as 'Set Password') were reviewed and are test fixtures or UI labels, not credentials. Routes listed per server implementation (Go and Rust each implement tic-tac-toe, 'pt' and 'demo' servers); all servers default to loopback binding.",
+    "scan_date": "2026-11-25T19:34:54Z",
+    "schema_version": "1.0",
+    "project_root": "https://github.com/johnzastrow/tictactoe"
+  },
+  "version_control": {
+    "is_git_repo": true,
+    "has_uncommitted_changes": false,
+    "remote_configured": true,
+    "has_gitignore": true,
+    "gitignore_gaps": [
+      "no .env/*.env, *.pem, *.key or credentials.json patterns (none present in repo; only *.db/*.db-shm/*.db-wal, build outputs and OS/editor files are excluded)"
+    ],
+    "commit_count_sampled": 19
+  },
+  "dependencies": {
+    "python": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": [
+        "no Python manifest; helper scripts under docs/ and */e2e/ import stdlib modules only (os, re, datetime, urllib, subprocess, shutil) plus playwright-style browser driving inferred from e2e names - not declared anywhere"
+      ]
+    },
+    "node": {
+      "manifest_files": [],
+      "package_manager": "none",
+      "dependency_count": 0,
+      "findings": [
+        "no package.json; JavaScript is limited to rust/crates/ttt-server/web/app.js and Go WASM boot.js loaders"
+      ]
+    },
+    "go": {
+      "manifest_files": [
+        "go/go.mod",
+        "go/go.sum"
+      ],
+      "package_manager": "go modules",
+      "dependency_count": 29,
+      "findings": [
+        "all requirements pinned to exact versions with go.sum present; go.mod declares go 1.26.5",
+        "module path git.wharf.fluidgrid.org/jcz/tictactoe/go differs from the GitHub remote (self-hosted Forgejo path)"
+      ]
+    },
+    "rust": {
+      "manifest_files": [
+        "rust/Cargo.toml",
+        "rust/Cargo.lock",
+        "rust/crates/*/Cargo.toml (13 crates)"
+      ],
+      "package_manager": "cargo",
+      "dependency_count": 121,
+      "findings": [
+        "dependency_count is the number of dependency entries summed across the 13 crate manifests (duplicates across crates counted); versions are semver-range specs (e.g. \"1\", \"0.8\") resolved by committed Cargo.lock",
+        "workspace lint unsafe_code = forbid"
+      ]
+    }
+  },
+  "secrets_and_credentials": {
+    "committed_secret_files": [],
+    "hardcoded_secrets_in_source": [],
+    "proper_secret_handling_found": [
+      {
+        "file": "rust/crates/pt/src/main.rs",
+        "mechanism": "PT_PASSWORD / PT_SEED_PASSWORD read from environment; seed password generated when not supplied"
+      },
+      {
+        "file": "rust/crates/pt-server/src/auth.rs",
+        "mechanism": "Argon2id password hashing (m=19456,t=2,p=1) with OS RNG salt"
+      },
+      {
+        "file": "go/internal/pt/auth/auth.go",
+        "mechanism": "Argon2id password hashing, hash format compatible with the Rust implementation"
+      },
+      {
+        "file": "go/internal/pt/client/client.go",
+        "mechanism": "client token cache written with file mode 0600 under PT_CONFIG_DIR / OS config dir"
+      },
+      {
+        "file": "go/internal/pt/server/http.go",
+        "mechanism": "session cookie set HttpOnly, SameSite=Strict, Secure when TLS"
+      }
+    ],
+    "env_example_present": false
+  },
+  "interfaces": {
+    "entry_points": [
+      {
+        "type": "cli",
+        "framework": "go (cmd/ttt)",
+        "file": "go/cmd/ttt/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "go (cmd/ttt-tui)",
+        "file": "go/cmd/ttt-tui/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "go (cmd/pt)",
+        "file": "go/cmd/pt/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "go (cmd/demo)",
+        "file": "go/cmd/demo/main.go"
+      },
+      {
+        "type": "cli",
+        "framework": "rust (clap) ttt",
+        "file": "rust/crates/ttt/src/main.rs"
+      },
+      {
+        "type": "cli",
+        "framework": "rust (clap) pt",
+        "file": "rust/crates/pt/src/main.rs"
+      },
+      {
+        "type": "cli",
+        "framework": "rust (clap) demo",
+        "file": "rust/crates/demo/src/main.rs"
+      },
+      {
+        "type": "web_api",
+        "framework": "go net/http + coder/websocket",
+        "file": "go/internal/pt/server/http.go"
+      },
+      {
+        "type": "web_api",
+        "framework": "rust axum + WebSocket",
+        "file": "rust/crates/pt-server/src/web.rs"
+      },
+      {
+        "type": "web_api",
+        "framework": "go net/http (tic-tac-toe)",
+        "file": "go/internal/web/web.go"
+      },
+      {
+        "type": "web_api",
+        "framework": "rust axum (tic-tac-toe)",
+        "file": "rust/crates/ttt-server/src/web.rs"
+      },
+      {
+        "type": "web_client_wasm",
+        "framework": "Leptos (Rust) and syscall/js (Go) browser clients",
+        "file": "rust/crates/pt-web/src/main.rs"
+      },
+      {
+        "type": "cli",
+        "framework": "python helper scripts (screenshots, e2e)",
+        "file": "docs/demo/screenshots/gen_tapes.py"
+      }
+    ],
+    "routes": [
+      {
+        "method": "GET",
+        "path": "/",
+        "file": "go/internal/web/web.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/app.js",
+        "file": "go/internal/web/web.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/style.css",
+        "file": "go/internal/web/web.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/ws",
+        "file": "go/internal/web/web.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/ws",
+        "file": "rust/crates/ttt-server/src/web.rs",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/api/health",
+        "file": "go/internal/pt/server/http.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/login",
+        "file": "go/internal/pt/server/http.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/logout",
+        "file": "go/internal/pt/server/http.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/me",
+        "file": "go/internal/pt/server/http.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/ws",
+        "file": "go/internal/pt/server/http.go",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/",
+        "file": "go/internal/pt/server/http.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/api/health",
+        "file": "go/internal/demo/server/http.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/ws",
+        "file": "go/internal/demo/server/http.go",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/api/health",
+        "file": "rust/crates/pt-server/src/web.rs",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/login",
+        "file": "rust/crates/pt-server/src/web.rs",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "POST",
+        "path": "/api/logout",
+        "file": "rust/crates/pt-server/src/web.rs",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/me",
+        "file": "rust/crates/pt-server/src/web.rs",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/ws",
+        "file": "rust/crates/pt-server/src/web.rs",
+        "auth_detected": true
+      },
+      {
+        "method": "GET",
+        "path": "/api/health",
+        "file": "rust/crates/demo-server/src/web.rs",
+        "auth_detected": false,
+        "severity": "low"
+      },
+      {
+        "method": "GET",
+        "path": "/ws",
+        "file": "rust/crates/demo-server/src/web.rs",
+        "auth_detected": false,
+        "severity": "low"
+      }
+    ],
+    "network_binding": "127.0.0.1 by default for the tic-tac-toe servers (go/cmd/ttt/main.go listens on 127.0.0.1 only). pt and demo servers take --bind and refuse a non-loopback bind without TLS unless --allow-plaintext is passed (go/internal/pt/server/serve.go lines 40-46); Host/Origin allowlists documented in README.",
+    "cors_wide_open": false
+  },
+  "data_access": {
+    "databases": [
+      {
+        "type": "sqlite",
+        "credential_source": "none (local file, path from --db flag)",
+        "file": "rust/crates/pt-server/src/store.rs",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "values are bound with rusqlite params; a few queries interpolate table/column names via format! (store.rs lines 427, 1072, 1127, 1183) but those names come from internal entity/field metadata lookups (fields::field), not request input - a latent pattern, not an active injection path"
+        }
+      },
+      {
+        "type": "sqlite",
+        "credential_source": "none (local file, path from --db flag)",
+        "file": "go/internal/pt/store (modernc.org/sqlite)",
+        "access_type": "read_write",
+        "sql_injection_risk": {
+          "present": false,
+          "severity": "low",
+          "reason": "Go store not fully traced; no user-input string concatenation observed in the pre-gathered evidence"
+        }
+      }
+    ],
+    "external_apis": [],
+    "file_system_access": [
+      {
+        "file": "go/internal/pt/client/client.go",
+        "detail": "writes client session/token config file (mode 0600) under PT_CONFIG_DIR or OS config directory",
+        "access_type": "write"
+      },
+      {
+        "file": "go/internal/pt/tui/config.go",
+        "detail": "writes TUI preferences file (mode 0600)",
+        "access_type": "write"
+      },
+      {
+        "file": "rust/crates/pt-tui/src/net.rs",
+        "detail": "reads/writes client config under PT_CONFIG_DIR, APPDATA, Library/Application Support or XDG_CONFIG_HOME",
+        "access_type": "read_write"
+      },
+      {
+        "file": "rust/crates/pt-server/build.rs",
+        "detail": "build-time file write of generated assets",
+        "access_type": "write"
+      }
+    ],
+    "sensitive_data_indicators": [
+      {
+        "field_or_variable": "password (users table, login, SetPassword)",
+        "file": "rust/crates/pt-server/src/store.rs"
+      },
+      {
+        "field_or_variable": "password",
+        "file": "go/internal/pt/server/http.go"
+      },
+      {
+        "field_or_variable": "email (demo form fields)",
+        "file": "rust/crates/demo-core/src/keys.rs"
+      }
+    ],
+    "office_and_collaboration_sources": []
+  },
+  "configuration_and_deployment": {
+    "containerized": false,
+    "docker_findings": [
+      "none - no Dockerfile or compose file present"
+    ],
+    "deploy_config_files": [
+      "rust/Makefile",
+      "go/Makefile"
+    ],
+    "environment_variables_referenced": [
+      "COLORTERM",
+      "DEMO_CONFORM_URL",
+      "DEMO_E2E_CHANNEL",
+      "DEMO_E2E_RESTART",
+      "DEMO_E2E_SHOTS",
+      "DEMO_E2E_URL",
+      "DEMO_HEADED",
+      "DEMO_SHOTS",
+      "DEMO_TUI_DUMP",
+      "DEMO_URL",
+      "DEMO_VERBOSE",
+      "PT_CONFIG_DIR",
+      "PT_CONFORM_PASSWORD",
+      "PT_CONFORM_URL",
+      "PT_E2E_PASSWORD",
+      "PT_E2E_RESTART",
+      "PT_E2E_SHOTS",
+      "PT_E2E_URL",
+      "PT_PASSWORD",
+      "PT_SEED_PASSWORD",
+      "PT_SHOTS",
+      "PT_TUI_DUMP",
+      "PT_URL",
+      "PT_VERBOSE",
+      "TERM",
+      "TERM_PROGRAM",
+      "WT_SESSION",
+      "APPDATA",
+      "HOME",
+      "XDG_CONFIG_HOME"
+    ],
+    "readme_present": true,
+    "readme_describes_deployment": true
+  },
+  "capability_summary": {
+    "what_this_app_can_do": [
+      "Lets two players play tic-tac-toe on one shared live game from a terminal UI and a browser tab at the same time, served locally with no login (127.0.0.1 only), in both a Rust and a Go implementation.",
+      "Runs 'pt', a projects-and-tasks business-style app (grid, board, timeline, dashboard views) with terminal and WebAssembly web clients over a shared SQLite database; users log in with a password and see and edit projects, programs, templates and tasks according to their role.",
+      "Runs a 'demo' control gallery server (no login) used only to exercise UI widgets in four clients.",
+      "Seeds the pt database with demo users and data and prints or accepts a seed password."
+    ],
+    "data_sources_touched": [
+      {
+        "source": "pt SQLite database file (users with Argon2id hashes, programs, projects, templates, tasks, activity)",
+        "access": "read_write",
+        "leaves_organization": false
+      },
+      {
+        "source": "local client config files (session token, preferences)",
+        "access": "read_write",
+        "leaves_organization": false
+      }
+    ],
+    "who_can_reach_it": "By default only the local machine (loopback bind with Host/Origin allowlists). The pt and demo servers can be bound to other interfaces, but refuse non-loopback binds without TLS unless --allow-plaintext is given. The tic-tac-toe servers have no authentication (loopback only); the pt server requires login for /ws, /api/me and /api/logout with login throttling.",
+    "unauthorized_action_red_flags": [
+      "none found - no external API calls, no hardcoded credentials, no data leaving the host observed",
+      "--allow-plaintext option permits serving the authenticated pt app over plain HTTP on a non-loopback interface (explicit opt-in)",
+      "tic-tac-toe and demo WebSocket endpoints have no authentication (loopback default)"
+    ]
+  },
+  "summary": {
+    "top_findings": [
+      "No secrets, secret files or provider keys found; passwords hashed with Argon2id; password values in grep hits are test fixtures",
+      "Servers bind loopback by default; non-loopback bind requires TLS or an explicit --allow-plaintext flag",
+      "Tic-tac-toe and demo WebSocket endpoints are unauthenticated (low: loopback only, no sensitive data)",
+      "SQL built with format! only for internal table/column names; values are parameterized",
+      "No .env/key patterns in .gitignore, and no CI workflow or Dockerfile present"
+    ],
+    "finding_counts_by_severity": {
+      "critical": 0,
+      "high": 0,
+      "low": 14
+    }
+  }
+}

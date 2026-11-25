@@ -13,5 +13,5 @@ Produce a `{REPONAME}_Summary.md` Markdown file, with mermaid diagrams as needed
 
 Create a `{REPONAME}_Governance.md` where you concisely complete the questions found in the template questionnaire.md in the results repo  about each app. Again, stay within the scope of the skill for your analysis, and reuse the previously created output JSON.
 
-
+Apply semver and create a changelog for the repo when the analyses are done. Make sure the README summarizes the findings and the work completed at a high-level
 

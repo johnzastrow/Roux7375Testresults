@@ -57,3 +57,258 @@ These credentials are visible right now in public repositories, so you'll probab
 - garminview: backend/.env is tracked and contains a database URL with a password.
 - jz_jupyters: a MySQL password appears in scripts and notebooks.
 - LearningPy: mantis_bak.py contains a third-party service password.
+
+
+❯ check all the mermaid diagrams for readability
+
+The summary has three Mermaid diagrams. I'll try to render them to see how they actually look.
+
+  Listed 1 directory, did not run 1 other call
+$ S=/tmp/claude-1000/-home-jcz-Github/13711b86-54c4-4aca-9c1f-4aab65ce6cce/scratchpad; mkdir -p $S/mm && cd $S/mm && awk '/^```mermaid/{n++; f=sprintf("d%d.mmd",n); next} /^```$/{f=""; next} f{print > f}' /home/jcz/Github/Roux7375Testresults/outputs/johnzastrow_Summary.md && ls
+for i in 1 2 3; do n…
+1 action blocked by auto mode · /permissions to review
+│ Auto mode: [Undermining Oversight]
+
+❯ on the axis too
+
+I can't render locally because downloading the Mermaid CLI was blocked. Instead I'll look at the diagrams as GitHub renders them, which is where readers will see them. I'll check the axis labels too.
+
+  Called claude-in-chrome 7 times, did not run 1 other call
+Claude in Chrome[find](pattern: Findings by severity heading)
+1 action not run · permission denied
+│ Reason: Can't interact with browser-internal or unparseable URLs. Navigate to a web page first.
+
+I'm reviewing the GitHub-rendered charts. The language pie has overlapping slice labels. Next I'll check the bar chart and its axes.
+
+  Called claude-in-chrome 2 times
+
+The GitHub render has three readability problems: overlapping repo names on the bar chart x-axis, critical and high bars that overlay each other in the same pale color, and a language pie with crowded labels that misleads since repos can have several languages. I'll switch the charts to horizontal bars with split critical and high series in distinct colors, and do the language chart the same way. · summary
+
+  Made 2 scratchpad edits +30 -17, ran 1 shell command
+
+The new chart definitions look correct. I can't render locally, so I'll ship this as a patch release (1.0.1, per your semver convention) and then check it on GitHub.
+
+  Ran 1 shell command · 1 failed
+
+The remote has new commits I don't have locally. I'll look at them before integrating.
+
+  Ran 1 shell command
+
+The new remote commit only changes conversation.txt, which I didn't touch, so there's no conflict. I'll rebase on top of it and push.
+
+● Bash(git rebase -q origin/main && git push -q origin main && git log --oneline -3)
+a6e8aab Fix summary chart readability (v1.0.1)
+ce349c1 Document governance scan results and action items
+67e5c55 Add governance-scan results for 43 public repositories (v1.0.0)
+Updated conversation.txt +37 -1
+(a git step in this command can move the working tree, so these may be its changes, not edits)
+(files that changed while this command ran, by the command or by another process; a convenience view, not a review or audit of the command)
+Allowed by auto mode
+
+  Called claude-in-chrome 2 times
+
+The language and critical charts now read cleanly, with one label per row on each axis. Next I'll check the high chart.
+
+
+All four charts now read well on GitHub. I'll close the browser tab.
+
+  Called claude-in-chrome
+
+I checked all the Mermaid diagrams as GitHub renders them, fixed the hard-to-read ones, and pushed the fix as v1.0.1 (commit a6e8aab). I viewed the new version on GitHub, and every axis label is now readable.
+
+┌───────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┬───────────────────────────────────────────────────────────────────────┐
+│         Chart         │                                                                      Problem                                                                       │                                  Fix                                  │
+├───────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ Findings by severity  │ None. Clear labels and colours.                                                                                                                    │ Unchanged                                                             │
+│ (pie)                 │                                                                                                                                                    │                                                                       │
+├───────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ Critical and high per │ The repo names on the x-axis overlapped and couldn't be read. Mermaid drew the two series on top of each other in nearly the same pale colour, so  │ Split into two horizontal bar charts, critical in red and high in     │
+│  repo (bar)           │ critical counts were hidden behind high (waterlogger's 9 critical sat behind its 27 high), and there was no legend.                                │ orange. Each repo name sits on its own row of the axis.               │
+├───────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────┤
+│ Languages (pie)       │ Labels on the small slices collided. A pie also implied parts of a whole, which is wrong because a repo can have several languages.                │ Now a horizontal bar chart with a note that counts add up to more     │
+│                       │                                                                                                                                                    │ than 43.                                                              │
+└───────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────┘
+
+All the charts keep your house theme colours and fonts. The bar charts now also sort largest first and leave a little room above the top value.
+
+- Version: CHANGELOG.md has a 1.0.1 entry and VERSION now reads 1.0.1.
+- Your commit: the push was rejected at first because GitHub had a newer commit, ce349c1, which only changes conversation.txt. I rebased my change on top of it, so your commit is kept.
+- Tag: I haven't tagged v1.0.1. Tell me if you want it to match v1.0.0.
+- Local rendering: downloading the Mermaid CLI to render locally was blocked, so I checked the charts on GitHub instead.
+
+Crunched for 2m 0s · done 4:44 PM
+
+❯ tag v1.0.1
+
+  Ran 1 shell command
+
+I tagged commit a6e8aab (the chart readability fix) as v1.0.1 and pushed it to GitHub. Both v1.0.0 and v1.0.1 are now on the remote.
+
+Churned for 5s · done 4:45 PM
+
+❯ create a GitHub release for v1.0.1
+
+  Ran 1 shell command
+
+The GitHub release for v1.0.1 is published and marked as the latest: https://github.com/johnzastrow/Roux7375Testresults/releases/tag/v1.0.1
+
+The notes are taken from the 1.0.1 CHANGELOG entry. They also say that no scan data changed: the 43 JSON inventories and 43 Governance files are the same as in v1.0.0, and only the summary charts were fixed. v1.0.0 has a tag but no GitHub release; I can create one for it too if you want.
+
+Cooked for 8s · done 4:46 PM
+
+recap: I scanned your 43 public repos with the governance-scan skill, published the results, fixed the summary charts, and released v1.0.1 on GitHub. Next, you should change and remove the passwords exposed in garminview, jz_jupyters, and LearningPy. (turn off recaps in /config)
+
+❯ can we include small data flow diagrams for each project in the summary file? external endpoints are important to itemize
+
+Yes. Before designing the diagrams, I'll check how consistently the agents recorded endpoints and data sources in the JSON.
+
+  Ran 1 shell command
+
+Endpoint data is in all 43 inventories, though agents wrote hosts either as bare hostnames or as descriptions, so diagram labels will be shortened and each repo gets a full endpoint table. I'm building per-repo flowcharts from the JSON next, with external endpoints highlighted and a new matrix 2.9 listing every network endpoint. · summary
+
+
+
+❯ keep the diagrams readable when printing that doc on letter sized paper
+Interrupted · What should Claude do instead?
+
+❯ proceed
+
+Two fixes are coming before publishing: the diagrams will be restructured and labels wrapped so they print at near full size, with external endpoints marked by text as well as shading, and garminview's Ollama endpoint will be reclassified as external because its URL is configurable. · summary
+
+  Ran 2 shell commands
+
+The garminview diagram now uses the compact layout with the Ollama endpoint marked external. I'm updating the section note next, then releasing v1.1.0 and checking it on GitHub. · summary
+
+  Ran 1 shell command
+
+Pushed. Now I'll check a few rendered diagrams on GitHub (a busy one and a simple one) for layout and print width.
+
+  Called claude-in-chrome 3 times, did not run 2 other calls
+Claude in Chrome[computer](scroll down)
+2 actions not run · permission denied
+
+The diagram is still loading; I'll wait a moment and check again.
+
+  Called claude-in-chrome 2 times
+
+The three-column layout fits the page width. The text looks small at this zoom, so I'll zoom in to judge whether it would be legible in print.
+
+  Called claude-in-chrome
+
+Text renders at about 8px because Mermaid shrinks the diagram to the column width, and the edge labels take most of that width while repeating the arrowheads. I'm dropping the labels, keeping the dashed "unclear" style, and enlarging the font so the diagrams scale down less. · summary
+
+● Bash(S=/tmp/claude-1000/-home-jcz-Github/13711b86-54c4-4aca-9c1f-4aab65ce6cce/scratchpad; cd $S && python3 -I - bin/build_summary.py <<'EOF'
+      import sys…)
+0
+an arrow into the app means read, out of the app means write, a double-headed arrow means read/write, and a dashed line means unclear
+bd23c5a Enlarge data flow diagram text for letter-size printing
+1 file changed (binary, mode only or too large to show)
+outputs/johnzastrow_Summary.md
+Allowed by auto mode
+
+  Calling claude-in-chrome 3 times · 3s…
+
+
+The diagram is narrower but still small on GitHub, so its viewer probably also caps height to a fixed frame. I'm measuring the rendered size next. · summary
+
+  Called claude-in-chrome
+
+The garminview diagram measures about 730px wide, which should print near full size on letter paper. Next I'll check that all 42 diagrams rendered by looking at each frame's height. · summary
+
+  Called claude-in-chrome
+
+No frame is suspiciously small, but several share the same 183px height. They could be identical tiny diagrams, or identical error boxes. I'll look at one.
+
+  Called claude-in-chrome
+
+The 183px frames are expected, since simple repositories like qgis-plugin-skill, surveyart, and utilities have only one or two data nodes. I'm taking a screenshot of one to confirm. · summary
+
+  Called claude-in-chrome
+
+The simple diagram renders fine at 183px, but the flow diagrams' text comes out around 10-11px instead of the requested 17, likely because the unitless "17" is ignored. I'm trying "18px" next. · summary
+
+❯ you can break up the diagrams into more smaller ones if needed
+
+I'll split each repository's data flow into smaller diagrams, one for local data and one for network endpoints capped at four per diagram, and stop the browser checks unless you want them. · summary
+
+  Made 2 scratchpad edits +35 -12, read 1 file, ran 2 shell commands
+
+The split works: 63 small flowcharts, none with more than 5 data nodes. I'll update the unreleased 1.1.0 changelog entry to match and push.
+
+  Ran 1 shell command
+
+Each repository in outputs/johnzastrow_Summary.md now has small data flow diagrams and an itemized endpoint list, pushed to main as version 1.1.0 (latest commit b984341). I haven't seen the final version rendered: you stopped the browser check just after the 18px font change, and the diagram split came after that.
+
+What each repository section shows
+- Local data diagram: callers, the app, databases, and local files. All local file access is shown as one node.
+- Network endpoints diagrams: at most 4 endpoints per diagram, continued as "part 2 of 2" where needed (pgeo has 7 endpoints, for example).
+- Network endpoints table: every endpoint with its kind, access, whether it leaves the host network, and the source file. Diagram labels are shortened, so the full text is here.
+- New matrix 2.9: every network endpoint across all 43 repositories in one table.
+
+How to read the diagrams:
+- An arrow into the app means read, out of the app means write, a double-headed arrow means read/write, and a dashed line means unclear.
+- Endpoints that leave the host network are marked with the word EXTERNAL and red shading, so they still stand out on a black-and-white printout.
+- Loopback and private-network endpoints are marked LAN.
+- Configurable URLs count as external because they can point off-host. That rule caught garminview's LLM endpoint, which defaults to localhost but can be configured to any server.
+
+Letter-size printing
+- There are 63 diagrams, each with at most 5 data nodes.
+- Labels wrap at about 24 characters, and I dropped the "read"/"write" text on the arrows because the arrowheads already show direction.
+- On GitHub I measured a busy diagram (garminview's, before the split) at about 730px wide. Letter paper's printable width is about 720px, so it should print at about full size.
+- The font now uses an explicit 18px. The earlier unitless "17" appeared to be ignored, which left diagram text smaller than the body text; that is my inference, not something I confirmed.
+- The new diagrams reuse the syntax that already rendered correctly. If you want them confirmed, I can check them in the browser or you can open the file on GitHub.
+
+CHANGELOG.md has the 1.1.0 entry and VERSION reads 1.1.0. I haven't tagged or released 1.1.0; tell me if you want v1.1.0 tagged and a GitHub release like v1.0.1's.
+
+Churned for 44s · done 4:57 PM
+
+❯ keep the browser checks
+
+I'll check the new version in the browser: one repo with a split diagram (pgeo) and one simple repo.
+
+  Called claude-in-chrome 4 times
+
+All 67 diagrams are on the page (4 charts and 63 flow diagrams). The many zero heights are probably lazy loading of off-screen frames. I'll check what's in view.
+
+  Called claude-in-chrome 3 times
+
+The pgeo local-data diagram fails with "Unable to render rich display," and I suspect the new 18px font value or the apostrophe in "Who's." I'm testing a simple diagram without the apostrophe to tell which it is. · summary
+
+  Called claude-in-chrome 3 times
+
+The simple diagram fails too, so the font size value "18px" is the cause, not the split or apostrophe. I'm switching to the plain number "18" and rechecking. · summary
+
+It still fails. GitHub may be serving a cached copy, so I'll check whether the failing block's source contains the old or the new font value.
+
+  Called claude-in-chrome
+
+The page source now has the new "18" value, but all 63 flowcharts still fail while the 4 charts render, so the font wasn't the only cause. I'm comparing a flowchart from the last working version against the current one next. · summary
+
+  Ran 2 shell commands
+
+The font value differs only between the working and failing blocks (17 versus 18), which shouldn't cause a syntax error. GitHub may be capping diagrams per page (67 now, versus 42 when everything rendered), so I'm looking for the error message near a failing block next. · summary
+
+  Called claude-in-chrome
+
+Not every diagram fails: 30 of the 67 frames rendered. I'll map which ones rendered against their positions in the document to see if there's a pattern.
+
+  Called claude-in-chrome
+
+Only the first 30 diagrams render, so the page seems capped somewhere between 42 and 67 diagrams. I'm counting how many diagrams a gentler split would give before picking a fix. · summary
+
+  Ran 1 shell command
+
+None of the fixes will work without reorganizing the files, so I'm stopping to check with you. Meanwhile, main's summary is partly broken: diagrams after the 30th show "Unable to render rich display". · summary
+
+Answered Claude's questions:
+· GitHub stops rendering Mermaid after about 30-42 diagrams per page. The summary now has 67 (4 charts plus 63 small data flow diagrams), so everything after the 30th fails. Even one combined diagram per repo would still be 47. How should the per-repo data flow diagrams be delivered? → In each Governance file
+
+You chose to keep the flow diagrams in each repo's <repo>_Governance.md, with the summary holding only the endpoint tables and a link. I'm wrapping the inserted section in marker comments so rebuilds don't duplicate it. · summary
+
+  Ran 1 shell command
+
+❯ Split the document into  parts
+
+Your new message ("Split the document into parts") seems to be missing a number, and it changes the plan, so I'll confirm before writing anything.
+
+

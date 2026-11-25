@@ -13,6 +13,7 @@ Please complete the relevant sections below. This information will be used to ev
 
 
 **Developer**
+
 Auditing Focus: Environment safety, deployment mechanics, local secrets handling, and technical build parameters.
 Audit Questions
 1. What local runtime environment and package dependencies are required to run, test, and build this application?
@@ -22,6 +23,7 @@ Audit Questions
 Answers
 
 **Application Owner**
+
 Auditing Focus: Functional completeness, feature alignment, and user interaction design against approved business requirements.
 Audit Questions
 1. Give a summary of the business problems being solved by this application?
@@ -31,6 +33,7 @@ Audit Questions
 Answers
 
 **IT Department**
+
 Auditing Focus: Data boundaries, external API connectivity, credential lifecycle, and compliance with data loss prevention (DLP) rules.
 Audit Questions
 1. What internal data stores, cloud services, or third-party APIs does this application connect to? If there are any, are the credentials encrypted?
@@ -40,6 +43,7 @@ Audit Questions
 Answers
 
 **Data Manager**
+
 Auditing Focus: Data lineage, external system dependencies, data transformations, and notification channels for system changes.
 Audit Questions
 1. What specific data sources were approved for use with this application? With each Include:
@@ -50,6 +54,7 @@ d. If specific roles in the application should be restricted from the data sourc
 Answers
 
 **Security Officer**
+
 Auditing Focus: Policy compliance, vulnerability management, audit trail logging, and regulatory alignment.
 Audit Questions
 1. What security controls should be enforced around hardcoded credentials, API key exposure, and source control hygiene?

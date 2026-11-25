@@ -14,6 +14,9 @@ All notable changes to this repository are documented here. The format follows
 - Matrix 2.9 "Network endpoints (all repositories)" listing every endpoint across the 43 inventories.
 
 ### Changed
+- The repository sections moved out of `johnzastrow_Summary.md` into `johnzastrow_Summary_Part1.md` to
+  `_Part3.md` (at most 28 diagrams each), because GitHub stops rendering Mermaid after about 30 diagrams per
+  page. The summary keeps the overview, charts and matrices, and links each repository to its part.
 - Diagrams stay readable when printed on letter-size paper: each repository's data flow is split into small
   diagrams (local data, then network endpoints at most four per diagram), labels are wrapped, and redundant
   edge labels are dropped because arrowheads already show read/write direction.

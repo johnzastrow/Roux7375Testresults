@@ -1,6 +1,6 @@
 # Governance Scan Summary - johnzastrow public repositories
 
-Generated: 2026-11-25 21:54 UTC  
+Generated: 2026-11-25 21:55 UTC  
 Method: [governance-scan skill v1.0](https://github.com/MichaelHynesRoux/INFO-7375-Governance-Scan-Skill) (read-only inventory) applied to each public, non-fork repository of [johnzastrow](https://github.com/johnzastrow), excluding this results repository.  
 Repositories scanned: **43**. Per-repo inventories: `<repo>.json`; questionnaire answers: `<repo>_Governance.md`.
 
@@ -36,7 +36,7 @@ A repository can contain several languages, so counts sum to more than the numbe
 %%{init: {"theme":"base","xyChart":{"width":760,"height":596,"xAxis":{"labelFontSize":14},"yAxis":{"labelFontSize":13}},"themeVariables":{"xyChart":{"plotColorPalette":"#6B8CAE"},"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"16","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 xychart-beta horizontal
     title "Repositories per detected language"
-    x-axis ["python", "node / js / ts", "shell", "go", "none (docs or assets only)", "sql", "powershell", "rust", "cpp", "ini/config", "batch"]
+    x-axis ["python", "node / js / ts", "shell", "go", "none (docs or assets only)", "sql", "powershell", "rust", "cpp", "batch", "ini/config"]
     y-axis "Repositories" 0 --> 31
     bar [28, 10, 9, 7, 6, 4, 2, 2, 1, 1, 1]
 ```
@@ -532,7 +532,7 @@ Every external API host and network mail/collaboration source recorded in the in
 
 ## 3. Repository sections
 
-Each section has a small data flow diagram built only from that repository's JSON. Arrows follow the recorded `access_type`: read points into the app, write points out of it, read/write points both ways, and a dashed line means unclear. Endpoints that leave the host network are labelled EXTERNAL and shaded red; loopback or private-LAN endpoints are labelled LAN. Diagrams are sized to print on letter paper; labels are shortened, and the full endpoint text is in the table under each diagram. Local file access is shown as one node; databases and network endpoints are itemized.
+Each section has a small data flow diagram built only from that repository's JSON. Arrows follow the recorded `access_type`: an arrow into the app means read, out of the app means write, a double-headed arrow means read/write, and a dashed line means unclear. Endpoints that leave the host network are labelled EXTERNAL and shaded red; loopback or private-LAN endpoints are labelled LAN. Diagrams are sized to print on letter paper; labels are shortened, and the full endpoint text is in the table under each diagram. Local file access is shown as one node; databases and network endpoints are itemized.
 
 ### actalog
 
@@ -551,24 +551,24 @@ Link: https://github.com/johnzastrow/actalog | Languages: go, javascript, vue, s
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"actalog"}}
     U(["Callers:<br>cli, scheduled, spa,<br>web_api"]) --> APP
     D1[("DB: sqlite / postgresql<br>/ mysql-mariadb...")]
-    APP <-->|read/write| D1
+    APP <--> D1
     O2["CSV files (2)"]
-    APP <-->|read/write| O2
+    APP <--> O2
     F3["Local files (5 paths)"]
-    APP <-->|read/write| F3
+    APP <--> F3
     E4["EXTERNAL:<br>SMTP server configured<br>via SMTP_HOST (net/sm..."]
-    APP -->|write| E4
+    APP --> E4
     E5["EXTERNAL:<br>youtube.com (video<br>links/embeds entered..."]
-    E5 -->|read| APP
+    E5 --> APP
     E6["EXTERNAL:<br>OTEL_EXPORTER_OTLP_EN...<br>(referenced only in..."]
-    APP -->|write| E6
+    APP --> E6
     E7["EXTERNAL:<br>outbound SMTP via<br>SMTP_HOST (no mailbox..."]
-    APP -->|write| E7
+    APP --> E7
     class E4,E5,E6,E7 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -623,16 +623,16 @@ Link: https://github.com/johnzastrow/actalog-benchmark | Languages: go | Finding
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"actalog-benchmark"}}
     U(["Callers:<br>cli"]) --> APP
     F1["Local files (3 paths)"]
-    APP <-->|read/write| F1
+    APP <--> F1
     E2["EXTERNAL:<br>user-supplied ActaLog<br>instance (--url),..."]
-    APP <-->|read/write| E2
+    APP <--> E2
     E3["EXTERNAL:<br>same target: POST<br>/api/auth/login, GET..."]
-    APP <-->|read/write| E3
+    APP <--> E3
     class E2,E3 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -680,24 +680,24 @@ Link: https://github.com/johnzastrow/bittabby | Languages: go, javascript | Find
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"bittabby"}}
     U(["Callers:<br>cli, scheduled_job,<br>web_app"]) --> APP
     D1[("DB: sqlite (default,<br>modernc.org/sqlite,...")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: mariadb/mysql<br>(optional,...")]
-    APP <-->|read/write| D2
+    APP <--> D2
     O3["CSV files (1)"]
-    O3 -->|read| APP
+    O3 --> APP
     F4["Local files (2 paths)"]
-    APP <-->|read/write| F4
+    APP <--> F4
     E5["EXTERNAL:<br>configurable SMTP server<br>(BITT_SMTP_HOST)"]
-    APP -->|write| E5
+    APP --> E5
     E6["EXTERNAL:<br>ntfy server<br>(BITT_NTFY_URL, ntfy...."]
-    APP -->|write| E6
+    APP --> E6
     E7["EXTERNAL:<br>SMTP host from config<br>(net/smtp), outbound..."]
-    APP -->|write| E7
+    APP --> E7
     class E5,E6,E7 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -749,16 +749,16 @@ Link: https://github.com/johnzastrow/choreme | Languages: go, typescript, vue, j
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"choreme"}}
     U(["Callers:<br>cli, scheduled_job,<br>web_api, web_ui"]) --> APP
     D1[("DB: sqlite / postgresql<br>/ mysql (selected by...")]
-    APP <-->|read/write| D1
+    APP <--> D1
     F2["Local files (1 paths)"]
-    APP <-->|read/write| F2
+    APP <--> F2
     E3["EXTERNAL:<br>SMTP server from<br>SMTP_HOST (example..."]
-    APP -->|write| E3
+    APP --> E3
     class E3 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -805,12 +805,12 @@ Link: https://github.com/johnzastrow/DocQGISProject | Languages: python | Findin
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"DocQGISProject"}}
     U(["Callers:<br>cli, gui,<br>processing_provider,<br>qgis_plugin"]) --> APP
     F1["Local files (3 paths)"]
-    APP <-->|read/write| F1
+    APP <--> F1
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -852,26 +852,26 @@ Link: https://github.com/johnzastrow/garminview | Languages: python, typescript,
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"garminview"}}
     U(["Callers:<br>cli, notebook,<br>scheduled_job, web_api,<br>web_ui"]) --> APP
     D1[("DB: mariadb<br>(mysql+pymysql) or...")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: sqlite (GarminDB<br>files garmin.db,...")]
-    D2 -->|read| APP
+    D2 --> APP
     O3["CSV files (2)"]
-    APP <-->|read/write| O3
+    APP <--> O3
     F4["Local files (3 paths)"]
-    APP <-->|read/write| F4
+    APP <--> F4
     E5["EXTERNAL:<br>Garmin Connect (via<br>garmindb_cli /..."]
-    E5 -->|read| APP
+    E5 --> APP
     E6["EXTERNAL:<br>Actalog server (URL and<br>credentials stored in..."]
-    APP <-->|read/write| E6
+    APP <--> E6
     E7["EXTERNAL:<br>Actalog server<br>write-back (POST of..."]
-    APP -->|write| E7
+    APP --> E7
     E8["EXTERNAL:<br>Ollama or<br>OpenAI-compatible LLM..."]
-    APP -->|write| E8
+    APP --> E8
     class E5,E6,E7,E8 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -984,28 +984,28 @@ Link: https://github.com/johnzastrow/jz_jupyters | Languages: python, jupyter | 
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"jz_jupyters"}}
     U(["Callers:<br>cli, gui, notebook"]) --> APP
     D1[("DB: mysql")]
-    D1 -->|read| APP
+    D1 --> APP
     D2[("DB: mysql")]
-    D2 -->|read| APP
+    D2 --> APP
     D3[("DB: mysql")]
-    D3 -->|read| APP
+    D3 --> APP
     D4[("DB: mysql")]
     APP -.-|unclear| D4
     D5[("DB: sqlite")]
-    D5 -->|read| APP
+    D5 --> APP
     O6["EXCEL files (2)"]
-    O6 -->|read| APP
+    O6 --> APP
     O7["CSV files (2)"]
-    O7 -->|read| APP
+    O7 --> APP
     F8["Local files (5 paths)"]
-    APP <-->|read/write| F8
+    APP <--> F8
     E9["EXTERNAL:<br>api.github.com"]
-    E9 -->|read| APP
+    E9 --> APP
     class E9 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -1054,26 +1054,26 @@ Link: https://github.com/johnzastrow/LearningPy | Languages: python | Findings: 
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"LearningPy"}}
     U(["Callers:<br>cli, notebook"]) --> APP
     D1[("DB: sqlite")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: sqlite")]
-    APP <-->|read/write| D2
+    APP <--> D2
     D3[("DB: sqlite")]
     APP -.-|unclear| D3
     O4["CSV files (2)"]
-    APP <-->|read/write| O4
+    APP <--> O4
     F5["Local files (3 paths)"]
-    APP -->|write| F5
+    APP --> F5
     E6["EXTERNAL:<br>se.mantishub.io"]
-    E6 -->|read| APP
+    E6 --> APP
     E7["EXTERNAL:<br>www.bloomberg.com"]
-    E7 -->|read| APP
+    E7 --> APP
     E8["EXTERNAL:<br>207.246.85.12"]
-    E8 -->|read| APP
+    E8 --> APP
     E9["EXTERNAL:<br>www.facebook.com /<br>www.google.com /..."]
     APP -.-|unclear| E9
     class E6,E7,E8,E9 ext
@@ -1125,16 +1125,16 @@ Link: https://github.com/johnzastrow/lineup | Languages: python | Findings: crit
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"lineup"}}
     U(["Callers:<br>cli, gui"]) --> APP
     D1[("DB: sqlite")]
-    APP <-->|read/write| D1
+    APP <--> D1
     O2["CSV files (1)"]
-    APP <-->|read/write| O2
+    APP <--> O2
     F3["Local files (4 paths)"]
-    APP <-->|read/write| F3
+    APP <--> F3
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -1177,16 +1177,16 @@ Link: https://github.com/johnzastrow/localfeather | Languages: python, cpp, shel
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"localfeather"}}
     U(["Callers:<br>cli, dev_server,<br>device_firmware,<br>service, web_api, web_ui"]) --> APP
     D1[("DB: mariadb/mysql<br>(pymysql via SQLAlchemy)")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: sqlite (development<br>fallback)")]
-    APP <-->|read/write| D2
+    APP <--> D2
     F3["Local files (2 paths)"]
-    APP <-->|read/write| F3
+    APP <--> F3
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -1262,14 +1262,14 @@ Link: https://github.com/johnzastrow/mapsplat | Languages: python | Findings: cr
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"mapsplat"}}
     U(["Callers:<br>ci_workflow,<br>qgis_plugin,<br>web_static_server_gen..."]) --> APP
     F1["Local files (4 paths)"]
-    APP <-->|read/write| F1
+    APP <--> F1
     E2["EXTERNAL:<br>unpkg.com<br>(maplibre-gl@4.7.1,..."]
-    E2 -->|read| APP
+    E2 --> APP
     class E2 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -1315,24 +1315,24 @@ Link: https://github.com/johnzastrow/mapsplat4 | Languages: python, node, shell,
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"mapsplat4"}}
     U(["Callers:<br>cli, qgis_plugin"]) --> APP
     D1[("DB: sqlite (MBTiles<br>read)")]
-    D1 -->|read| APP
+    D1 --> APP
     F2["Local files (4 paths)"]
-    APP <-->|read/write| F2
+    APP <--> F2
     E3["EXTERNAL:<br>unpkg.com (MapLibre GL<br>JS and PMTiles JS..."]
-    E3 -->|read| APP
+    E3 --> APP
     E4["EXTERNAL:<br>build.protomaps.com /<br>maps.protomaps.com /..."]
-    E4 -->|read| APP
+    E4 --> APP
     E5["EXTERNAL:<br>tile.openstreetmap.org,<br>basemaps.cartocdn.com..."]
-    E5 -->|read| APP
+    E5 --> APP
     E6["EXTERNAL:<br>user-supplied<br>basemap/style URLs..."]
-    E6 -->|read| APP
+    E6 --> APP
     E7["EXTERNAL:<br>raw.githubusercontent...<br>(Protomaps license text)"]
-    E7 -->|read| APP
+    E7 --> APP
     class E3,E4,E5,E6,E7 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -1384,18 +1384,18 @@ Link: https://github.com/johnzastrow/marimo-qgis | Languages: python, shell | Fi
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"marimo-qgis"}}
     U(["Callers:<br>cli, notebook,<br>qgis_plugin, web_api"]) --> APP
     D1[("DB: sqlite (in-memory<br>version probe)")]
-    D1 -->|read| APP
+    D1 --> APP
     F2["Local files (4 paths)"]
-    APP -->|write| F2
+    APP --> F2
     E3["EXTERNAL:<br>github.com (downloads<br>repository zip of..."]
-    E3 -->|read| APP
+    E3 --> APP
     E4["EXTERNAL:<br>PyPI via pip (installs<br>marimo and..."]
-    E4 -->|read| APP
+    E4 --> APP
     E5["EXTERNAL:<br>astral.sh (uv install<br>hint text only)"]
     APP -.-|unclear| E5
     class E3,E4,E5 ext
@@ -1448,14 +1448,14 @@ Link: https://github.com/johnzastrow/metadatamgr | Languages: python | Findings:
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"metadatamgr"}}
     U(["Callers:<br>cli, qgis_plugin"]) --> APP
     D1[("DB: sqlite/geopackage")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: sqlite/geopackage")]
-    APP <-->|read/write| D2
+    APP <--> D2
     F3["Local files (5 paths)"]
     APP -.-|unclear| F3
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
@@ -1503,24 +1503,24 @@ Link: https://github.com/johnzastrow/mqs | Languages: python, shell | Findings: 
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"mqs"}}
     U(["Callers:<br>cli, gui, qgis_plugin,<br>qgis_processing_scripts"]) --> APP
     D1[("DB: sqlite (GeoPackage<br>inventory)")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: sqlite<br>(GeoPackage/SpatiaLit...")]
-    APP <-->|read/write| D2
+    APP <--> D2
     D3[("DB: postgresql (QGIS<br>project store)")]
-    APP <-->|read/write| D3
+    APP <--> D3
     D4[("DB: sqlite (metadata<br>manager database)")]
-    APP <-->|read/write| D4
+    APP <--> D4
     F5["Local files (4 paths)"]
-    APP <-->|read/write| F5
+    APP <--> F5
     E6["EXTERNAL:<br>plugins.qgis.org<br>(XML-RPC plugin upload)"]
-    APP -->|write| E6
+    APP --> E6
     E7["EXTERNAL:<br>unpkg.com<br>(MapLibre/pmtiles JS..."]
-    E7 -->|read| APP
+    E7 --> APP
     class E6,E7 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -1571,24 +1571,24 @@ Link: https://github.com/johnzastrow/mqs4 | Languages: python | Findings: critic
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"mqs4"}}
     U(["Callers:<br>cli, desktop_gui,<br>qgis_plugin,<br>qgis_processing_script"]) --> APP
     D1[("DB: sqlite (GeoPackage<br>inventory)")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: sqlite<br>(GeoPackage/SpatiaLit...")]
-    APP <-->|read/write| D2
+    APP <--> D2
     D3[("DB: sqlite (metadata<br>cache database)")]
-    APP <-->|read/write| D3
+    APP <--> D3
     D4[("DB: postgresql")]
-    APP <-->|read/write| D4
+    APP <--> D4
     F5["Local files (6 paths)"]
-    APP <-->|read/write| F5
+    APP <--> F5
     E6["EXTERNAL:<br>plugins.qgis.org<br>(XML-RPC upload of..."]
-    APP -->|write| E6
+    APP --> E6
     E7["EXTERNAL:<br>user-specified<br>PostgreSQL host"]
-    APP <-->|read/write| E7
+    APP <--> E7
     class E6,E7 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -1637,20 +1637,20 @@ Link: https://github.com/johnzastrow/ms | Languages: python | Findings: critical
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"ms"}}
     U(["Callers:<br>background_agents,<br>notebook"]) --> APP
     O1["CSV files (1)"]
-    APP -->|write| O1
+    APP --> O1
     F2["Local files (3 paths)"]
-    APP -->|write| F2
+    APP --> F2
     E3["EXTERNAL:<br>archive.apache.org"]
-    E3 -->|read| APP
+    E3 --> APP
     E4["EXTERNAL:<br>CIFAR-10 download via<br>keras.datasets.cifar1..."]
-    E4 -->|read| APP
+    E4 --> APP
     E5["LAN:<br>localhost:9092 (Apache<br>Kafka broker, local)"]
-    APP <-->|read/write| E5
+    APP <--> E5
     class E3,E4 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -1701,34 +1701,34 @@ Link: https://github.com/johnzastrow/mydocmost | Languages: node | Findings: cri
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"mydocmost"}}
     U(["Callers:<br>cli, scheduled_job,<br>web_api, web_frontend"]) --> APP
     D1[("DB: postgresql")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: redis")]
-    APP <-->|read/write| D2
+    APP <--> D2
     O3["CSV files (1)"]
-    O3 -->|read| APP
+    O3 --> APP
     F4["Local files (2 paths)"]
-    APP <-->|read/write| F4
+    APP <--> F4
     E5["EXTERNAL:<br>tel.docmost.com"]
-    APP -->|write| E5
+    APP --> E5
     E6["EXTERNAL:<br>api.github.com"]
-    E6 -->|read| APP
+    E6 --> APP
     E7["EXTERNAL:<br>configurable OpenAI /<br>OpenAI-compatible /..."]
-    APP -->|write| E7
+    APP --> E7
     E8["EXTERNAL:<br>configurable S3 endpoint<br>(AWS_S3_ENDPOINT)"]
-    APP <-->|read/write| E8
+    APP <--> E8
     E9["EXTERNAL:<br>SMTP/Postmark<br>(MAIL_DRIVER)"]
-    APP -->|write| E9
+    APP --> E9
     E10["EXTERNAL:<br>login.microsoftonline...<br>/ accounts.google.com..."]
     APP -.-|unclear| E10
     E11["EXTERNAL:<br>embed.diagrams.net<br>(draw.io embed,..."]
-    E11 -->|read| APP
+    E11 --> APP
     E12["EXTERNAL:<br>SMTP_HOST (configurable)<br>via nodemailer, outbo..."]
-    APP -->|write| E12
+    APP --> E12
     class E5,E6,E7,E8,E9,E10,E11,E12 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -1791,20 +1791,20 @@ Link: https://github.com/johnzastrow/myvinyl | Languages: python | Findings: cri
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"myvinyl"}}
     U(["Callers:<br>cli, scheduled, web_app"]) --> APP
     D1[("DB: sqlite")]
-    APP <-->|read/write| D1
+    APP <--> D1
     O2["CSV files (1)"]
-    APP -->|write| O2
+    APP --> O2
     F3["Local files (2 paths)"]
-    APP <-->|read/write| F3
+    APP <--> F3
     E4["EXTERNAL:<br>api.discogs.com"]
-    E4 -->|read| APP
+    E4 --> APP
     E5["EXTERNAL:<br>i.discogs.com"]
-    E5 -->|read| APP
+    E5 --> APP
     class E4,E5 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -1854,30 +1854,30 @@ Link: https://github.com/johnzastrow/niva | Languages: python, node | Findings: 
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"niva"}}
     U(["Callers:<br>cli, language_server,<br>qgis_plugin,<br>vscode_extension"]) --> APP
     D1[("DB: sqlite (GeoPackage)<br>via stdlib sqlite3")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: PostgreSQL/PostGIS<br>and other databases v...")]
-    APP <-->|read/write| D2
+    APP <--> D2
     O3["CSV files (1)"]
-    APP <-->|read/write| O3
+    APP <--> O3
     F4["Local files (3 paths)"]
-    APP <-->|read/write| F4
+    APP <--> F4
     E5["EXTERNAL:<br>ntfy.sh (default,<br>NIVA_NTFY_SERVER..."]
-    APP -->|write| E5
+    APP --> E5
     E6["EXTERNAL:<br>user-configured SMTP<br>host (smtp.gmail.com..."]
-    APP -->|write| E6
+    APP --> E6
     E7["EXTERNAL:<br>user-supplied<br>WFS/WMS/ArcGIS REST/X..."]
-    E7 -->|read| APP
+    E7 --> APP
     E8["EXTERNAL:<br>github.com (marimo<br>on-ramp release zip..."]
-    E8 -->|read| APP
+    E8 --> APP
     E9["EXTERNAL:<br>micro.mamba.pm (install<br>hint text only)"]
-    E9 -->|read| APP
+    E9 --> APP
     E10["EXTERNAL:<br>SMTP host from<br>NIVA_SMTP_HOST (send..."]
-    APP -->|write| E10
+    APP --> E10
     class E5,E6,E7,E8,E9,E10 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -1929,14 +1929,14 @@ Link: https://github.com/johnzastrow/orgphoto | Languages: python | Findings: cr
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"orgphoto"}}
     U(["Callers:<br>cli"]) --> APP
     D1[("DB: sqlite")]
-    APP <-->|read/write| D1
+    APP <--> D1
     F2["Local files (2 paths)"]
-    APP <-->|read/write| F2
+    APP <--> F2
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -1977,36 +1977,36 @@ Link: https://github.com/johnzastrow/pgeo | Languages: python, node | Findings: 
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"pgeo"}}
     U(["Callers:<br>cli, reverse_proxy,<br>web_api, web_frontend"]) --> APP
     D1[("DB: postgresql (PostGIS)<br>via asyncpg and...")]
-    D1 -->|read| APP
+    D1 --> APP
     D2[("DB: postgresql (PostGIS)<br>loader/owner role")]
-    APP <-->|read/write| D2
+    APP <--> D2
     D3[("DB: duckdb / sqlite<br>(read-only Who's On...")]
-    APP <-->|read/write| D3
+    APP <--> D3
     O4["CSV files (2)"]
-    APP <-->|read/write| O4
+    APP <--> O4
     F5["Local files (4 paths)"]
-    APP <-->|read/write| F5
+    APP <--> F5
     E6["EXTERNAL:<br>www2.census.gov"]
-    E6 -->|read| APP
+    E6 --> APP
     E7["EXTERNAL:<br>download.geofabrik.de"]
-    E7 -->|read| APP
+    E7 --> APP
     E8["EXTERNAL:<br>data.whosonfirst.org"]
-    E8 -->|read| APP
+    E8 --> APP
     E9["EXTERNAL:<br>batch.openaddresses.io"]
-    E9 -->|read| APP
+    E9 --> APP
     E10["EXTERNAL:<br>stac.overturemaps.org"]
-    E10 -->|read| APP
+    E10 --> APP
     E11["EXTERNAL:<br>prd-tnm.s3.amazonaws.com"]
-    E11 -->|read| APP
+    E11 --> APP
     E12["EXTERNAL:<br>build.protomaps.com"]
-    E12 -->|read| APP
+    E12 --> APP
     E13["EXTERNAL:<br>raw.githubusercontent..."]
-    E13 -->|read| APP
+    E13 --> APP
     class E6,E7,E8,E9,E10,E11,E12,E13 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -2059,20 +2059,20 @@ Link: https://github.com/johnzastrow/photochomper | Languages: python, shell | F
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"photochomper"}}
     U(["Callers:<br>cli"]) --> APP
     D1[("DB: sqlite")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: sqlite")]
-    APP <-->|read/write| D2
+    APP <--> D2
     D3[("DB: sqlite")]
-    APP -->|write| D3
+    APP --> D3
     O4["CSV files (1)"]
-    APP <-->|read/write| O4
+    APP <--> O4
     F5["Local files (4 paths)"]
-    APP <-->|read/write| F5
+    APP <--> F5
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2115,14 +2115,14 @@ Link: https://github.com/johnzastrow/postgis_linear_referencing | Languages: sql
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"postgis_linear_re..."}}
     U(["Callers:<br>sql_script"]) --> APP
     D1[("DB: postgresql (PostGIS)")]
-    APP <-->|read/write| D1
+    APP <--> D1
     F2["Local files (1 paths)"]
-    F2 -->|read| APP
+    F2 --> APP
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2163,14 +2163,14 @@ Link: https://github.com/johnzastrow/pydataminer | Languages: python | Findings:
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"pydataminer"}}
     U(["Callers:<br>arcgis_script_tool"]) --> APP
     O1["EXCEL files (1)"]
-    APP -->|write| O1
+    APP --> O1
     F2["Local files (3 paths)"]
-    APP <-->|read/write| F2
+    APP <--> F2
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2210,22 +2210,22 @@ Link: https://github.com/johnzastrow/QGIS | Languages: batch, powershell, python
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"QGIS"}}
     U(["Callers:<br>cli"]) --> APP
     D1[("DB: sqlite (GeoPackage)")]
     APP -.-|unclear| D1
     F2["Local files (4 paths)"]
-    APP <-->|read/write| F2
+    APP <--> F2
     E3["EXTERNAL:<br>plugins.qgis.org"]
-    E3 -->|read| APP
+    E3 --> APP
     E4["EXTERNAL:<br>feed.qgis.org"]
-    E4 -->|read| APP
+    E4 --> APP
     E5["EXTERNAL:<br>tile.openstreetmap.org"]
-    E5 -->|read| APP
+    E5 --> APP
     E6["EXTERNAL:<br>s3.amazonaws.com (Mapzen<br>terrain tiles)"]
-    E6 -->|read| APP
+    E6 --> APP
     class E3,E4,E5,E6 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -2274,12 +2274,12 @@ Link: https://github.com/johnzastrow/qgis-plugin-skill | Languages: python, shel
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"qgis-plugin-skill"}}
     U(["Callers:<br>cli"]) --> APP
     F1["Local files (2 paths)"]
-    APP <-->|read/write| F1
+    APP <--> F1
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2318,12 +2318,12 @@ Link: https://github.com/johnzastrow/qgis-vscode-setup | Languages: python | Fin
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"qgis-vscode-setup"}}
     U(["Callers:<br>cli, qgis_console_script"]) --> APP
     F1["Local files (4 paths)"]
-    APP <-->|read/write| F1
+    APP <--> F1
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2363,12 +2363,12 @@ Link: https://github.com/johnzastrow/QGISModes | Languages: python | Findings: c
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"QGISModes"}}
     U(["Callers:<br>dev_script, qgis_plugin"]) --> APP
     F1["Local files (4 paths)"]
-    APP <-->|read/write| F1
+    APP <--> F1
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2410,24 +2410,24 @@ Link: https://github.com/johnzastrow/seh | Languages: python | Findings: critica
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"seh"}}
     U(["Callers:<br>cli, scheduled_job,<br>script"]) --> APP
     D1[("DB: sqlite (default),<br>postgresql, mariadb v...")]
-    APP <-->|read/write| D1
+    APP <--> D1
     O2["EXCEL files (1)"]
-    APP -->|write| O2
+    APP --> O2
     O3["CSV files (1)"]
-    APP -->|write| O3
+    APP --> O3
     F4["Local files (3 paths)"]
-    APP -->|write| F4
+    APP --> F4
     E5["EXTERNAL:<br>monitoringapi.solared..."]
-    E5 -->|read| APP
+    E5 --> APP
     E6["EXTERNAL:<br>smtp.gmail.com (default<br>SEH_SMTP_HOST,..."]
-    APP -->|write| E6
+    APP --> E6
     E7["EXTERNAL:<br>SMTP server from<br>SEH_SMTP_HOST (defaul..."]
-    APP -->|write| E7
+    APP --> E7
     class E5,E6,E7 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
@@ -2537,12 +2537,12 @@ Link: https://github.com/johnzastrow/surveyart | Languages: python | Findings: c
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"surveyart"}}
     U(["Callers:<br>cli"]) --> APP
     F1["Local files (4 paths)"]
-    APP <-->|read/write| F1
+    APP <--> F1
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2585,14 +2585,14 @@ Link: https://github.com/johnzastrow/systers | Languages: rust | Findings: criti
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"systers"}}
     U(["Callers:<br>cli"]) --> APP
     D1[("DB: sqlite")]
-    APP <-->|read/write| D1
+    APP <--> D1
     F2["Local files (4 paths)"]
-    APP <-->|read/write| F2
+    APP <--> F2
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2638,16 +2638,16 @@ Link: https://github.com/johnzastrow/tictactoe | Languages: go, rust, python, ja
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"tictactoe"}}
     U(["Callers:<br>cli, web_api,<br>web_client_wasm"]) --> APP
     D1[("DB: sqlite")]
-    APP <-->|read/write| D1
+    APP <--> D1
     D2[("DB: sqlite")]
-    APP <-->|read/write| D2
+    APP <--> D2
     F3["Local files (4 paths)"]
-    APP <-->|read/write| F3
+    APP <--> F3
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2689,11 +2689,11 @@ Link: https://github.com/johnzastrow/trilium-farmer | Languages: - | Findings: c
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"trilium-farmer"}}
     E1["LAN:<br>Trilium Notes ETAPI (URL<br>from TRILIUM_URL, REA..."]
-    APP <-->|read/write| E1
+    APP <--> E1
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2736,12 +2736,12 @@ Link: https://github.com/johnzastrow/utilities | Languages: shell | Findings: cr
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"utilities"}}
     U(["Callers:<br>cli"]) --> APP
     F1["Local files (6 paths)"]
-    APP <-->|read/write| F1
+    APP <--> F1
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2781,14 +2781,14 @@ Link: https://github.com/johnzastrow/vidstack | Languages: python | Findings: cr
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"vidstack"}}
     U(["Callers:<br>cli, script"]) --> APP
     D1[("DB: sqlite (GeoNames<br>GeoPackage...")]
-    D1 -->|read| APP
+    D1 --> APP
     F2["Local files (5 paths)"]
-    APP <-->|read/write| F2
+    APP <--> F2
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2830,18 +2830,18 @@ Link: https://github.com/johnzastrow/waterlogger | Languages: go | Findings: cri
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"waterlogger"}}
     U(["Callers:<br>service, web_app"]) --> APP
     D1[("DB: sqlite (default) or<br>mariadb via gorm")]
-    APP <-->|read/write| D1
+    APP <--> D1
     O2["EXCEL files (1)"]
-    APP -->|write| O2
+    APP --> O2
     O3["CSV files (1)"]
-    APP -->|write| O3
+    APP --> O3
     F4["Local files (4 paths)"]
-    APP <-->|read/write| F4
+    APP <--> F4
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2888,20 +2888,20 @@ Link: https://github.com/johnzastrow/waxgrove | Languages: go, typescript, sql |
 **Data flow**
 
 ```mermaid
-%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"17","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
     APP{{"waxgrove"}}
     U(["Callers:<br>background_jobs, cli,<br>web_api, web_client"]) --> APP
     D1[("DB: sqlite")]
-    APP <-->|read/write| D1
+    APP <--> D1
     F2["Local files (1 paths)"]
-    APP <-->|read/write| F2
+    APP <--> F2
     E3["EXTERNAL:<br>api.spotify.com"]
-    APP <-->|read/write| E3
+    APP <--> E3
     E4["EXTERNAL:<br>accounts.spotify.com"]
-    APP -->|write| E4
+    APP --> E4
     E5["EXTERNAL:<br>musicbrainz.org"]
-    E5 -->|read| APP
+    E5 --> APP
     class E3,E4,E5 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```

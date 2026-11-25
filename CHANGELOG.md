@@ -7,8 +7,8 @@ All notable changes to this repository are documented here. The format follows
 ## [1.1.0] - 2026-11-25
 
 ### Added
-- `outputs/johnzastrow_Summary.md`: a small data flow diagram in each repository section, built only from that
-  repository's JSON. It shows callers, databases, local files, and every network endpoint, with arrow direction
+- Data flow diagrams for each repository section (in the summary part files), built only from that
+  repository's JSON. They show callers, databases, local files, and every network endpoint, with arrow direction
   taken from the recorded `access_type`. Endpoints that leave the host network are labelled EXTERNAL and shaded.
 - A per-repository "Network endpoints" table itemizing each endpoint (kind, access, leaves host network, source file).
 - Matrix 2.9 "Network endpoints (all repositories)" listing every endpoint across the 43 inventories.

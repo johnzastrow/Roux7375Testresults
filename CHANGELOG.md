@@ -4,6 +4,15 @@ All notable changes to this repository are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-11-25
+
+### Fixed
+- `outputs/johnzastrow_Summary.md` chart readability on GitHub: the critical/high bar chart had overlapping
+  repository names on its axis and overlaid, near-identical colored series that hid the critical counts. It is
+  replaced by two horizontal bar charts (critical in red, high in orange), one repository per axis row.
+- The language pie chart had colliding slice labels and implied parts of a whole although repositories can
+  contain several languages. It is now a horizontal bar chart with an explanatory note.
+
 ## [1.0.0] - 2026-11-25
 
 First complete result set from running the governance-scan skill v1.0 against the public, non-fork repositories

@@ -1,6 +1,6 @@
 # Governance Scan Summary - johnzastrow public repositories
 
-Generated: 2026-11-25 19:40 UTC  
+Generated: 2026-11-25 21:44 UTC  
 Method: [governance-scan skill v1.0](https://github.com/MichaelHynesRoux/INFO-7375-Governance-Scan-Skill) (read-only inventory) applied to each public, non-fork repository of [johnzastrow](https://github.com/johnzastrow), excluding this results repository.  
 Repositories scanned: **43**. Per-repo inventories: `<repo>.json`; questionnaire answers: `<repo>_Governance.md`.
 
@@ -30,34 +30,41 @@ pie showData title Findings by severity
 
 ### Languages detected (repos per language)
 
+A repository can contain several languages, so counts sum to more than the number of repositories.
+
 ```mermaid
-%%{init: {"theme":"base","themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"16","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
-pie showData title Repos per detected language
-    "python" : 28
-    "node / js / ts" : 10
-    "shell" : 9
-    "go" : 7
-    "none (docs or assets only)" : 6
-    "sql" : 4
-    "powershell" : 2
-    "rust" : 2
-    "cpp" : 1
-    "ini/config" : 1
-    "batch" : 1
+%%{init: {"theme":"base","xyChart":{"width":760,"height":596,"xAxis":{"labelFontSize":14},"yAxis":{"labelFontSize":13}},"themeVariables":{"xyChart":{"plotColorPalette":"#6B8CAE"},"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"16","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+xychart-beta horizontal
+    title "Repositories per detected language"
+    x-axis ["python", "node / js / ts", "shell", "go", "none (docs or assets only)", "sql", "powershell", "rust", "cpp", "batch", "ini/config"]
+    y-axis "Repositories" 0 --> 31
+    bar [28, 10, 9, 7, 6, 4, 2, 2, 1, 1, 1]
 ```
 
-### Critical and high findings per repository
+### Critical findings per repository
 
-Only repos with at least one critical or high finding are shown. Critical and high appear as separate bar series.
+Only repositories with at least one critical finding are shown.
 
 ```mermaid
-%%{init: {"theme":"base","themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"16","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
-xychart-beta
-    title "Critical (series 1) and High (series 2) findings"
-    x-axis ["jz_jupyters", "waterlogger", "garminview", "localfeather", "actalog", "LearningPy", "mqs", "actalog-benchmark", "choreme", "seh"]
-    y-axis "Findings" 0 --> 54
-    bar [19, 9, 4, 2, 1, 1, 0, 0, 0, 0]
-    bar [0, 27, 53, 7, 0, 0, 2, 1, 1, 1]
+%%{init: {"theme":"base","xyChart":{"width":760,"height":366,"xAxis":{"labelFontSize":14},"yAxis":{"labelFontSize":13}},"themeVariables":{"xyChart":{"plotColorPalette":"#b4413c"},"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"16","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+xychart-beta horizontal
+    title "Critical findings per repository"
+    x-axis ["jz_jupyters", "waterlogger", "garminview", "localfeather", "actalog", "LearningPy"]
+    y-axis "Findings" 0 --> 21
+    bar [19, 9, 4, 2, 1, 1]
+```
+
+### High findings per repository
+
+Only repositories with at least one high finding are shown.
+
+```mermaid
+%%{init: {"theme":"base","xyChart":{"width":760,"height":412,"xAxis":{"labelFontSize":14},"yAxis":{"labelFontSize":13}},"themeVariables":{"xyChart":{"plotColorPalette":"#d9893b"},"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"16","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+xychart-beta horizontal
+    title "High findings per repository"
+    x-axis ["garminview", "waterlogger", "localfeather", "mqs", "actalog-benchmark", "choreme", "seh"]
+    y-axis "Findings" 0 --> 58
+    bar [53, 27, 7, 2, 1, 1, 1]
 ```
 
 ## 2. Matrices

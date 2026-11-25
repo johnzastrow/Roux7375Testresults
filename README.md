@@ -26,7 +26,7 @@ Version: see [VERSION](VERSION). History: see [CHANGELOG.md](CHANGELOG.md).
 |---|--:|---|
 | `<repo>.json` | 43 | The skill's structured inventory, following `reference/output-schema.md` exactly |
 | `<repo>_Governance.md` | 43 | Concise answers to [questionnaire.md](questionnaire.md) for each repository, built from that repository's JSON |
-| [`johnzastrow_Summary.md`](outputs/johnzastrow_Summary.md) | 1 | Cross-repository summary: Mermaid charts, nine matrices (including every network endpoint), and an index of the parts |
+| [`johnzastrow_Summary.md`](outputs/johnzastrow_Summary.md) | 1 | Cross-repository summary: table of contents, lists of figures and tables, Mermaid charts, nine matrices (including every network endpoint), and an index of the parts |
 | `johnzastrow_Summary_Part<N>.md` | 3 | Per-repository sections with small data flow diagrams and itemized network endpoints; split so GitHub renders every diagram and each part prints on letter paper |
 
 Business-intent questions in the questionnaire (approvals, branding, audience, required controls) cannot be

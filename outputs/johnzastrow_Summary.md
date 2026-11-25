@@ -1,12 +1,184 @@
 # Governance Scan Summary - johnzastrow public repositories
 
-Generated: 2026-11-25 22:01 UTC  
+Generated: 2026-11-25 22:05 UTC  
 Method: [governance-scan skill v1.0](https://github.com/MichaelHynesRoux/INFO-7375-Governance-Scan-Skill) (read-only inventory) applied to each public, non-fork repository of [johnzastrow](https://github.com/johnzastrow), excluding this results repository.  
 Repositories scanned: **43**. Per-repo inventories: `<repo>.json`; questionnaire answers: `<repo>_Governance.md`.
 
 > This is a technical inventory, not an approval verdict. Per the skill, judgment happens in the evaluation step that compares these facts against the business questionnaire. Full interface and data-access detection is defined only for Python and Node.js; other languages were scanned for dependencies, configuration, and secret patterns (see each JSON's `scan_metadata.notes`).
 
+## Contents
+
+- [1 Overview](#sec-1)
+  - [1.1 Findings by severity (all repos)](#sec-1-1)
+  - [1.2 Languages detected (repos per language)](#sec-1-2)
+  - [1.3 Critical findings per repository](#sec-1-3)
+  - [1.4 High findings per repository](#sec-1-4)
+- [2 Matrices](#sec-2)
+  - [2.1 Severity matrix](#sec-2-1)
+  - [2.2 Version control](#sec-2-2)
+  - [2.3 Dependencies](#sec-2-3)
+  - [2.4 Secrets and credentials](#sec-2-4)
+  - [2.5 Interfaces and entry points](#sec-2-5)
+  - [2.6 Data access](#sec-2-6)
+  - [2.7 Data leaving the organization](#sec-2-7)
+  - [2.8 Configuration and deployment](#sec-2-8)
+  - [2.9 Network endpoints (all repositories)](#sec-2-9)
+- [3 Repository sections](#sec-3)
+  - [Part 1: sections 3.1 to 3.18](johnzastrow_Summary_Part1.md)
+  - [Part 2: sections 3.19 to 3.37](johnzastrow_Summary_Part2.md)
+  - [Part 3: sections 3.38 to 3.43](johnzastrow_Summary_Part3.md)
+- [List of figures](#list-of-figures)
+- [List of tables](#list-of-tables)
+
+<a id="list-of-figures"></a>
+## List of figures
+
+- [Figure 1. Findings by severity (all repos).](#figure-1)
+- [Figure 2. Languages detected (repos per language).](#figure-2)
+- [Figure 3. Critical findings per repository.](#figure-3)
+- [Figure 4. High findings per repository.](#figure-4)
+- [Figure 5. actalog - data flow, local data.](johnzastrow_Summary_Part1.md#figure-5)
+- [Figure 6. actalog - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-6)
+- [Figure 7. actalog-benchmark - data flow, local data.](johnzastrow_Summary_Part1.md#figure-7)
+- [Figure 8. actalog-benchmark - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-8)
+- [Figure 9. bittabby - data flow, local data.](johnzastrow_Summary_Part1.md#figure-9)
+- [Figure 10. bittabby - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-10)
+- [Figure 11. choreme - data flow, local data.](johnzastrow_Summary_Part1.md#figure-11)
+- [Figure 12. choreme - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-12)
+- [Figure 13. DocQGISProject - data flow, local data.](johnzastrow_Summary_Part1.md#figure-13)
+- [Figure 14. garminview - data flow, local data.](johnzastrow_Summary_Part1.md#figure-14)
+- [Figure 15. garminview - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-15)
+- [Figure 16. jz_jupyters - data flow, local data (part 1 of 2).](johnzastrow_Summary_Part1.md#figure-16)
+- [Figure 17. jz_jupyters - data flow, local data (part 2 of 2).](johnzastrow_Summary_Part1.md#figure-17)
+- [Figure 18. jz_jupyters - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-18)
+- [Figure 19. LearningPy - data flow, local data.](johnzastrow_Summary_Part1.md#figure-19)
+- [Figure 20. LearningPy - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-20)
+- [Figure 21. lineup - data flow, local data.](johnzastrow_Summary_Part1.md#figure-21)
+- [Figure 22. localfeather - data flow, local data.](johnzastrow_Summary_Part1.md#figure-22)
+- [Figure 23. mapsplat - data flow, local data.](johnzastrow_Summary_Part1.md#figure-23)
+- [Figure 24. mapsplat - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-24)
+- [Figure 25. mapsplat4 - data flow, local data.](johnzastrow_Summary_Part1.md#figure-25)
+- [Figure 26. mapsplat4 - data flow, network endpoints (part 1 of 2).](johnzastrow_Summary_Part1.md#figure-26)
+- [Figure 27. mapsplat4 - data flow, network endpoints (part 2 of 2).](johnzastrow_Summary_Part1.md#figure-27)
+- [Figure 28. marimo-qgis - data flow, local data.](johnzastrow_Summary_Part1.md#figure-28)
+- [Figure 29. marimo-qgis - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-29)
+- [Figure 30. metadatamgr - data flow, local data.](johnzastrow_Summary_Part1.md#figure-30)
+- [Figure 31. mqs - data flow, local data.](johnzastrow_Summary_Part1.md#figure-31)
+- [Figure 32. mqs - data flow, network endpoints.](johnzastrow_Summary_Part1.md#figure-32)
+- [Figure 33. mqs4 - data flow, local data.](johnzastrow_Summary_Part2.md#figure-33)
+- [Figure 34. mqs4 - data flow, network endpoints.](johnzastrow_Summary_Part2.md#figure-34)
+- [Figure 35. ms - data flow, local data.](johnzastrow_Summary_Part2.md#figure-35)
+- [Figure 36. ms - data flow, network endpoints.](johnzastrow_Summary_Part2.md#figure-36)
+- [Figure 37. mydocmost - data flow, local data.](johnzastrow_Summary_Part2.md#figure-37)
+- [Figure 38. mydocmost - data flow, network endpoints (part 1 of 2).](johnzastrow_Summary_Part2.md#figure-38)
+- [Figure 39. mydocmost - data flow, network endpoints (part 2 of 2).](johnzastrow_Summary_Part2.md#figure-39)
+- [Figure 40. myvinyl - data flow, local data.](johnzastrow_Summary_Part2.md#figure-40)
+- [Figure 41. myvinyl - data flow, network endpoints.](johnzastrow_Summary_Part2.md#figure-41)
+- [Figure 42. niva - data flow, local data.](johnzastrow_Summary_Part2.md#figure-42)
+- [Figure 43. niva - data flow, network endpoints (part 1 of 2).](johnzastrow_Summary_Part2.md#figure-43)
+- [Figure 44. niva - data flow, network endpoints (part 2 of 2).](johnzastrow_Summary_Part2.md#figure-44)
+- [Figure 45. orgphoto - data flow, local data.](johnzastrow_Summary_Part2.md#figure-45)
+- [Figure 46. pgeo - data flow, local data.](johnzastrow_Summary_Part2.md#figure-46)
+- [Figure 47. pgeo - data flow, network endpoints (part 1 of 2).](johnzastrow_Summary_Part2.md#figure-47)
+- [Figure 48. pgeo - data flow, network endpoints (part 2 of 2).](johnzastrow_Summary_Part2.md#figure-48)
+- [Figure 49. photochomper - data flow, local data.](johnzastrow_Summary_Part2.md#figure-49)
+- [Figure 50. postgis_linear_referencing - data flow, local data.](johnzastrow_Summary_Part2.md#figure-50)
+- [Figure 51. pydataminer - data flow, local data.](johnzastrow_Summary_Part2.md#figure-51)
+- [Figure 52. QGIS - data flow, local data.](johnzastrow_Summary_Part2.md#figure-52)
+- [Figure 53. QGIS - data flow, network endpoints.](johnzastrow_Summary_Part2.md#figure-53)
+- [Figure 54. qgis-plugin-skill - data flow, local data.](johnzastrow_Summary_Part2.md#figure-54)
+- [Figure 55. qgis-vscode-setup - data flow, local data.](johnzastrow_Summary_Part2.md#figure-55)
+- [Figure 56. QGISModes - data flow, local data.](johnzastrow_Summary_Part2.md#figure-56)
+- [Figure 57. seh - data flow, local data.](johnzastrow_Summary_Part2.md#figure-57)
+- [Figure 58. seh - data flow, network endpoints.](johnzastrow_Summary_Part2.md#figure-58)
+- [Figure 59. surveyart - data flow, local data.](johnzastrow_Summary_Part2.md#figure-59)
+- [Figure 60. systers - data flow, local data.](johnzastrow_Summary_Part2.md#figure-60)
+- [Figure 61. tictactoe - data flow, local data.](johnzastrow_Summary_Part3.md#figure-61)
+- [Figure 62. trilium-farmer - data flow, network endpoints.](johnzastrow_Summary_Part3.md#figure-62)
+- [Figure 63. utilities - data flow, local data.](johnzastrow_Summary_Part3.md#figure-63)
+- [Figure 64. vidstack - data flow, local data.](johnzastrow_Summary_Part3.md#figure-64)
+- [Figure 65. waterlogger - data flow, local data.](johnzastrow_Summary_Part3.md#figure-65)
+- [Figure 66. waxgrove - data flow, local data.](johnzastrow_Summary_Part3.md#figure-66)
+- [Figure 67. waxgrove - data flow, network endpoints.](johnzastrow_Summary_Part3.md#figure-67)
+
+<a id="list-of-tables"></a>
+## List of tables
+
+- [Table 1. Summary metrics across all scanned repositories.](#table-1)
+- [Table 2. Severity matrix.](#table-2)
+- [Table 3. Version control.](#table-3)
+- [Table 4. Dependencies.](#table-4)
+- [Table 5. Secrets and credentials.](#table-5)
+- [Table 6. Interfaces and entry points.](#table-6)
+- [Table 7. Data access.](#table-7)
+- [Table 8. Data leaving the organization.](#table-8)
+- [Table 9. Configuration and deployment.](#table-9)
+- [Table 10. Network endpoints (all repositories).](#table-10)
+- [Table 11. Repository sections by part file.](#table-11)
+- [Table 12. actalog - network endpoints.](johnzastrow_Summary_Part1.md#table-12)
+- [Table 13. actalog - data sources touched.](johnzastrow_Summary_Part1.md#table-13)
+- [Table 14. actalog-benchmark - network endpoints.](johnzastrow_Summary_Part1.md#table-14)
+- [Table 15. actalog-benchmark - data sources touched.](johnzastrow_Summary_Part1.md#table-15)
+- [Table 16. bittabby - network endpoints.](johnzastrow_Summary_Part1.md#table-16)
+- [Table 17. bittabby - data sources touched.](johnzastrow_Summary_Part1.md#table-17)
+- [Table 18. choreme - network endpoints.](johnzastrow_Summary_Part1.md#table-18)
+- [Table 19. choreme - data sources touched.](johnzastrow_Summary_Part1.md#table-19)
+- [Table 20. DocQGISProject - data sources touched.](johnzastrow_Summary_Part1.md#table-20)
+- [Table 21. garminview - network endpoints.](johnzastrow_Summary_Part1.md#table-21)
+- [Table 22. garminview - data sources touched.](johnzastrow_Summary_Part1.md#table-22)
+- [Table 23. jz_jupyters - network endpoints.](johnzastrow_Summary_Part1.md#table-23)
+- [Table 24. jz_jupyters - data sources touched.](johnzastrow_Summary_Part1.md#table-24)
+- [Table 25. LearningPy - network endpoints.](johnzastrow_Summary_Part1.md#table-25)
+- [Table 26. LearningPy - data sources touched.](johnzastrow_Summary_Part1.md#table-26)
+- [Table 27. lineup - data sources touched.](johnzastrow_Summary_Part1.md#table-27)
+- [Table 28. localfeather - data sources touched.](johnzastrow_Summary_Part1.md#table-28)
+- [Table 29. mapsplat - network endpoints.](johnzastrow_Summary_Part1.md#table-29)
+- [Table 30. mapsplat - data sources touched.](johnzastrow_Summary_Part1.md#table-30)
+- [Table 31. mapsplat4 - network endpoints.](johnzastrow_Summary_Part1.md#table-31)
+- [Table 32. mapsplat4 - data sources touched.](johnzastrow_Summary_Part1.md#table-32)
+- [Table 33. marimo-qgis - network endpoints.](johnzastrow_Summary_Part1.md#table-33)
+- [Table 34. marimo-qgis - data sources touched.](johnzastrow_Summary_Part1.md#table-34)
+- [Table 35. metadatamgr - data sources touched.](johnzastrow_Summary_Part1.md#table-35)
+- [Table 36. mqs - network endpoints.](johnzastrow_Summary_Part1.md#table-36)
+- [Table 37. mqs - data sources touched.](johnzastrow_Summary_Part1.md#table-37)
+- [Table 38. mqs4 - network endpoints.](johnzastrow_Summary_Part2.md#table-38)
+- [Table 39. mqs4 - data sources touched.](johnzastrow_Summary_Part2.md#table-39)
+- [Table 40. ms - network endpoints.](johnzastrow_Summary_Part2.md#table-40)
+- [Table 41. ms - data sources touched.](johnzastrow_Summary_Part2.md#table-41)
+- [Table 42. mydocmost - network endpoints.](johnzastrow_Summary_Part2.md#table-42)
+- [Table 43. mydocmost - data sources touched.](johnzastrow_Summary_Part2.md#table-43)
+- [Table 44. myvinyl - network endpoints.](johnzastrow_Summary_Part2.md#table-44)
+- [Table 45. myvinyl - data sources touched.](johnzastrow_Summary_Part2.md#table-45)
+- [Table 46. niva - network endpoints.](johnzastrow_Summary_Part2.md#table-46)
+- [Table 47. niva - data sources touched.](johnzastrow_Summary_Part2.md#table-47)
+- [Table 48. orgphoto - data sources touched.](johnzastrow_Summary_Part2.md#table-48)
+- [Table 49. pgeo - network endpoints.](johnzastrow_Summary_Part2.md#table-49)
+- [Table 50. pgeo - data sources touched.](johnzastrow_Summary_Part2.md#table-50)
+- [Table 51. photochomper - data sources touched.](johnzastrow_Summary_Part2.md#table-51)
+- [Table 52. postgis_linear_referencing - data sources touched.](johnzastrow_Summary_Part2.md#table-52)
+- [Table 53. pydataminer - data sources touched.](johnzastrow_Summary_Part2.md#table-53)
+- [Table 54. QGIS - network endpoints.](johnzastrow_Summary_Part2.md#table-54)
+- [Table 55. QGIS - data sources touched.](johnzastrow_Summary_Part2.md#table-55)
+- [Table 56. qgis-plugin-skill - data sources touched.](johnzastrow_Summary_Part2.md#table-56)
+- [Table 57. qgis-vscode-setup - data sources touched.](johnzastrow_Summary_Part2.md#table-57)
+- [Table 58. QGISModes - data sources touched.](johnzastrow_Summary_Part2.md#table-58)
+- [Table 59. seh - network endpoints.](johnzastrow_Summary_Part2.md#table-59)
+- [Table 60. seh - data sources touched.](johnzastrow_Summary_Part2.md#table-60)
+- [Table 61. surveyart - data sources touched.](johnzastrow_Summary_Part2.md#table-61)
+- [Table 62. systers - data sources touched.](johnzastrow_Summary_Part2.md#table-62)
+- [Table 63. tictactoe - data sources touched.](johnzastrow_Summary_Part3.md#table-63)
+- [Table 64. trilium-farmer - network endpoints.](johnzastrow_Summary_Part3.md#table-64)
+- [Table 65. trilium-farmer - data sources touched.](johnzastrow_Summary_Part3.md#table-65)
+- [Table 66. utilities - data sources touched.](johnzastrow_Summary_Part3.md#table-66)
+- [Table 67. vidstack - data sources touched.](johnzastrow_Summary_Part3.md#table-67)
+- [Table 68. waterlogger - data sources touched.](johnzastrow_Summary_Part3.md#table-68)
+- [Table 69. waxgrove - network endpoints.](johnzastrow_Summary_Part3.md#table-69)
+- [Table 70. waxgrove - data sources touched.](johnzastrow_Summary_Part3.md#table-70)
+
+<a id="sec-1"></a>
 ## 1. Overview
+
+<a id="table-1"></a>**Table 1.** Summary metrics across all scanned repositories.
 
 | Metric | Value |
 |---|---|
@@ -18,7 +190,8 @@ Repositories scanned: **43**. Per-repo inventories: `<repo>.json`; questionnaire
 | Repos with at least one high | 7 |
 | Repos with no severity-tagged findings | 19 |
 
-### Findings by severity (all repos)
+<a id="sec-1-1"></a>
+### 1.1 Findings by severity (all repos)
 
 ```mermaid
 %%{init: {"theme":"base","themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"16","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -28,7 +201,11 @@ pie showData title Findings by severity
     "Low" : 178
 ```
 
-### Languages detected (repos per language)
+<a id="figure-1"></a>*Figure 1. Findings by severity (all repos).*
+
+
+<a id="sec-1-2"></a>
+### 1.2 Languages detected (repos per language)
 
 A repository can contain several languages, so counts sum to more than the number of repositories.
 
@@ -41,7 +218,11 @@ xychart-beta horizontal
     bar [28, 10, 9, 7, 6, 4, 2, 2, 1, 1, 1]
 ```
 
-### Critical findings per repository
+<a id="figure-2"></a>*Figure 2. Languages detected (repos per language).*
+
+
+<a id="sec-1-3"></a>
+### 1.3 Critical findings per repository
 
 Only repositories with at least one critical finding are shown.
 
@@ -54,7 +235,11 @@ xychart-beta horizontal
     bar [19, 9, 4, 2, 1, 1]
 ```
 
-### High findings per repository
+<a id="figure-3"></a>*Figure 3. Critical findings per repository.*
+
+
+<a id="sec-1-4"></a>
+### 1.4 High findings per repository
 
 Only repositories with at least one high finding are shown.
 
@@ -67,9 +252,16 @@ xychart-beta horizontal
     bar [53, 27, 7, 2, 1, 1, 1]
 ```
 
+<a id="figure-4"></a>*Figure 4. High findings per repository.*
+
+
+<a id="sec-2"></a>
 ## 2. Matrices
 
+<a id="sec-2-1"></a>
 ### 2.1 Severity matrix
+
+<a id="table-2"></a>**Table 2.** Severity matrix.
 
 | Repository | Languages | Critical | High | Low | Total |
 |---|---|--:|--:|--:|--:|
@@ -117,7 +309,10 @@ xychart-beta horizontal
 | [waterlogger](johnzastrow_Summary_Part3.md#waterlogger) | go | 9 | 27 | 16 | 52 |
 | [waxgrove](johnzastrow_Summary_Part3.md#waxgrove) | go, typescript, sql | 0 | 0 | 5 | 5 |
 
+<a id="sec-2-2"></a>
 ### 2.2 Version control
+
+<a id="table-3"></a>**Table 3.** Version control.
 
 | Repository | Git repo | Commits sampled | Remote | .gitignore | .gitignore gaps |
 |---|---|--:|---|---|--:|
@@ -165,7 +360,10 @@ xychart-beta horizontal
 | waterlogger | yes | 20 | yes | yes | 3 |
 | waxgrove | yes | 20 | yes | yes | 0 |
 
+<a id="sec-2-3"></a>
 ### 2.3 Dependencies
+
+<a id="table-4"></a>**Table 4.** Dependencies.
 
 | Repository | Ecosystems (manifests) | Declared deps | Dependency findings |
 |---|---|--:|--:|
@@ -213,7 +411,10 @@ xychart-beta horizontal
 | waterlogger | go (2) | 9 | 3 |
 | waxgrove | node (4), go (2) | 29 | 3 |
 
+<a id="sec-2-4"></a>
 ### 2.4 Secrets and credentials
+
+<a id="table-5"></a>**Table 5.** Secrets and credentials.
 
 | Repository | Committed secret files | Hardcoded secrets (C/H/L) | Proper handling sites | .env example |
 |---|--:|---|--:|---|
@@ -261,7 +462,10 @@ xychart-beta horizontal
 | waterlogger | 0 | 0/1/6 | 2 | no |
 | waxgrove | 0 | 0/0/0 | 6 | no |
 
+<a id="sec-2-5"></a>
 ### 2.5 Interfaces and entry points
+
+<a id="table-6"></a>**Table 6.** Interfaces and entry points.
 
 | Repository | Entry point types | Routes | Routes without detected auth | Network binding | CORS wide open |
 |---|---|--:|--:|---|---|
@@ -309,7 +513,10 @@ xychart-beta horizontal
 | waterlogger | service, web_app | 45 | 4 | Default config host 'localhost' port 2342; configurable to 0 | yes |
 | waxgrove | background_jobs, cli, web_api, web_client | 51 | 5 | 127.0.0.1:8080 by default (internal/config/config.go); Docke | no |
 
+<a id="sec-2-6"></a>
 ### 2.6 Data access
+
+<a id="table-7"></a>**Table 7.** Data access.
 
 | Repository | Databases | SQL injection risk | External APIs | File system access | Office/collab sources | Sensitive-data indicators |
 |---|---|---|--:|--:|--:|--:|
@@ -357,7 +564,10 @@ xychart-beta horizontal
 | waterlogger | sqlite (default) or mariadb via gorm | none | 0 | 4 | 2 | 3 |
 | waxgrove | sqlite | none | 3 | 1 | 0 | 3 |
 
+<a id="sec-2-7"></a>
 ### 2.7 Data leaving the organization
+
+<a id="table-8"></a>**Table 8.** Data leaving the organization.
 
 | Repository | Data sources touched | Sources where data leaves the organization |
 |---|--:|---|
@@ -405,7 +615,10 @@ xychart-beta horizontal
 | waterlogger | 2 | none |
 | waxgrove | 3 | Spotify Web API (api.spotify.com, accounts.spotify.com); MusicBrainz API (musicbrainz.org) |
 
+<a id="sec-2-8"></a>
 ### 2.8 Configuration and deployment
+
+<a id="table-9"></a>**Table 9.** Configuration and deployment.
 
 | Repository | Containerized | Deploy config files | Env vars referenced | README | README covers deployment |
 |---|---|--:|--:|---|---|
@@ -453,9 +666,12 @@ xychart-beta horizontal
 | waterlogger | yes | 9 | 1 | yes | yes |
 | waxgrove | yes | 5 | 14 | yes | yes |
 
+<a id="sec-2-9"></a>
 ### 2.9 Network endpoints (all repositories)
 
 Every external API host and network mail/collaboration source recorded in the inventories. "Leaves host network" is no for loopback or private-LAN addresses, yes otherwise; configurable endpoints count as yes because they can point off-host.
+
+<a id="table-10"></a>**Table 10.** Network endpoints (all repositories).
 
 | Repository | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|---|
@@ -530,9 +746,12 @@ Every external API host and network mail/collaboration source recorded in the in
 | waxgrove | accounts.spotify.com | external API | write | yes | internal/spotify/auth.go |
 | waxgrove | musicbrainz.org | external API | read | yes | internal/musicbrainz/client.go |
 
+<a id="sec-3"></a>
 ## 3. Repository sections
 
 The per-repository sections, each with its data flow diagrams, are split across 3 part files so that every diagram renders on GitHub (it stops rendering Mermaid after about 30 diagrams per page) and each part prints as a manageable document.
+
+<a id="table-11"></a>**Table 11.** Repository sections by part file.
 
 | Part | Repositories |
 |---|---|

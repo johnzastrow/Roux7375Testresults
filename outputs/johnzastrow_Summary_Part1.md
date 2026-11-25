@@ -2,15 +2,36 @@
 
 Back to the [summary overview and matrices](johnzastrow_Summary.md). Part 1 | [Part 2](johnzastrow_Summary_Part2.md) | [Part 3](johnzastrow_Summary_Part3.md)
 
-Repositories in this part: [actalog](#actalog), [actalog-benchmark](#actalog-benchmark), [bittabby](#bittabby), [choreme](#choreme), [DocQGISProject](#docqgisproject), [garminview](#garminview), [gob](#gob), [johnzastrow](#johnzastrow), [jz_jupyters](#jz_jupyters), [LearningPy](#learningpy), [lineup](#lineup), [localfeather](#localfeather), [mainegeo](#mainegeo), [mapsplat](#mapsplat), [mapsplat4](#mapsplat4), [marimo-qgis](#marimo-qgis), [metadatamgr](#metadatamgr), [mqs](#mqs)
+## Contents
+
+- [3.1 actalog](#actalog)
+- [3.2 actalog-benchmark](#actalog-benchmark)
+- [3.3 bittabby](#bittabby)
+- [3.4 choreme](#choreme)
+- [3.5 DocQGISProject](#docqgisproject)
+- [3.6 garminview](#garminview)
+- [3.7 gob](#gob)
+- [3.8 johnzastrow](#johnzastrow)
+- [3.9 jz_jupyters](#jz_jupyters)
+- [3.10 LearningPy](#learningpy)
+- [3.11 lineup](#lineup)
+- [3.12 localfeather](#localfeather)
+- [3.13 mainegeo](#mainegeo)
+- [3.14 mapsplat](#mapsplat)
+- [3.15 mapsplat4](#mapsplat4)
+- [3.16 marimo-qgis](#marimo-qgis)
+- [3.17 metadatamgr](#metadatamgr)
+- [3.18 mqs](#mqs)
+
 
 Each section has small data flow diagrams built only from that repository's JSON. Arrows follow the recorded `access_type`: an arrow into the app means read, out of the app means write, a double-headed arrow means read/write, and a dashed line means unclear. Local data and network endpoints are drawn as separate small diagrams (split further when long) so each prints at a readable size on letter paper. Endpoints that leave the host network are labelled EXTERNAL and shaded red; loopback or private-LAN endpoints are labelled LAN. Labels are shortened; the full endpoint text is in the table under the diagrams. Local file access is shown as one node; databases and network endpoints are itemized.
 
-### actalog
+<a id="actalog"></a>
+## 3.1 actalog
 
 Link: https://github.com/johnzastrow/actalog | Languages: go, javascript, vue, shell, python | Findings: critical 1, high 0, low 29 | Inventory: [actalog.json](actalog.json) | Questionnaire: [actalog_Governance.md](actalog_Governance.md)
 
-**What this application can do**
+#### 3.1.1 What this application can do
 
 - Lets registered users log CrossFit workouts, track personal records, view progress charts, performance history, calendars and leaderboards, and import/export their data as CSV or JSON (authenticated; subscription required for write operations).
 - Lets anyone without a login register (when enabled), log in, reset a password, and browse the public catalog of standard movements, WODs and workout templates.
@@ -18,11 +39,12 @@ Link: https://github.com/johnzastrow/actalog | Languages: go, javascript, vue, s
 - Lets coaches or admins view session rosters and check in or mark no-shows for class sessions.
 - Serves uploaded avatar files publicly at /uploads/* and public Swagger API documentation at /api/docs/*.
 
-**Who can reach it:** Binds to 0.0.0.0:8080 by default and is designed to be reachable by any user who can reach the host (optionally behind a Caddy reverse proxy). Most routes require a JWT; the public routes are login/registration/password reset, version, Swagger docs, the standard movement/WOD/template catalog, /health and /uploads/*.
+#### 3.1.2 Who can reach it
 
-**Data flow**
+Binds to 0.0.0.0:8080 by default and is designed to be reachable by any user who can reach the host (optionally behind a Caddy reverse proxy). Most routes require a JWT; the public routes are login/registration/password reset, version, Swagger docs, the standard movement/WOD/template catalog, /health and /uploads/*.
 
-*Local data*
+#### 3.1.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -38,7 +60,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-5"></a>*Figure 5. actalog - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -56,7 +80,12 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-6"></a>*Figure 6. actalog - data flow, network endpoints.*
+
+
+#### 3.1.4 Network endpoints
+
+<a id="table-12"></a>**Table 12.** actalog - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
@@ -65,7 +94,9 @@ flowchart LR
 | OTEL_EXPORTER_OTLP_ENDPOINT (referenced only in docker/docker-compose.yml) | external API | write | yes | docker/docker-compose.yml |
 | outbound SMTP via SMTP_HOST (no mailbox read) | email_mailbox | write | yes | pkg/email/email.go |
 
-**Data sources touched**
+#### 3.1.5 Data sources touched
+
+<a id="table-13"></a>**Table 13.** actalog - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -75,14 +106,14 @@ flowchart LR
 | User-uploaded CSV imports (including a Wodify performance export) and CSV/JSON exports | read_write | no |
 | youtube.com video links stored with WOD/movement entries | read | yes |
 
-**Top findings**
+#### 3.1.6 Top findings
 
 - Critical: password-shaped string committed in docker/trouble/docker-compose.yml:22 (MARIADB_ROOT_PASSWORD error-message default), tracked and not gitignored
 - Low: tracked docker/.env.postgres, docker/.env.mariadb (placeholders) and web/certs/localhost-key.pem (dev key)
 - 217 of 236 /api routes sit behind JWT middleware (120 admin-only); 19 public API routes plus /health, /uploads/*, / are recorded as low
 - JWT_SECRET may be empty unless APP_ENV=production; default bind 0.0.0.0; registration enabled by default
 
-**Unauthorized-action red flags**
+#### 3.1.7 Unauthorized-action red flags
 
 - docker/trouble/docker-compose.yml contains a password-shaped string tied to MARIADB_ROOT_PASSWORD in a tracked file.
 - Swagger UI (/api/docs/*) and the standard catalog are served without authentication.
@@ -90,22 +121,24 @@ flowchart LR
 - Admin backup download/restore and user password-set endpoints exist (admin-only); a compromised admin account exposes the full database.
 - Tracked data exports contain personal data (author email and workout notes; a gym customer name).
 
-### actalog-benchmark
+<a id="actalog-benchmark"></a>
+## 3.2 actalog-benchmark
 
 Link: https://github.com/johnzastrow/actalog-benchmark | Languages: go | Findings: critical 0, high 1, low 0 | Inventory: [actalog-benchmark.json](actalog-benchmark.json) | Questionnaire: [actalog-benchmark_Governance.md](actalog-benchmark_Governance.md)
 
-**What this application can do**
+#### 3.2.1 What this application can do
 
 - Measures connectivity (DNS, TCP, TLS), health, API endpoint latency, frontend assets and concurrent load against a user-specified ActaLog server.
 - Logs in to the target with a supplied email and password and calls authenticated API endpoints with the returned JWT.
 - Can trigger the server's /api/benchmark endpoint, which generates up to 500000 records server-side.
 - Writes JSON and Markdown reports and compares earlier result files.
 
-**Who can reach it:** Local command-line tool run by the user; no listener. It reaches whatever host the user points it at, including production instances.
+#### 3.2.2 Who can reach it
 
-**Data flow**
+Local command-line tool run by the user; no listener. It reaches whatever host the user points it at, including production instances.
 
-*Local data*
+#### 3.2.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -117,7 +150,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-7"></a>*Figure 7. actalog-benchmark - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -131,37 +166,45 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-8"></a>*Figure 8. actalog-benchmark - data flow, network endpoints.*
+
+
+#### 3.2.4 Network endpoints
+
+<a id="table-14"></a>**Table 14.** actalog-benchmark - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
 | user-supplied ActaLog instance (--url); committed report shows https://al.fluidgrid.site | external API | read_write | yes | internal/client/client.go |
 | same target: POST /api/auth/login, GET /api/version, /api/workouts, /api/movements, /api/wods, /api/pr-movements, /api/notifications/count; POST /api/benchmark (server-side benchmark, up to 500000 records) | external API | read_write | yes | internal/metrics/endpoints.go |
 
-**Data sources touched**
+#### 3.2.5 Data sources touched
+
+<a id="table-15"></a>**Table 15.** actalog-benchmark - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
 | ActaLog instance API (user-supplied URL) | read_write (login POST, GETs, server-side benchmark POST) | yes |
 | Local JSON/Markdown report files | read_write | no |
 
-**Top findings**
+#### 3.2.6 Top findings
 
 - Password supplied through --pass CLI flag (cmd/actalog-bench/main.go)
 - Committed report discloses a personal email address and production URL
 - No hardcoded secrets or secret files found
 
-**Unauthorized-action red flags**
+#### 3.2.7 Unauthorized-action red flags
 
 - Password accepted as a --pass command-line argument
 - A committed report contains a personal email address and the production URL of the tested instance
 - Load testing and the server-side benchmark can create heavy load or records on the target
 
-### bittabby
+<a id="bittabby"></a>
+## 3.3 bittabby
 
 Link: https://github.com/johnzastrow/bittabby | Languages: go, javascript | Findings: critical 0, high 0, low 7 | Inventory: [bittabby.json](bittabby.json) | Questionnaire: [bittabby_Governance.md](bittabby_Governance.md)
 
-**What this application can do**
+#### 3.3.1 What this application can do
 
 - Lets signed-in users keep shared running-balance 'tabs' for money owed between people: post charges, record payments, adjustments, late fees and interest, loan terms, and undo entries as reversing entries.
 - Lets admins create users, enable/disable accounts, configure email and ntfy notification delivery, and grant a 'can reconcile' permission.
@@ -169,11 +212,12 @@ Link: https://github.com/johnzastrow/bittabby | Languages: go, javascript | Find
 - Sends payment reminders by email (SMTP) and ntfy when an external cron calls POST /internal/tick with the shared secret.
 - Lets users upload and view profile avatars.
 
-**Who can reach it:** Listens on :8080 (all interfaces) by default. Every application route is behind a session login (requireAuth, requireAdmin, or requireReconcile); only /healthz, /static, /sw.js, /setup, /login, /logout are open, and /internal/tick requires a bearer secret. Session cookies are only marked Secure when BITT_SECURE_COOKIES=true.
+#### 3.3.2 Who can reach it
 
-**Data flow**
+Listens on :8080 (all interfaces) by default. Every application route is behind a session login (requireAuth, requireAdmin, or requireReconcile); only /healthz, /static, /sw.js, /setup, /login, /logout are open, and /internal/tick requires a bearer secret. Session cookies are only marked Secure when BITT_SECURE_COOKIES=true.
 
-*Local data*
+#### 3.3.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -191,7 +235,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-9"></a>*Figure 9. bittabby - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -207,7 +253,12 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-10"></a>*Figure 10. bittabby - data flow, network endpoints.*
+
+
+#### 3.3.4 Network endpoints
+
+<a id="table-16"></a>**Table 16.** bittabby - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
@@ -215,7 +266,9 @@ flowchart LR
 | ntfy server (BITT_NTFY_URL, ntfy.sh default examples) | external API | write | yes | internal/notify/notify.go |
 | SMTP host from config (net/smtp); outbound reminders only | email_mailbox | write | yes | internal/notify/notify.go |
 
-**Data sources touched**
+#### 3.3.5 Data sources touched
+
+<a id="table-17"></a>**Table 17.** bittabby - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -224,36 +277,38 @@ flowchart LR
 | SMTP server (configurable) | write (reminder emails with names/amounts) | yes |
 | ntfy server (configurable, ntfy.sh style) | write (reminder notifications) | yes |
 
-**Top findings**
+#### 3.3.6 Top findings
 
 - No hardcoded secrets or committed secret files found outside test fixtures
 - Unauthenticated routes are limited to health, static, setup, login/logout (low)
 - Secure cookie flag defaults to off; compose uses :latest image tag
 - Optional notification egress to SMTP and ntfy servers
 
-**Unauthorized-action red flags**
+#### 3.3.7 Unauthorized-action red flags
 
 - Financial ledger and bank statement lines are personal financial data stored unencrypted in a local SQLite/MariaDB database.
 - Notification content may leave the network through SMTP and ntfy (ntfy.sh if configured).
 - BITT_SECURE_COOKIES defaults to false.
 - GET/POST /setup is open until the first account is created.
 
-### choreme
+<a id="choreme"></a>
+## 3.4 choreme
 
 Link: https://github.com/johnzastrow/choreme | Languages: go, typescript, vue, javascript, sql | Findings: critical 0, high 1, low 14 | Inventory: [choreme.json](choreme.json) | Questionnaire: [choreme_Governance.md](choreme_Governance.md)
 
-**What this application can do**
+#### 3.4.1 What this application can do
 
 - Lets anyone who can reach the server register a new household and its first user, and log in to receive a 24-hour JWT.
 - Lets authenticated family members view and update their own profile, and (admin/manager roles) list household users and generate invites.
 - Manages family savings accounts: deposits, withdrawals, transfer requests with approval, spending limits and interest rates, with role checks in handlers; a scheduler accrues interest and resets limits.
 - Chore, assignment, reward, redemption, ledger, audit and report endpoints exist but are largely stubs returning placeholder responses.
 
-**Who can reach it:** HTTP server; binds to localhost by default but the Docker image binds 0.0.0.0:8080 and compose publishes ports. Registration, login and household join are unauthenticated; all other /api/v1 routes require a JWT. CORS allows any origin.
+#### 3.4.2 Who can reach it
 
-**Data flow**
+HTTP server; binds to localhost by default but the Docker image binds 0.0.0.0:8080 and compose publishes ports. Registration, login and household join are unauthenticated; all other /api/v1 routes require a JWT. CORS allows any origin.
 
-*Local data*
+#### 3.4.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -267,7 +322,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-11"></a>*Figure 11. choreme - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -279,26 +336,33 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-12"></a>*Figure 12. choreme - data flow, network endpoints.*
+
+
+#### 3.4.4 Network endpoints
+
+<a id="table-18"></a>**Table 18.** choreme - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
 | SMTP server from SMTP_HOST (example smtp.gmail.com in .env.example) | external API | write | yes | internal/config/config.go |
 
-**Data sources touched**
+#### 3.4.5 Data sources touched
+
+<a id="table-19"></a>**Table 19.** choreme - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
 | Application database (SQLite file, PostgreSQL or MySQL) holding users, households, balances and transfers | read_write | no |
 | SMTP server (configured, not yet clearly used by code) | write (planned notification emails) | yes |
 
-**Top findings**
+#### 3.4.6 Top findings
 
 - JWT secret defaults to a hardcoded value in internal/config/config.go if JWT_SECRET is unset (high)
 - Wildcard CORS with credentials; Docker image binds 0.0.0.0 and runs as root
 - Placeholder credentials in docker-compose.yml (low); compiled binaries tracked in git
 
-**Unauthorized-action red flags**
+#### 3.4.7 Unauthorized-action red flags
 
 - JWT signing secret falls back to the hardcoded default 'your-secret-key' when JWT_SECRET is unset (Dockerfile does not set it); anyone who knows the default could forge tokens with any role
 - docker-compose.yml ships placeholder JWT secret and weak DB passwords
@@ -306,21 +370,23 @@ flowchart LR
 - Docker container runs as root
 - Financial-style data (balances, transfers) of minors stored; no rate limiting seen on login
 
-### DocQGISProject
+<a id="docqgisproject"></a>
+## 3.5 DocQGISProject
 
 Link: https://github.com/johnzastrow/DocQGISProject | Languages: python | Findings: critical 0, high 0, low 2 | Inventory: [DocQGISProject.json](DocQGISProject.json) | Questionnaire: [DocQGISProject_Governance.md](DocQGISProject_Governance.md)
 
-**What this application can do**
+#### 3.5.1 What this application can do
 
 - Reads a QGIS project and writes Markdown, HTML, PDF and JSON documentation (layers, styles, layouts, settings) into a folder the user chooses, with credentials redacted by default.
 - Rebuilds a new QGIS project file from the generated JSON, optionally remapping data folders and attaching QGIS auth configs.
 - Optionally captures screenshots of QGIS dialogs, skipping pages that show data sources or logins.
 
-**Who can reach it:** Runs locally inside QGIS (dialog, Processing toolbox, Python console). No network listener or outbound network code found.
+#### 3.5.2 Who can reach it
 
-**Data flow**
+Runs locally inside QGIS (dialog, Processing toolbox, Python console). No network listener or outbound network code found.
 
-*Local data*
+#### 3.5.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -332,44 +398,51 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-13"></a>*Figure 13. DocQGISProject - data flow, local data.*
+
+
+#### 3.5.4 Network endpoints
 
 None recorded.
 
-**Data sources touched**
+#### 3.5.5 Data sources touched
+
+<a id="table-20"></a>**Table 20.** DocQGISProject - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
 | Local QGIS project files (.qgz/.qgs) and the datasets they reference (for counts and extents) | read | no |
 | Output folder on local disk (reports, JSON, images, QML, QPT, rebuilt .qgz) | write | no |
 
-**Top findings**
+#### 3.5.6 Top findings
 
 - Two placeholder passwords in test fixtures (low, allowlisted for detect-secrets)
 - .gitignore does not exclude .env / key / credential files
 - No routes, no network code, no database access found; credentials are redacted from outputs by design
 
-**Unauthorized-action red flags**
+#### 3.5.7 Unauthorized-action red flags
 
 - With redact=false or paths=absolute the generated reports/JSON could contain credentials or full home-folder paths; both default to safe values
 - Generated JSON embeds the project's data-source list, which could reveal internal server names
 
-### garminview
+<a id="garminview"></a>
+## 3.6 garminview
 
 Link: https://github.com/johnzastrow/garminview | Languages: python, typescript, vue, shell | Findings: critical 4, high 53, low 16 | Inventory: [garminview.json](garminview.json) | Questionnaire: [garminview_Governance.md](garminview_Governance.md)
 
-**What this application can do**
+#### 3.6.1 What this application can do
 
 - Shows personal Garmin (and Polar/MyFitnessPal/Actalog) health and training data - sleep, HR, weight, activities, training load, nutrition - in a web dashboard, to anyone who can reach the server; no login is required.
 - Lets anyone who can reach it export health metrics as CSV or JSON for any date range.
 - Lets anyone who can reach it read all app configuration (including the stored Actalog password), change configuration and schedules, upload MyFitnessPal exports, trigger Garmin downloads and Actalog syncs, and import files from a server directory path.
 - Runs scheduled background syncs against Garmin Connect via GarminDB and against an Actalog server, and parses workout notes with a configurable LLM endpoint.
 
-**Who can reach it:** Whoever can reach the published frontend port (default 8080 on the host, listening on all interfaces) - the API behind it has no authentication on any route. In local development it is reachable from the same machine only if bound to localhost.
+#### 3.6.2 Who can reach it
 
-**Data flow**
+Whoever can reach the published frontend port (default 8080 on the host, listening on all interfaces) - the API behind it has no authentication on any route. In local development it is reachable from the same machine only if bound to localhost.
 
-*Local data*
+#### 3.6.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -387,7 +460,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-14"></a>*Figure 14. garminview - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -405,7 +480,12 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-15"></a>*Figure 15. garminview - data flow, network endpoints.*
+
+
+#### 3.6.4 Network endpoints
+
+<a id="table-21"></a>**Table 21.** garminview - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
@@ -414,7 +494,9 @@ flowchart LR
 | Actalog server write-back (POST of matched Garmin data) | external API | write | yes | backend/garminview/ingestion/actalog_writeback.py |
 | Ollama or OpenAI-compatible LLM server (default http://localhost:11434, configurable URL; receives workout note text) | external API | write | yes | backend/garminview/ingestion/notes_parser.py |
 
-**Data sources touched**
+#### 3.6.5 Data sources touched
+
+<a id="table-22"></a>**Table 22.** garminview - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -424,13 +506,13 @@ flowchart LR
 | Ollama / OpenAI-compatible LLM endpoint (workout note text) | write (sends text) | yes |
 | MyFitnessPal and Polar export files | read | no |
 
-**Top findings**
+#### 3.6.6 Top findings
 
 - No authentication on any API route, including admin, config, export and sync endpoints
 - backend/.env with a credential-bearing database URL is tracked in git (critical)
 - GET /admin/config exposes the stored Actalog password; /export/* returns bulk personal health data (critical)
 
-**Unauthorized-action red flags**
+#### 3.6.7 Unauthorized-action red flags
 
 - backend/.env is tracked in git and contains a database connection string with credentials (value redacted)
 - GET /admin/config returns all app_config values, including the stored Actalog password in plaintext, without any authentication
@@ -439,80 +521,92 @@ flowchart LR
 - Workout note text is sent to a configurable LLM endpoint; if that is a third-party service, user data leaves the network
 - A personal MyFitnessPal export zip and sync logs are committed to the repository
 
-### gob
+<a id="gob"></a>
+## 3.7 gob
 
 Link: https://github.com/johnzastrow/gob | Languages: - | Findings: critical 0, high 0, low 0 | Inventory: [gob.json](gob.json) | Questionnaire: [gob_Governance.md](gob_Governance.md)
 
-**What this application can do**
+#### 3.7.1 What this application can do
 
 - Nothing executable: the repository holds a requirements/ideas note (notes.md) for forum-style software and a logo.
 
-**Who can reach it:** No executable code or network service; content is only readable by whoever can access the GitHub repository.
+#### 3.7.2 Who can reach it
 
-**Data flow**
+No executable code or network service; content is only readable by whoever can access the GitHub repository.
+
+#### 3.7.3 Data flow
 
 No data stores, files or network endpoints recorded in the inventory.
 
-**Network endpoints**
+#### 3.7.4 Network endpoints
 
 None recorded.
 
-**Data sources touched:** none recorded.
+#### 3.7.5 Data sources touched
 
-**Top findings**
+None recorded.
+
+#### 3.7.6 Top findings
 
 - No code, dependencies or secrets found; notes.md lists planned forum software features
 - No README and no .gitignore present
 
-**Unauthorized-action red flags**
+#### 3.7.7 Unauthorized-action red flags
 
 - None recorded.
 
-### johnzastrow
+<a id="johnzastrow"></a>
+## 3.8 johnzastrow
 
 Link: https://github.com/johnzastrow/johnzastrow | Languages: - | Findings: critical 0, high 0, low 0 | Inventory: [johnzastrow.json](johnzastrow.json) | Questionnaire: [johnzastrow_Governance.md](johnzastrow_Governance.md)
 
-**What this application can do**
+#### 3.8.1 What this application can do
 
 - Nothing executable: the repository only holds the README displayed on the author's GitHub profile.
 
-**Who can reach it:** Public README on GitHub; no running application.
+#### 3.8.2 Who can reach it
 
-**Data flow**
+Public README on GitHub; no running application.
+
+#### 3.8.3 Data flow
 
 No data stores, files or network endpoints recorded in the inventory.
 
-**Network endpoints**
+#### 3.8.4 Network endpoints
 
 None recorded.
 
-**Data sources touched:** none recorded.
+#### 3.8.5 Data sources touched
 
-**Top findings**
+None recorded.
+
+#### 3.8.6 Top findings
 
 - no severity-tagged findings
 - repository contains only a profile README (no code)
 
-**Unauthorized-action red flags**
+#### 3.8.7 Unauthorized-action red flags
 
 - None recorded.
 
-### jz_jupyters
+<a id="jz_jupyters"></a>
+## 3.9 jz_jupyters
 
 Link: https://github.com/johnzastrow/jz_jupyters | Languages: python, jupyter | Findings: critical 19, high 0, low 1 | Inventory: [jz_jupyters.json](jz_jupyters.json) | Questionnaire: [jz_jupyters_Governance.md](jz_jupyters_Governance.md)
 
-**What this application can do**
+#### 3.9.1 What this application can do
 
 - Reads weather, gas and electric-utility views from a MySQL 'weather' database on localhost or 192.168.1.110 using a hardcoded username and password, and plots them as charts saved to PNG files.
 - Reads local CSV, Excel and SQLite files and plots or prints the contents (tutorial examples).
 - Fetches the Matplotlib release list from the public GitHub API to draw a timeline chart.
 - Includes tutorial notebooks and scripts for pandas, matplotlib, bokeh, and Python basics; some write to hardcoded C:\ paths.
 
-**Who can reach it:** Nothing is served: scripts run only for whoever executes them locally and connect out to a local or private-LAN MySQL server. Because the repo is on GitHub, the hardcoded database credentials are visible to anyone who can read the repository.
+#### 3.9.2 Who can reach it
 
-**Data flow**
+Nothing is served: scripts run only for whoever executes them locally and connect out to a local or private-LAN MySQL server. Because the repo is on GitHub, the hardcoded database credentials are visible to anyone who can read the repository.
 
-*Local data (part 1 of 2)*
+#### 3.9.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -532,7 +626,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Local data (part 2 of 2)*
+<a id="figure-16"></a>*Figure 16. jz_jupyters - data flow, local data (part 1 of 2).*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -547,7 +643,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-17"></a>*Figure 17. jz_jupyters - data flow, local data (part 2 of 2).*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -559,13 +657,20 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-18"></a>*Figure 18. jz_jupyters - data flow, network endpoints.*
+
+
+#### 3.9.4 Network endpoints
+
+<a id="table-23"></a>**Table 23.** jz_jupyters - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
 | api.github.com | external API | read | yes | matpltlib/timeline.py |
 
-**Data sources touched**
+#### 3.9.5 Data sources touched
+
+<a id="table-24"></a>**Table 24.** jz_jupyters - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -575,34 +680,36 @@ flowchart LR
 | CSV and Excel files in the repo (data.csv, petals.xlsx, weather*.csv) | read | no |
 | GitHub REST API (api.github.com) | read (public release list) | no |
 
-**Top findings**
+#### 3.9.6 Top findings
 
 - Hardcoded MySQL password (user jcz) repeated across 15 tracked scripts and notebooks (19 occurrences)
 - No dependency manifest despite pandas, matplotlib, sqlalchemy, numpy usage
 - Committed binary data files (SQLite .db, xlsx, csv, zip)
 - No server or routes - tutorial/exploration code only
 
-**Unauthorized-action red flags**
+#### 3.9.7 Unauthorized-action red flags
 
 - Same MySQL password for user 'jcz' hardcoded in 19 tracked files (scripts and notebooks), including a private LAN host address
 - Hardcoded Windows paths (C:\data, C:\Code) in tutorial code
 - Binary database and data files (.db, .xlsx, .csv, .zip) committed to the repo
 
-### LearningPy
+<a id="learningpy"></a>
+## 3.10 LearningPy
 
 Link: https://github.com/johnzastrow/LearningPy | Languages: python | Findings: critical 1, high 0, low 3 | Inventory: [LearningPy.json](LearningPy.json) | Questionnaire: [LearningPy_Governance.md](LearningPy_Governance.md)
 
-**What this application can do**
+#### 3.10.1 What this application can do
 
 - Automates a browser login (Selenium/Firefox) to a MantisHub site and downloads a backup, using a username and password typed into the script.
 - Scrapes stock index quotes from public web pages and stores them in a local SQLite database.
 - Analyzes an electricity usage CSV in a notebook and runs assorted Python learning exercises (strings, dicts, water-chemistry calculator, birthday and age scripts).
 
-**Who can reach it:** Run locally by whoever executes the scripts; no server, no listening ports. The repository (public GitHub remote) exposes the committed credential and data files to anyone who can read it.
+#### 3.10.2 Who can reach it
 
-**Data flow**
+Run locally by whoever executes the scripts; no server, no listening ports. The repository (public GitHub remote) exposes the committed credential and data files to anyone who can read it.
 
-*Local data*
+#### 3.10.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -622,7 +729,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-19"></a>*Figure 19. LearningPy - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -640,7 +749,12 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-20"></a>*Figure 20. LearningPy - data flow, network endpoints.*
+
+
+#### 3.10.4 Network endpoints
+
+<a id="table-25"></a>**Table 25.** LearningPy - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
@@ -649,7 +763,9 @@ flowchart LR
 | 207.246.85.12 | external API | read | yes | beautiful_soup/beautiful2db.py |
 | www.facebook.com / www.google.com / www.yahoo.com / login.live.com (Selenium tutorial examples) | external API | unclear | yes | base_selen.py |
 
-**Data sources touched**
+#### 3.10.5 Data sources touched
+
+<a id="table-26"></a>**Table 26.** LearningPy - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -658,33 +774,35 @@ flowchart LR
 | Local SQLite files (example.db, flights.db, example2.db) | read_write | no |
 | USE2023-08_12_2025.csv electricity usage | read | no |
 
-**Top findings**
+#### 3.10.6 Top findings
 
 - Hardcoded real-looking MantisHub password (and email) in mantis_bak.py
 - Placeholder passwords in Selenium tutorial scripts (low)
 - No dependency manifest; .gitignore omits .env, *.db, *.log, .idea
 
-**Unauthorized-action red flags**
+#### 3.10.7 Unauthorized-action red flags
 
 - mantis_bak.py contains a real-looking MantisHub email and password committed to git.
 - Utility usage CSV with account/meter-style identifiers and four SQLite databases are committed.
 - Scripts automate logins to third-party sites (Facebook, Microsoft, MantisHub) via Selenium.
 
-### lineup
+<a id="lineup"></a>
+## 3.11 lineup
 
 Link: https://github.com/johnzastrow/lineup | Languages: python | Findings: critical 0, high 0, low 1 | Inventory: [lineup.json](lineup.json) | Questionnaire: [lineup_Governance.md](lineup_Governance.md)
 
-**What this application can do**
+#### 3.11.1 What this application can do
 
 - Loads a CSV of duplicate/similar photo groups, caches it in a local SQLite database, and shows groups with thumbnails, master markers and a list view.
 - Lets the local user move or permanently delete selected image files from disk.
 - Exports the database back to CSV and keeps a recent-databases list in the user's home directory.
 
-**Who can reach it:** Desktop application run locally by the person who starts it; no network listener and no login. It acts with that user's file-system permissions.
+#### 3.11.2 Who can reach it
 
-**Data flow**
+Desktop application run locally by the person who starts it; no network listener and no login. It acts with that user's file-system permissions.
 
-*Local data*
+#### 3.11.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -700,11 +818,16 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-21"></a>*Figure 21. lineup - data flow, local data.*
+
+
+#### 3.11.4 Network endpoints
 
 None recorded.
 
-**Data sources touched**
+#### 3.11.5 Data sources touched
+
+<a id="table-27"></a>**Table 27.** lineup - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -712,21 +835,22 @@ None recorded.
 | Local SQLite database .lineup_cache.db | read_write | no |
 | User photo files on local disk | read_write (move/delete) | no |
 
-**Top findings**
+#### 3.11.6 Top findings
 
 - Latent SQL injection pattern (f-string column name) in search_images; no untrusted caller found
 - Gitignored .image_cache/ and uv.lock are tracked; cache metadata contains a local Windows user path
 - App permanently deletes user files; no secrets, routes or external APIs found
 
-**Unauthorized-action red flags**
+#### 3.11.7 Unauthorized-action red flags
 
 - Permanently deletes image files (Path.unlink) with no recycle bin; no network or external data transfer found.
 
-### localfeather
+<a id="localfeather"></a>
+## 3.12 localfeather
 
 Link: https://github.com/johnzastrow/localfeather | Languages: python, cpp, shell, sql | Findings: critical 2, high 7, low 20 | Inventory: [localfeather.json](localfeather.json) | Questionnaire: [localfeather_Governance.md](localfeather_Governance.md)
 
-**What this application can do**
+#### 3.12.1 What this application can do
 
 - Accepts temperature/humidity/pressure readings from ESP32 devices over HTTP and stores them in MariaDB; unknown devices self-register and wait for approval.
 - Lets anyone who can reach the server approve, edit or delete devices through /api/devices endpoints with no login.
@@ -734,11 +858,12 @@ Link: https://github.com/johnzastrow/localfeather | Languages: python, cpp, shel
 - Provides a login-protected web dashboard where admins approve, rename, delete devices, regenerate API keys and edit location/notes.
 - Distributes ESP32 firmware over HTTP (OTA) to any caller who knows a version string; no signature or checksum handling seen.
 
-**Who can reach it:** Bound to 0.0.0.0:5000 over plain HTTP, so reachable by anyone on the network (or internet if forwarded). The web UI requires login, but the device-management API, readings list and OTA endpoints have no authentication.
+#### 3.12.2 Who can reach it
 
-**Data flow**
+Bound to 0.0.0.0:5000 over plain HTTP, so reachable by anyone on the network (or internet if forwarded). The web UI requires login, but the device-management API, readings list and OTA endpoints have no authentication.
 
-*Local data*
+#### 3.12.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -754,18 +879,23 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-22"></a>*Figure 22. localfeather - data flow, local data.*
+
+
+#### 3.12.4 Network endpoints
 
 None recorded.
 
-**Data sources touched**
+#### 3.12.5 Data sources touched
+
+<a id="table-28"></a>**Table 28.** localfeather - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
 | MariaDB localfeather database (users, devices, readings, firmware, updates) | read_write | no |
 | SQLite development database (optional) | read_write | no |
 
-**Top findings**
+#### 3.12.6 Top findings
 
 - Unauthenticated device approve/delete/update API endpoints (server/app/api/devices.py)
 - Default SECRET_KEY fallback in server/app/__init__.py:30
@@ -773,7 +903,7 @@ None recorded.
 - Flask debug=True bound to 0.0.0.0 in server/run.py
 - Unauthenticated device inventory (IP/MAC) and OTA firmware download
 
-**Unauthorized-action red flags**
+#### 3.12.7 Unauthorized-action red flags
 
 - POST /api/devices/<id>/approve and DELETE /api/devices/<id> have no authentication (code comments say auth to be added)
 - GET /api/devices exposes IP and MAC addresses and locations without login
@@ -782,50 +912,57 @@ None recorded.
 - OTA firmware download is unauthenticated and no integrity verification is visible
 - No CSRF protection or TLS found
 
-### mainegeo
+<a id="mainegeo"></a>
+## 3.13 mainegeo
 
 Link: https://github.com/johnzastrow/mainegeo | Languages: - | Findings: critical 0, high 0, low 0 | Inventory: [mainegeo.json](mainegeo.json) | Questionnaire: [mainegeo_Governance.md](mainegeo_Governance.md)
 
-**What this application can do**
+#### 3.13.1 What this application can do
 
 - Nothing executable: the repository stores SVG illustration files of Maine geography and terrain.
 
-**Who can reach it:** No executable code or network service; content is only readable by whoever can access the GitHub repository.
+#### 3.13.2 Who can reach it
 
-**Data flow**
+No executable code or network service; content is only readable by whoever can access the GitHub repository.
+
+#### 3.13.3 Data flow
 
 No data stores, files or network endpoints recorded in the inventory.
 
-**Network endpoints**
+#### 3.13.4 Network endpoints
 
 None recorded.
 
-**Data sources touched:** none recorded.
+#### 3.13.5 Data sources touched
 
-**Top findings**
+None recorded.
+
+#### 3.13.6 Top findings
 
 - No executable code, dependencies or secrets found; repository holds SVG artwork only
 - No .gitignore present
 
-**Unauthorized-action red flags**
+#### 3.13.7 Unauthorized-action red flags
 
 - None recorded.
 
-### mapsplat
+<a id="mapsplat"></a>
+## 3.14 mapsplat
 
 Link: https://github.com/johnzastrow/mapsplat | Languages: python | Findings: critical 0, high 0, low 1 | Inventory: [mapsplat.json](mapsplat.json) | Questionnaire: [mapsplat_Governance.md](mapsplat_Governance.md)
 
-**What this application can do**
+#### 3.14.1 What this application can do
 
 - Exports a QGIS project's vector and raster layers to a self-contained static web map (PMTiles + MapLibre GL JS style and HTML viewer).
 - Downloads MapLibre GL JS and PMTiles JavaScript assets from unpkg.com at export time (no checksum verification) to bundle them for offline use, falling back to CDN links on failure.
 - Generates a serve.py local web server that serves the exported map directory with HTTP Range support and Access-Control-Allow-Origin: * on every response.
 
-**Who can reach it:** The plugin runs inside the user's QGIS. The generated serve.py binds to 127.0.0.1 by default (local only) with no authentication; if started with --host 0.0.0.0 it serves the exported map to anyone on the network. README documents deploying exports to static hosts and Linux VPS (Caddy/Nginx).
+#### 3.14.2 Who can reach it
 
-**Data flow**
+The plugin runs inside the user's QGIS. The generated serve.py binds to 127.0.0.1 by default (local only) with no authentication; if started with --host 0.0.0.0 it serves the exported map to anyone on the network. README documents deploying exports to static hosts and Linux VPS (Caddy/Nginx).
 
-*Local data*
+#### 3.14.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -837,7 +974,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-23"></a>*Figure 23. mapsplat - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -849,13 +988,20 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-24"></a>*Figure 24. mapsplat - data flow, network endpoints.*
+
+
+#### 3.14.4 Network endpoints
+
+<a id="table-29"></a>**Table 29.** mapsplat - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
 | unpkg.com (maplibre-gl@4.7.1, pmtiles@3.2.0) | external API | read | yes | exporter.py |
 
-**Data sources touched**
+#### 3.14.5 Data sources touched
+
+<a id="table-30"></a>**Table 30.** mapsplat - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -863,33 +1009,35 @@ flowchart LR
 | Exported map package files in the output folder | write | no |
 | unpkg.com (MapLibre/PMTiles JS assets) | read | no |
 
-**Top findings**
+#### 3.14.6 Top findings
 
 - Generated serve.py has no auth and wildcard CORS, default bind 127.0.0.1 (low); becomes exposed with --host 0.0.0.0
 - Remote JS assets downloaded from unpkg.com without checksum
 - No dependency manifest beyond QGIS metadata.txt; CI installs unpinned pip packages
 
-**Unauthorized-action red flags**
+#### 3.14.7 Unauthorized-action red flags
 
 - Generated serve.py sends Access-Control-Allow-Origin: * with no authentication; safe by default on 127.0.0.1 but exposed if bound to 0.0.0.0
 - JavaScript libraries are downloaded from unpkg.com at export time over HTTPS without integrity checks
 
-### mapsplat4
+<a id="mapsplat4"></a>
+## 3.15 mapsplat4
 
 Link: https://github.com/johnzastrow/mapsplat4 | Languages: python, node, shell, powershell | Findings: critical 0, high 0, low 1 | Inventory: [mapsplat4.json](mapsplat4.json) | Questionnaire: [mapsplat4_Governance.md](mapsplat4_Governance.md)
 
-**What this application can do**
+#### 3.15.1 What this application can do
 
 - Exports the layers, styling, labels and layer order of the open QGIS project into a self-contained static web map (PMTiles plus MapLibre GL JS).
 - Runs ogr2ogr/GDAL and the pmtiles command line tool on the user's own layer data to build tiles.
 - Optionally downloads MapLibre/PMTiles scripts and probes basemap URLs on the internet.
 - Writes a serve.py helper that starts a local static web server (127.0.0.1 by default) with CORS open to all origins to preview the exported map.
 
-**Who can reach it:** A desktop QGIS plugin used by whoever runs QGIS. The optional generated serve.py binds to 127.0.0.1 by default and has no authentication; it is reachable from the network only if started with --host 0.0.0.0. Exported maps are static and intended to be published publicly if hosted.
+#### 3.15.2 Who can reach it
 
-**Data flow**
+A desktop QGIS plugin used by whoever runs QGIS. The optional generated serve.py binds to 127.0.0.1 by default and has no authentication; it is reachable from the network only if started with --host 0.0.0.0. Exported maps are static and intended to be published publicly if hosted.
 
-*Local data*
+#### 3.15.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -903,7 +1051,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints (part 1 of 2)*
+<a id="figure-25"></a>*Figure 25. mapsplat4 - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -921,7 +1071,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints (part 2 of 2)*
+<a id="figure-26"></a>*Figure 26. mapsplat4 - data flow, network endpoints (part 1 of 2).*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -933,7 +1085,12 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-27"></a>*Figure 27. mapsplat4 - data flow, network endpoints (part 2 of 2).*
+
+
+#### 3.15.4 Network endpoints
+
+<a id="table-31"></a>**Table 31.** mapsplat4 - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
@@ -943,7 +1100,9 @@ flowchart LR
 | user-supplied basemap/style URLs (HEAD/ranged GET probe, https/http only) | external API | read | yes | mapsplat_dockwidget.py |
 | raw.githubusercontent.com (Protomaps license text) | external API | read | yes | scripts/gen_basemap_styles.mjs |
 
-**Data sources touched**
+#### 3.15.5 Data sources touched
+
+<a id="table-32"></a>**Table 32.** mapsplat4 - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -952,34 +1111,36 @@ flowchart LR
 | Public basemap/tile hosts (Protomaps, OpenStreetMap, Carto, Esri, OpenTopoMap) and unpkg.com | read | no |
 | MBTiles file (sqlite) | read | no |
 
-**Top findings**
+#### 3.15.6 Top findings
 
 - No secrets or committed secret files; detect-secrets and bandit run in CI
 - Generated serve.py has open CORS and no auth (binds 127.0.0.1 by default)
 - No dependency manifest or lockfile; dev tools fetched unpinned
 
-**Unauthorized-action red flags**
+#### 3.15.7 Unauthorized-action red flags
 
 - Generated serve.py sends Access-Control-Allow-Origin: * and has no authentication (reachable beyond localhost if --host 0.0.0.0).
 - Exported viewer loads MapLibre and PMTiles from unpkg.com unless offline bundling is chosen.
 - Exported map bundles contain the user's layer data, which becomes public if the folder is hosted publicly.
 
-### marimo-qgis
+<a id="marimo-qgis"></a>
+## 3.16 marimo-qgis
 
 Link: https://github.com/johnzastrow/marimo-qgis | Languages: python, shell | Findings: critical 0, high 0, low 0 | Inventory: [marimo-qgis.json](marimo-qgis.json) | Questionnaire: [marimo-qgis_Governance.md](marimo-qgis_Governance.md)
 
-**What this application can do**
+#### 3.16.1 What this application can do
 
 - Runs marimo reactive notebooks on QGIS's own Python interpreter, launched from a dock inside QGIS.
 - Exposes a token-protected localhost HTTP bridge that lets notebooks read the open QGIS project (layers, features, extent, selection), insert layers back into it, and run any QGIS Processing algorithm.
 - Installs marimo and any packages the user names into QGIS's Python with pip, and can download example notebooks from GitHub.
 - Scaffolds new notebook files and writes launch logs to disk.
 
-**Who can reach it:** Desktop use only. The bridge binds 127.0.0.1 on a random port and requires a per-session bearer token on every request, so it is reachable only by local processes that know the token. Notebooks themselves can run arbitrary Python as the QGIS user.
+#### 3.16.2 Who can reach it
 
-**Data flow**
+Desktop use only. The bridge binds 127.0.0.1 on a random port and requires a per-session bearer token on every request, so it is reachable only by local processes that know the token. Notebooks themselves can run arbitrary Python as the QGIS user.
 
-*Local data*
+#### 3.16.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -993,7 +1154,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-28"></a>*Figure 28. marimo-qgis - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -1009,7 +1172,12 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-29"></a>*Figure 29. marimo-qgis - data flow, network endpoints.*
+
+
+#### 3.16.4 Network endpoints
+
+<a id="table-33"></a>**Table 33.** marimo-qgis - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
@@ -1017,7 +1185,9 @@ flowchart LR
 | PyPI via pip (installs marimo and user-requested packages) | external API | read | yes | plugin/ui/process.py |
 | astral.sh (uv install hint text only) | external API | unclear | yes | processing/launch_marimo.py |
 
-**Data sources touched**
+#### 3.16.5 Data sources touched
+
+<a id="table-34"></a>**Table 34.** marimo-qgis - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -1026,23 +1196,24 @@ flowchart LR
 | PyPI via pip | read | no |
 | Sample GeoPackage/SpatiaLite files in repo | read | no |
 
-**Top findings**
+#### 3.16.6 Top findings
 
 - No severity-tagged findings: all bridge routes require a bearer token and bind 127.0.0.1
 - Unpinned pandas/numpy in pyproject.toml; runtime pip installs into QGIS Python
 - Local bridge can run arbitrary Processing algorithms
 
-**Unauthorized-action red flags**
+#### 3.16.7 Unauthorized-action red flags
 
 - POST /api/run executes any Processing algorithm with caller-supplied parameters (guarded only by the local bearer token).
 - Notebooks launched by the plugin execute arbitrary Python on QGIS's interpreter by design.
 - pip installs of unpinned packages into the QGIS Python environment at run time.
 
-### metadatamgr
+<a id="metadatamgr"></a>
+## 3.17 metadatamgr
 
 Link: https://github.com/johnzastrow/metadatamgr | Languages: python | Findings: critical 0, high 0, low 1 | Inventory: [metadatamgr.json](metadatamgr.json) | Questionnaire: [metadatamgr_Governance.md](metadatamgr_Governance.md)
 
-**What this application can do**
+#### 3.17.1 What this application can do
 
 - Scans a user-selected folder tree for geospatial datasets and writes an inventory of files (format, CRS, size, metadata status) into a local GeoPackage.
 - Lets a QGIS user create and edit layer metadata through a 4-step wizard with contact and link management, and saves it to a local database cache, .qmd sidecar files, or embedded GeoPackage metadata.
@@ -1050,11 +1221,12 @@ Link: https://github.com/johnzastrow/metadatamgr | Languages: python | Findings:
 - Shows a metadata quality dashboard with completion statistics by directory, format and CRS.
 - Records the scanning user's OS username, machine hostname and OS version in the inventory records for multi-user tracking.
 
-**Who can reach it:** Runs inside the user's own QGIS desktop session; no listener, no authentication and none needed. Anyone with filesystem access to the shared GeoPackage can read the inventory, including recorded usernames and hostnames.
+#### 3.17.2 Who can reach it
 
-**Data flow**
+Runs inside the user's own QGIS desktop session; no listener, no authentication and none needed. Anyone with filesystem access to the shared GeoPackage can read the inventory, including recorded usernames and hostnames.
 
-*Local data*
+#### 3.17.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -1070,18 +1242,23 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-30"></a>*Figure 30. metadatamgr - data flow, local data.*
+
+
+#### 3.17.4 Network endpoints
 
 None recorded.
 
-**Data sources touched**
+#### 3.17.5 Data sources touched
+
+<a id="table-35"></a>**Table 35.** metadatamgr - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
 | Local GeoPackage/SQLite inventory and metadata database (geospatial_inventory and related tables) | read_write | no |
 | Local geospatial data files and metadata sidecars (shp, gpkg, FGDC/ESRI/ISO XML, .qmd) | read_write (reads datasets and metadata; writes .qmd and embedded metadata) | no |
 
-**Top findings**
+#### 3.17.6 Top findings
 
 - No secrets, secret files or provider keys found; CI runs detect-secrets and bandit
 - f-string SQL for table name guarded by _safe_identifier (latent, low)
@@ -1089,16 +1266,17 @@ None recorded.
 - Inventory records capture OS username, hostname and OS version
 - Developer test scripts contain hardcoded Windows paths including a user profile path
 
-**Unauthorized-action red flags**
+#### 3.17.7 Unauthorized-action red flags
 
 - Records OS username and machine hostname of each scanner in the inventory database (personal/operational data stored without any stated consent or retention policy)
 - Writes metadata sidecar files and embedded metadata into the user's data directories
 
-### mqs
+<a id="mqs"></a>
+## 3.18 mqs
 
 Link: https://github.com/johnzastrow/mqs | Languages: python, shell | Findings: critical 0, high 2, low 2 | Inventory: [mqs.json](mqs.json) | Questionnaire: [mqs_Governance.md](mqs_Governance.md)
 
-**What this application can do**
+#### 3.18.1 What this application can do
 
 - Inventories vector/raster files in directory trees into a GeoPackage and records the scanning OS username and file paths.
 - Edits and writes QGIS .qmd metadata (including contact email/phone) for datasets via a wizard.
@@ -1107,11 +1285,12 @@ Link: https://github.com/johnzastrow/mqs | Languages: python, shell | Findings: 
 - Renames vector layers/tables in bulk, with file backups.
 - Uploads a plugin zip to plugins.qgis.org using the author's credentials.
 
-**Who can reach it:** Desktop tools run locally by the user. The one network listener is the optional serve.py generated for exported web maps: it binds all interfaces with no authentication, so anyone on the local network can read the exported map folder while it is running.
+#### 3.18.2 Who can reach it
 
-**Data flow**
+Desktop tools run locally by the user. The one network listener is the optional serve.py generated for exported web maps: it binds all interfaces with no authentication, so anyone on the local network can read the exported map folder while it is running.
 
-*Local data*
+#### 3.18.3 Data flow
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -1131,7 +1310,9 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-*Network endpoints*
+<a id="figure-31"></a>*Figure 31. mqs - data flow, local data.*
+
+
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -1145,14 +1326,21 @@ flowchart LR
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
-**Network endpoints**
+<a id="figure-32"></a>*Figure 32. mqs - data flow, network endpoints.*
+
+
+#### 3.18.4 Network endpoints
+
+<a id="table-36"></a>**Table 36.** mqs - network endpoints.
 
 | Endpoint | Kind | Access | Leaves host network | Source file |
 |---|---|---|---|---|
 | plugins.qgis.org (XML-RPC plugin upload) | external API | write | yes | Plugins/metadata_manager/plugin_upload.py |
 | unpkg.com (MapLibre/pmtiles JS loaded by generated map HTML) and build.protomaps.com / protomaps.github.io (basemap tiles/fonts) | external API | read | yes | Plugins/mapsplat/exporter.py |
 
-**Data sources touched**
+#### 3.18.5 Data sources touched
+
+<a id="table-37"></a>**Table 37.** mqs - data sources touched.
 
 | Source | Access | Leaves organization |
 |---|---|---|
@@ -1161,14 +1349,14 @@ flowchart LR
 | plugins.qgis.org XML-RPC | write (plugin zip upload) | yes |
 | unpkg.com / protomaps hosts (loaded by exported web map in the viewer's browser) | read | no |
 
-**Top findings**
+#### 3.18.6 Top findings
 
 - Generated serve.py (Plugins/mapsplat/exporter.py) binds all interfaces, CORS *, no auth
 - F-string table names in SQL (inventory_processor.py, batchvectorrename.py) - local-only, low
 - .gitignore does not exclude .env / key / credential files
 - No committed secrets found
 
-**Unauthorized-action red flags**
+#### 3.18.7 Unauthorized-action red flags
 
 - Generated serve.py binds 0.0.0.0 with Access-Control-Allow-Origin * and no authentication
 - plugin_upload.py accepts the password via -w/--password command-line option (visible in shell history/process list) though it prompts if omitted

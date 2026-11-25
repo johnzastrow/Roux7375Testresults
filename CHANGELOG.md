@@ -12,6 +12,10 @@ All notable changes to this repository are documented here. The format follows
   taken from the recorded `access_type`. Endpoints that leave the host network are labelled EXTERNAL and shaded.
 - A per-repository "Network endpoints" table itemizing each endpoint (kind, access, leaves host network, source file).
 - Matrix 2.9 "Network endpoints (all repositories)" listing every endpoint across the 43 inventories.
+- A table of contents in every summary file, numbered sections continuing across the set (1 to 2.9 in the
+  overview, 3.1 to 3.43 for repositories with 3.n.1 to 3.n.7 subsections), continuous figure numbers
+  (Figures 1 to 67) with captions below each diagram, continuous table numbers (Tables 1 to 70) with captions
+  above each table, and a List of Figures and List of Tables in the overview linking into the parts.
 
 ### Changed
 - The repository sections moved out of `johnzastrow_Summary.md` into `johnzastrow_Summary_Part1.md` to

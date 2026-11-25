@@ -4,6 +4,19 @@ All notable changes to this repository are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-11-25
+
+### Added
+- `outputs/johnzastrow_Summary.md`: a small data flow diagram in each repository section, built only from that
+  repository's JSON. It shows callers, databases, local files, and every network endpoint, with arrow direction
+  taken from the recorded `access_type`. Endpoints that leave the host network are labelled EXTERNAL and shaded.
+- A per-repository "Network endpoints" table itemizing each endpoint (kind, access, leaves host network, source file).
+- Matrix 2.9 "Network endpoints (all repositories)" listing every endpoint across the 43 inventories.
+
+### Changed
+- Diagrams are laid out in three fixed columns (sources, app, destinations) with wrapped labels so they stay
+  readable when printed on letter-size paper.
+
 ## [1.0.1] - 2026-11-25
 
 ### Fixed

@@ -1,6 +1,6 @@
 # Governance Scan Summary - johnzastrow public repositories
 
-Generated: 2026-11-25 21:44 UTC  
+Generated: 2026-11-25 21:54 UTC  
 Method: [governance-scan skill v1.0](https://github.com/MichaelHynesRoux/INFO-7375-Governance-Scan-Skill) (read-only inventory) applied to each public, non-fork repository of [johnzastrow](https://github.com/johnzastrow), excluding this results repository.  
 Repositories scanned: **43**. Per-repo inventories: `<repo>.json`; questionnaire answers: `<repo>_Governance.md`.
 
@@ -36,7 +36,7 @@ A repository can contain several languages, so counts sum to more than the numbe
 %%{init: {"theme":"base","xyChart":{"width":760,"height":596,"xAxis":{"labelFontSize":14},"yAxis":{"labelFontSize":13}},"themeVariables":{"xyChart":{"plotColorPalette":"#6B8CAE"},"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"16","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 xychart-beta horizontal
     title "Repositories per detected language"
-    x-axis ["python", "node / js / ts", "shell", "go", "none (docs or assets only)", "sql", "powershell", "rust", "cpp", "batch", "ini/config"]
+    x-axis ["python", "node / js / ts", "shell", "go", "none (docs or assets only)", "sql", "powershell", "rust", "cpp", "ini/config", "batch"]
     y-axis "Repositories" 0 --> 31
     bar [28, 10, 9, 7, 6, 4, 2, 2, 1, 1, 1]
 ```
@@ -453,7 +453,86 @@ xychart-beta horizontal
 | waterlogger | yes | 9 | 1 | yes | yes |
 | waxgrove | yes | 5 | 14 | yes | yes |
 
+### 2.9 Network endpoints (all repositories)
+
+Every external API host and network mail/collaboration source recorded in the inventories. "Leaves host network" is no for loopback or private-LAN addresses, yes otherwise; configurable endpoints count as yes because they can point off-host.
+
+| Repository | Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|---|
+| actalog | SMTP server configured via SMTP_HOST (net/smtp, email verification, password reset, announcements) | external API | write | yes | pkg/email/email.go |
+| actalog | youtube.com (video links/embeds entered on WOD and movement forms) | external API | read | yes | web/src/views/WODCreateView.vue |
+| actalog | OTEL_EXPORTER_OTLP_ENDPOINT (referenced only in docker/docker-compose.yml) | external API | write | yes | docker/docker-compose.yml |
+| actalog | outbound SMTP via SMTP_HOST (no mailbox read) | email_mailbox | write | yes | pkg/email/email.go |
+| actalog-benchmark | user-supplied ActaLog instance (--url); committed report shows https://al.fluidgrid.site | external API | read_write | yes | internal/client/client.go |
+| actalog-benchmark | same target: POST /api/auth/login, GET /api/version, /api/workouts, /api/movements, /api/wods, /api/pr-movements, /api/notifications/count; POST /api/benchmark (server-side benchmark, up to 500000 records) | external API | read_write | yes | internal/metrics/endpoints.go |
+| bittabby | configurable SMTP server (BITT_SMTP_HOST) | external API | write | yes | internal/notify/notify.go |
+| bittabby | ntfy server (BITT_NTFY_URL, ntfy.sh default examples) | external API | write | yes | internal/notify/notify.go |
+| bittabby | SMTP host from config (net/smtp); outbound reminders only | email_mailbox | write | yes | internal/notify/notify.go |
+| choreme | SMTP server from SMTP_HOST (example smtp.gmail.com in .env.example) | external API | write | yes | internal/config/config.go |
+| garminview | Garmin Connect (via garmindb_cli / garminconnect library; credentials from mounted ~/.GarminDb config) | external API | read | yes | backend/garminview/api/routes/sync.py |
+| garminview | Actalog server (URL and credentials stored in app_config; user-configured) | external API | read_write | yes | backend/garminview/ingestion/actalog_client.py |
+| garminview | Actalog server write-back (POST of matched Garmin data) | external API | write | yes | backend/garminview/ingestion/actalog_writeback.py |
+| garminview | Ollama or OpenAI-compatible LLM server (default http://localhost:11434, configurable URL; receives workout note text) | external API | write | yes | backend/garminview/ingestion/notes_parser.py |
+| jz_jupyters | api.github.com | external API | read | yes | matpltlib/timeline.py |
+| LearningPy | se.mantishub.io | external API | read | yes | mantis_bak.py |
+| LearningPy | www.bloomberg.com | external API | read | yes | beautiful_soup/beautiful.py |
+| LearningPy | 207.246.85.12 | external API | read | yes | beautiful_soup/beautiful2db.py |
+| LearningPy | www.facebook.com / www.google.com / www.yahoo.com / login.live.com (Selenium tutorial examples) | external API | unclear | yes | base_selen.py |
+| mapsplat | unpkg.com (maplibre-gl@4.7.1, pmtiles@3.2.0) | external API | read | yes | exporter.py |
+| mapsplat4 | unpkg.com (MapLibre GL JS and PMTiles JS bundles, downloaded for offline mode and referenced by exported viewer) | external API | read | yes | exporter.py |
+| mapsplat4 | build.protomaps.com / maps.protomaps.com / protomaps.github.io (basemap PMTiles and styles) | external API | read | yes | basemap_helpers.py |
+| mapsplat4 | tile.openstreetmap.org, basemaps.cartocdn.com, server.arcgisonline.com, a.tile.opentopomap.org (XYZ basemap tiles) | external API | read | yes | mapsplat_dockwidget.py |
+| mapsplat4 | user-supplied basemap/style URLs (HEAD/ranged GET probe, https/http only) | external API | read | yes | mapsplat_dockwidget.py |
+| mapsplat4 | raw.githubusercontent.com (Protomaps license text) | external API | read | yes | scripts/gen_basemap_styles.mjs |
+| marimo-qgis | github.com (downloads repository zip of example/notebooks folders) | external API | read | yes | plugin/environment.py |
+| marimo-qgis | PyPI via pip (installs marimo and user-requested packages) | external API | read | yes | plugin/ui/process.py |
+| marimo-qgis | astral.sh (uv install hint text only) | external API | unclear | yes | processing/launch_marimo.py |
+| mqs | plugins.qgis.org (XML-RPC plugin upload) | external API | write | yes | Plugins/metadata_manager/plugin_upload.py |
+| mqs | unpkg.com (MapLibre/pmtiles JS loaded by generated map HTML) and build.protomaps.com / protomaps.github.io (basemap tiles/fonts) | external API | read | yes | Plugins/mapsplat/exporter.py |
+| mqs4 | plugins.qgis.org (XML-RPC upload of plugin zip with username/password) | external API | write | yes | Plugins/metadata_manager/plugin_upload.py |
+| mqs4 | user-specified PostgreSQL host | external API | read_write | yes | Scripts/qgis_project_manager.py |
+| ms | archive.apache.org | external API | read | yes | image_classification/image_class.ipynb |
+| ms | CIFAR-10 download via keras.datasets.cifar10.load_data (upstream dataset host, not named in code) | external API | read | yes | image_classification/stage2_image_class.ipynb |
+| ms | localhost:9092 (Apache Kafka broker, local) | external API | read_write | no | image_classification/stage2_image_class.ipynb |
+| mydocmost | tel.docmost.com | external API | write | yes | apps/server/src/integrations/telemetry/telemetry.service.ts |
+| mydocmost | api.github.com | external API | read | yes | apps/server/src/integrations/security/version.service.ts |
+| mydocmost | configurable OpenAI / OpenAI-compatible / Gemini / Ollama endpoint (AI_DRIVER, OPENAI_API_URL) | external API | write | yes | apps/server/src/integrations/environment/environment.validation.ts |
+| mydocmost | configurable S3 endpoint (AWS_S3_ENDPOINT) | external API | read_write | yes | apps/server/package.json |
+| mydocmost | SMTP/Postmark (MAIL_DRIVER) | external API | write | yes | apps/server/src/integrations/mail/drivers/smtp.driver.ts |
+| mydocmost | login.microsoftonline.com / accounts.google.com (SSO references) | external API | unclear | yes | apps/client/src |
+| mydocmost | embed.diagrams.net (draw.io embed, DRAWIO_URL) | external API | read | yes | apps/client/src/features/editor |
+| mydocmost | SMTP_HOST (configurable) via nodemailer; outbound only | email_mailbox | write | yes | apps/server/src/integrations/mail/drivers/smtp.driver.ts |
+| myvinyl | api.discogs.com | external API | read | yes | src/myvinyl/discogs.py |
+| myvinyl | i.discogs.com | external API | read | yes | src/myvinyl/discogs.py |
+| niva | ntfy.sh (default; NIVA_NTFY_SERVER overridable) | external API | write | yes | niva/utilities.py |
+| niva | user-configured SMTP host (smtp.gmail.com default for gmail senders) | external API | write | yes | niva/utilities.py |
+| niva | user-supplied WFS/WMS/ArcGIS REST/XYZ URLs (read only, http/https only) | external API | read | yes | niva/remote.py |
+| niva | github.com (marimo on-ramp release zip download) | external API | read | yes | niva/setup/marimo.py |
+| niva | micro.mamba.pm (install hint text only) | external API | read | yes | niva/pdal_doctor.py |
+| niva | SMTP host from NIVA_SMTP_HOST (send only, optional attachment) | email_mailbox | write | yes | niva/utilities.py |
+| pgeo | www2.census.gov | external API | read | yes | scripts/fetch_data.sh |
+| pgeo | download.geofabrik.de | external API | read | yes | scripts/fetch_data.sh |
+| pgeo | data.whosonfirst.org | external API | read | yes | scripts/fetch_data.sh |
+| pgeo | batch.openaddresses.io | external API | read | yes | scripts/fetch_data.sh |
+| pgeo | stac.overturemaps.org | external API | read | yes | pgeo/src/pgeo/load/sources.py |
+| pgeo | prd-tnm.s3.amazonaws.com | external API | read | yes | scripts/fetch_data.sh |
+| pgeo | build.protomaps.com | external API | read | yes | scripts/fetch_data.sh |
+| pgeo | raw.githubusercontent.com | external API | read | yes | scripts/vendor_web.sh |
+| QGIS | plugins.qgis.org | external API | read | yes | Profiles/profiles/default/QGIS/QGIS3.ini |
+| QGIS | feed.qgis.org | external API | read | yes | Profiles/profiles/default/QGIS/QGIS3.ini |
+| QGIS | tile.openstreetmap.org | external API | read | yes | Profiles/profiles/default/QGIS/QGIS3.ini |
+| QGIS | s3.amazonaws.com (Mapzen terrain tiles) | external API | read | yes | Profiles/profiles/default/QGIS/QGIS3.ini |
+| seh | monitoringapi.solaredge.com | external API | read | yes | src/seh/api/client.py |
+| seh | smtp.gmail.com (default SEH_SMTP_HOST; configurable) | external API | write | yes | src/seh/config/logging.py |
+| seh | SMTP server from SEH_SMTP_HOST (default smtp.gmail.com), sends sync success/failure notifications | email_mailbox | write | yes | src/seh/config/logging.py |
+| trilium-farmer | Trilium Notes ETAPI (URL from TRILIUM_URL; README example http://192.168.1.102:8080) | external API | read_write | no | README.md |
+| waxgrove | api.spotify.com | external API | read_write | yes | internal/spotify/client.go |
+| waxgrove | accounts.spotify.com | external API | write | yes | internal/spotify/auth.go |
+| waxgrove | musicbrainz.org | external API | read | yes | internal/musicbrainz/client.go |
+
 ## 3. Repository sections
+
+Each section has a small data flow diagram built only from that repository's JSON. Arrows follow the recorded `access_type`: read points into the app, write points out of it, read/write points both ways, and a dashed line means unclear. Endpoints that leave the host network are labelled EXTERNAL and shaded red; loopback or private-LAN endpoints are labelled LAN. Diagrams are sized to print on letter paper; labels are shortened, and the full endpoint text is in the table under each diagram. Local file access is shown as one node; databases and network endpoints are itemized.
 
 ### actalog
 
@@ -468,6 +547,40 @@ Link: https://github.com/johnzastrow/actalog | Languages: go, javascript, vue, s
 - Serves uploaded avatar files publicly at /uploads/* and public Swagger API documentation at /api/docs/*.
 
 **Who can reach it:** Binds to 0.0.0.0:8080 by default and is designed to be reachable by any user who can reach the host (optionally behind a Caddy reverse proxy). Most routes require a JWT; the public routes are login/registration/password reset, version, Swagger docs, the standard movement/WOD/template catalog, /health and /uploads/*.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"actalog"}}
+    U(["Callers:<br>cli, scheduled, spa,<br>web_api"]) --> APP
+    D1[("DB: sqlite / postgresql<br>/ mysql-mariadb...")]
+    APP <-->|read/write| D1
+    O2["CSV files (2)"]
+    APP <-->|read/write| O2
+    F3["Local files (5 paths)"]
+    APP <-->|read/write| F3
+    E4["EXTERNAL:<br>SMTP server configured<br>via SMTP_HOST (net/sm..."]
+    APP -->|write| E4
+    E5["EXTERNAL:<br>youtube.com (video<br>links/embeds entered..."]
+    E5 -->|read| APP
+    E6["EXTERNAL:<br>OTEL_EXPORTER_OTLP_EN...<br>(referenced only in..."]
+    APP -->|write| E6
+    E7["EXTERNAL:<br>outbound SMTP via<br>SMTP_HOST (no mailbox..."]
+    APP -->|write| E7
+    class E4,E5,E6,E7 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| SMTP server configured via SMTP_HOST (net/smtp, email verification, password reset, announcements) | external API | write | yes | pkg/email/email.go |
+| youtube.com (video links/embeds entered on WOD and movement forms) | external API | read | yes | web/src/views/WODCreateView.vue |
+| OTEL_EXPORTER_OTLP_ENDPOINT (referenced only in docker/docker-compose.yml) | external API | write | yes | docker/docker-compose.yml |
+| outbound SMTP via SMTP_HOST (no mailbox read) | email_mailbox | write | yes | pkg/email/email.go |
 
 **Data sources touched**
 
@@ -507,6 +620,30 @@ Link: https://github.com/johnzastrow/actalog-benchmark | Languages: go | Finding
 
 **Who can reach it:** Local command-line tool run by the user; no listener. It reaches whatever host the user points it at, including production instances.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"actalog-benchmark"}}
+    U(["Callers:<br>cli"]) --> APP
+    F1["Local files (3 paths)"]
+    APP <-->|read/write| F1
+    E2["EXTERNAL:<br>user-supplied ActaLog<br>instance (--url),..."]
+    APP <-->|read/write| E2
+    E3["EXTERNAL:<br>same target: POST<br>/api/auth/login, GET..."]
+    APP <-->|read/write| E3
+    class E2,E3 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| user-supplied ActaLog instance (--url); committed report shows https://al.fluidgrid.site | external API | read_write | yes | internal/client/client.go |
+| same target: POST /api/auth/login, GET /api/version, /api/workouts, /api/movements, /api/wods, /api/pr-movements, /api/notifications/count; POST /api/benchmark (server-side benchmark, up to 500000 records) | external API | read_write | yes | internal/metrics/endpoints.go |
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -539,6 +676,39 @@ Link: https://github.com/johnzastrow/bittabby | Languages: go, javascript | Find
 - Lets users upload and view profile avatars.
 
 **Who can reach it:** Listens on :8080 (all interfaces) by default. Every application route is behind a session login (requireAuth, requireAdmin, or requireReconcile); only /healthz, /static, /sw.js, /setup, /login, /logout are open, and /internal/tick requires a bearer secret. Session cookies are only marked Secure when BITT_SECURE_COOKIES=true.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"bittabby"}}
+    U(["Callers:<br>cli, scheduled_job,<br>web_app"]) --> APP
+    D1[("DB: sqlite (default,<br>modernc.org/sqlite,...")]
+    APP <-->|read/write| D1
+    D2[("DB: mariadb/mysql<br>(optional,...")]
+    APP <-->|read/write| D2
+    O3["CSV files (1)"]
+    O3 -->|read| APP
+    F4["Local files (2 paths)"]
+    APP <-->|read/write| F4
+    E5["EXTERNAL:<br>configurable SMTP server<br>(BITT_SMTP_HOST)"]
+    APP -->|write| E5
+    E6["EXTERNAL:<br>ntfy server<br>(BITT_NTFY_URL, ntfy...."]
+    APP -->|write| E6
+    E7["EXTERNAL:<br>SMTP host from config<br>(net/smtp), outbound..."]
+    APP -->|write| E7
+    class E5,E6,E7 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| configurable SMTP server (BITT_SMTP_HOST) | external API | write | yes | internal/notify/notify.go |
+| ntfy server (BITT_NTFY_URL, ntfy.sh default examples) | external API | write | yes | internal/notify/notify.go |
+| SMTP host from config (net/smtp); outbound reminders only | email_mailbox | write | yes | internal/notify/notify.go |
 
 **Data sources touched**
 
@@ -576,6 +746,29 @@ Link: https://github.com/johnzastrow/choreme | Languages: go, typescript, vue, j
 
 **Who can reach it:** HTTP server; binds to localhost by default but the Docker image binds 0.0.0.0:8080 and compose publishes ports. Registration, login and household join are unauthenticated; all other /api/v1 routes require a JWT. CORS allows any origin.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"choreme"}}
+    U(["Callers:<br>cli, scheduled_job,<br>web_api, web_ui"]) --> APP
+    D1[("DB: sqlite / postgresql<br>/ mysql (selected by...")]
+    APP <-->|read/write| D1
+    F2["Local files (1 paths)"]
+    APP <-->|read/write| F2
+    E3["EXTERNAL:<br>SMTP server from<br>SMTP_HOST (example..."]
+    APP -->|write| E3
+    class E3 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| SMTP server from SMTP_HOST (example smtp.gmail.com in .env.example) | external API | write | yes | internal/config/config.go |
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -609,6 +802,22 @@ Link: https://github.com/johnzastrow/DocQGISProject | Languages: python | Findin
 
 **Who can reach it:** Runs locally inside QGIS (dialog, Processing toolbox, Python console). No network listener or outbound network code found.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"DocQGISProject"}}
+    U(["Callers:<br>cli, gui,<br>processing_provider,<br>qgis_plugin"]) --> APP
+    F1["Local files (3 paths)"]
+    APP <-->|read/write| F1
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -639,6 +848,42 @@ Link: https://github.com/johnzastrow/garminview | Languages: python, typescript,
 - Runs scheduled background syncs against Garmin Connect via GarminDB and against an Actalog server, and parses workout notes with a configurable LLM endpoint.
 
 **Who can reach it:** Whoever can reach the published frontend port (default 8080 on the host, listening on all interfaces) - the API behind it has no authentication on any route. In local development it is reachable from the same machine only if bound to localhost.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"garminview"}}
+    U(["Callers:<br>cli, notebook,<br>scheduled_job, web_api,<br>web_ui"]) --> APP
+    D1[("DB: mariadb<br>(mysql+pymysql) or...")]
+    APP <-->|read/write| D1
+    D2[("DB: sqlite (GarminDB<br>files garmin.db,...")]
+    D2 -->|read| APP
+    O3["CSV files (2)"]
+    APP <-->|read/write| O3
+    F4["Local files (3 paths)"]
+    APP <-->|read/write| F4
+    E5["EXTERNAL:<br>Garmin Connect (via<br>garmindb_cli /..."]
+    E5 -->|read| APP
+    E6["EXTERNAL:<br>Actalog server (URL and<br>credentials stored in..."]
+    APP <-->|read/write| E6
+    E7["EXTERNAL:<br>Actalog server<br>write-back (POST of..."]
+    APP -->|write| E7
+    E8["EXTERNAL:<br>Ollama or<br>OpenAI-compatible LLM..."]
+    APP -->|write| E8
+    class E5,E6,E7,E8 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| Garmin Connect (via garmindb_cli / garminconnect library; credentials from mounted ~/.GarminDb config) | external API | read | yes | backend/garminview/api/routes/sync.py |
+| Actalog server (URL and credentials stored in app_config; user-configured) | external API | read_write | yes | backend/garminview/ingestion/actalog_client.py |
+| Actalog server write-back (POST of matched Garmin data) | external API | write | yes | backend/garminview/ingestion/actalog_writeback.py |
+| Ollama or OpenAI-compatible LLM server (default http://localhost:11434, configurable URL; receives workout note text) | external API | write | yes | backend/garminview/ingestion/notes_parser.py |
 
 **Data sources touched**
 
@@ -675,6 +920,14 @@ Link: https://github.com/johnzastrow/gob | Languages: - | Findings: critical 0, 
 
 **Who can reach it:** No executable code or network service; content is only readable by whoever can access the GitHub repository.
 
+**Data flow**
+
+No data stores, files or network endpoints recorded in the inventory.
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched:** none recorded.
 
 **Top findings**
@@ -695,6 +948,14 @@ Link: https://github.com/johnzastrow/johnzastrow | Languages: - | Findings: crit
 - Nothing executable: the repository only holds the README displayed on the author's GitHub profile.
 
 **Who can reach it:** Public README on GitHub; no running application.
+
+**Data flow**
+
+No data stores, files or network endpoints recorded in the inventory.
+
+**Network endpoints**
+
+None recorded.
 
 **Data sources touched:** none recorded.
 
@@ -719,6 +980,41 @@ Link: https://github.com/johnzastrow/jz_jupyters | Languages: python, jupyter | 
 - Includes tutorial notebooks and scripts for pandas, matplotlib, bokeh, and Python basics; some write to hardcoded C:\ paths.
 
 **Who can reach it:** Nothing is served: scripts run only for whoever executes them locally and connect out to a local or private-LAN MySQL server. Because the repo is on GitHub, the hardcoded database credentials are visible to anyone who can read the repository.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"jz_jupyters"}}
+    U(["Callers:<br>cli, gui, notebook"]) --> APP
+    D1[("DB: mysql")]
+    D1 -->|read| APP
+    D2[("DB: mysql")]
+    D2 -->|read| APP
+    D3[("DB: mysql")]
+    D3 -->|read| APP
+    D4[("DB: mysql")]
+    APP -.-|unclear| D4
+    D5[("DB: sqlite")]
+    D5 -->|read| APP
+    O6["EXCEL files (2)"]
+    O6 -->|read| APP
+    O7["CSV files (2)"]
+    O7 -->|read| APP
+    F8["Local files (5 paths)"]
+    APP <-->|read/write| F8
+    E9["EXTERNAL:<br>api.github.com"]
+    E9 -->|read| APP
+    class E9 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| api.github.com | external API | read | yes | matpltlib/timeline.py |
 
 **Data sources touched**
 
@@ -755,6 +1051,44 @@ Link: https://github.com/johnzastrow/LearningPy | Languages: python | Findings: 
 
 **Who can reach it:** Run locally by whoever executes the scripts; no server, no listening ports. The repository (public GitHub remote) exposes the committed credential and data files to anyone who can read it.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"LearningPy"}}
+    U(["Callers:<br>cli, notebook"]) --> APP
+    D1[("DB: sqlite")]
+    APP <-->|read/write| D1
+    D2[("DB: sqlite")]
+    APP <-->|read/write| D2
+    D3[("DB: sqlite")]
+    APP -.-|unclear| D3
+    O4["CSV files (2)"]
+    APP <-->|read/write| O4
+    F5["Local files (3 paths)"]
+    APP -->|write| F5
+    E6["EXTERNAL:<br>se.mantishub.io"]
+    E6 -->|read| APP
+    E7["EXTERNAL:<br>www.bloomberg.com"]
+    E7 -->|read| APP
+    E8["EXTERNAL:<br>207.246.85.12"]
+    E8 -->|read| APP
+    E9["EXTERNAL:<br>www.facebook.com /<br>www.google.com /..."]
+    APP -.-|unclear| E9
+    class E6,E7,E8,E9 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| se.mantishub.io | external API | read | yes | mantis_bak.py |
+| www.bloomberg.com | external API | read | yes | beautiful_soup/beautiful.py |
+| 207.246.85.12 | external API | read | yes | beautiful_soup/beautiful2db.py |
+| www.facebook.com / www.google.com / www.yahoo.com / login.live.com (Selenium tutorial examples) | external API | unclear | yes | base_selen.py |
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -788,6 +1122,26 @@ Link: https://github.com/johnzastrow/lineup | Languages: python | Findings: crit
 
 **Who can reach it:** Desktop application run locally by the person who starts it; no network listener and no login. It acts with that user's file-system permissions.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"lineup"}}
+    U(["Callers:<br>cli, gui"]) --> APP
+    D1[("DB: sqlite")]
+    APP <-->|read/write| D1
+    O2["CSV files (1)"]
+    APP <-->|read/write| O2
+    F3["Local files (4 paths)"]
+    APP <-->|read/write| F3
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -819,6 +1173,26 @@ Link: https://github.com/johnzastrow/localfeather | Languages: python, cpp, shel
 - Distributes ESP32 firmware over HTTP (OTA) to any caller who knows a version string; no signature or checksum handling seen.
 
 **Who can reach it:** Bound to 0.0.0.0:5000 over plain HTTP, so reachable by anyone on the network (or internet if forwarded). The web UI requires login, but the device-management API, readings list and OTA endpoints have no authentication.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"localfeather"}}
+    U(["Callers:<br>cli, dev_server,<br>device_firmware,<br>service, web_api, web_ui"]) --> APP
+    D1[("DB: mariadb/mysql<br>(pymysql via SQLAlchemy)")]
+    APP <-->|read/write| D1
+    D2[("DB: sqlite (development<br>fallback)")]
+    APP <-->|read/write| D2
+    F3["Local files (2 paths)"]
+    APP <-->|read/write| F3
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
 
 **Data sources touched**
 
@@ -854,6 +1228,14 @@ Link: https://github.com/johnzastrow/mainegeo | Languages: - | Findings: critica
 
 **Who can reach it:** No executable code or network service; content is only readable by whoever can access the GitHub repository.
 
+**Data flow**
+
+No data stores, files or network endpoints recorded in the inventory.
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched:** none recorded.
 
 **Top findings**
@@ -876,6 +1258,27 @@ Link: https://github.com/johnzastrow/mapsplat | Languages: python | Findings: cr
 - Generates a serve.py local web server that serves the exported map directory with HTTP Range support and Access-Control-Allow-Origin: * on every response.
 
 **Who can reach it:** The plugin runs inside the user's QGIS. The generated serve.py binds to 127.0.0.1 by default (local only) with no authentication; if started with --host 0.0.0.0 it serves the exported map to anyone on the network. README documents deploying exports to static hosts and Linux VPS (Caddy/Nginx).
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mapsplat"}}
+    U(["Callers:<br>ci_workflow,<br>qgis_plugin,<br>web_static_server_gen..."]) --> APP
+    F1["Local files (4 paths)"]
+    APP <-->|read/write| F1
+    E2["EXTERNAL:<br>unpkg.com<br>(maplibre-gl@4.7.1,..."]
+    E2 -->|read| APP
+    class E2 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| unpkg.com (maplibre-gl@4.7.1, pmtiles@3.2.0) | external API | read | yes | exporter.py |
 
 **Data sources touched**
 
@@ -908,6 +1311,41 @@ Link: https://github.com/johnzastrow/mapsplat4 | Languages: python, node, shell,
 - Writes a serve.py helper that starts a local static web server (127.0.0.1 by default) with CORS open to all origins to preview the exported map.
 
 **Who can reach it:** A desktop QGIS plugin used by whoever runs QGIS. The optional generated serve.py binds to 127.0.0.1 by default and has no authentication; it is reachable from the network only if started with --host 0.0.0.0. Exported maps are static and intended to be published publicly if hosted.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mapsplat4"}}
+    U(["Callers:<br>cli, qgis_plugin"]) --> APP
+    D1[("DB: sqlite (MBTiles<br>read)")]
+    D1 -->|read| APP
+    F2["Local files (4 paths)"]
+    APP <-->|read/write| F2
+    E3["EXTERNAL:<br>unpkg.com (MapLibre GL<br>JS and PMTiles JS..."]
+    E3 -->|read| APP
+    E4["EXTERNAL:<br>build.protomaps.com /<br>maps.protomaps.com /..."]
+    E4 -->|read| APP
+    E5["EXTERNAL:<br>tile.openstreetmap.org,<br>basemaps.cartocdn.com..."]
+    E5 -->|read| APP
+    E6["EXTERNAL:<br>user-supplied<br>basemap/style URLs..."]
+    E6 -->|read| APP
+    E7["EXTERNAL:<br>raw.githubusercontent...<br>(Protomaps license text)"]
+    E7 -->|read| APP
+    class E3,E4,E5,E6,E7 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| unpkg.com (MapLibre GL JS and PMTiles JS bundles, downloaded for offline mode and referenced by exported viewer) | external API | read | yes | exporter.py |
+| build.protomaps.com / maps.protomaps.com / protomaps.github.io (basemap PMTiles and styles) | external API | read | yes | basemap_helpers.py |
+| tile.openstreetmap.org, basemaps.cartocdn.com, server.arcgisonline.com, a.tile.opentopomap.org (XYZ basemap tiles) | external API | read | yes | mapsplat_dockwidget.py |
+| user-supplied basemap/style URLs (HEAD/ranged GET probe, https/http only) | external API | read | yes | mapsplat_dockwidget.py |
+| raw.githubusercontent.com (Protomaps license text) | external API | read | yes | scripts/gen_basemap_styles.mjs |
 
 **Data sources touched**
 
@@ -942,6 +1380,35 @@ Link: https://github.com/johnzastrow/marimo-qgis | Languages: python, shell | Fi
 - Scaffolds new notebook files and writes launch logs to disk.
 
 **Who can reach it:** Desktop use only. The bridge binds 127.0.0.1 on a random port and requires a per-session bearer token on every request, so it is reachable only by local processes that know the token. Notebooks themselves can run arbitrary Python as the QGIS user.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"marimo-qgis"}}
+    U(["Callers:<br>cli, notebook,<br>qgis_plugin, web_api"]) --> APP
+    D1[("DB: sqlite (in-memory<br>version probe)")]
+    D1 -->|read| APP
+    F2["Local files (4 paths)"]
+    APP -->|write| F2
+    E3["EXTERNAL:<br>github.com (downloads<br>repository zip of..."]
+    E3 -->|read| APP
+    E4["EXTERNAL:<br>PyPI via pip (installs<br>marimo and..."]
+    E4 -->|read| APP
+    E5["EXTERNAL:<br>astral.sh (uv install<br>hint text only)"]
+    APP -.-|unclear| E5
+    class E3,E4,E5 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| github.com (downloads repository zip of example/notebooks folders) | external API | read | yes | plugin/environment.py |
+| PyPI via pip (installs marimo and user-requested packages) | external API | read | yes | plugin/ui/process.py |
+| astral.sh (uv install hint text only) | external API | unclear | yes | processing/launch_marimo.py |
 
 **Data sources touched**
 
@@ -978,6 +1445,26 @@ Link: https://github.com/johnzastrow/metadatamgr | Languages: python | Findings:
 
 **Who can reach it:** Runs inside the user's own QGIS desktop session; no listener, no authentication and none needed. Anyone with filesystem access to the shared GeoPackage can read the inventory, including recorded usernames and hostnames.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"metadatamgr"}}
+    U(["Callers:<br>cli, qgis_plugin"]) --> APP
+    D1[("DB: sqlite/geopackage")]
+    APP <-->|read/write| D1
+    D2[("DB: sqlite/geopackage")]
+    APP <-->|read/write| D2
+    F3["Local files (5 paths)"]
+    APP -.-|unclear| F3
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1012,6 +1499,38 @@ Link: https://github.com/johnzastrow/mqs | Languages: python, shell | Findings: 
 - Uploads a plugin zip to plugins.qgis.org using the author's credentials.
 
 **Who can reach it:** Desktop tools run locally by the user. The one network listener is the optional serve.py generated for exported web maps: it binds all interfaces with no authentication, so anyone on the local network can read the exported map folder while it is running.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mqs"}}
+    U(["Callers:<br>cli, gui, qgis_plugin,<br>qgis_processing_scripts"]) --> APP
+    D1[("DB: sqlite (GeoPackage<br>inventory)")]
+    APP <-->|read/write| D1
+    D2[("DB: sqlite<br>(GeoPackage/SpatiaLit...")]
+    APP <-->|read/write| D2
+    D3[("DB: postgresql (QGIS<br>project store)")]
+    APP <-->|read/write| D3
+    D4[("DB: sqlite (metadata<br>manager database)")]
+    APP <-->|read/write| D4
+    F5["Local files (4 paths)"]
+    APP <-->|read/write| F5
+    E6["EXTERNAL:<br>plugins.qgis.org<br>(XML-RPC plugin upload)"]
+    APP -->|write| E6
+    E7["EXTERNAL:<br>unpkg.com<br>(MapLibre/pmtiles JS..."]
+    E7 -->|read| APP
+    class E6,E7 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| plugins.qgis.org (XML-RPC plugin upload) | external API | write | yes | Plugins/metadata_manager/plugin_upload.py |
+| unpkg.com (MapLibre/pmtiles JS loaded by generated map HTML) and build.protomaps.com / protomaps.github.io (basemap tiles/fonts) | external API | read | yes | Plugins/mapsplat/exporter.py |
 
 **Data sources touched**
 
@@ -1049,6 +1568,38 @@ Link: https://github.com/johnzastrow/mqs4 | Languages: python | Findings: critic
 
 **Who can reach it:** Desktop tools run locally by the QGIS user; no network listener and no authentication layer of their own.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mqs4"}}
+    U(["Callers:<br>cli, desktop_gui,<br>qgis_plugin,<br>qgis_processing_script"]) --> APP
+    D1[("DB: sqlite (GeoPackage<br>inventory)")]
+    APP <-->|read/write| D1
+    D2[("DB: sqlite<br>(GeoPackage/SpatiaLit...")]
+    APP <-->|read/write| D2
+    D3[("DB: sqlite (metadata<br>cache database)")]
+    APP <-->|read/write| D3
+    D4[("DB: postgresql")]
+    APP <-->|read/write| D4
+    F5["Local files (6 paths)"]
+    APP <-->|read/write| F5
+    E6["EXTERNAL:<br>plugins.qgis.org<br>(XML-RPC upload of..."]
+    APP -->|write| E6
+    E7["EXTERNAL:<br>user-specified<br>PostgreSQL host"]
+    APP <-->|read/write| E7
+    class E6,E7 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| plugins.qgis.org (XML-RPC upload of plugin zip with username/password) | external API | write | yes | Plugins/metadata_manager/plugin_upload.py |
+| user-specified PostgreSQL host | external API | read_write | yes | Scripts/qgis_project_manager.py |
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1082,6 +1633,35 @@ Link: https://github.com/johnzastrow/ms | Languages: python | Findings: critical
 - Documentation describes installing JupyterHub on an Ubuntu VPS bound to 0.0.0.0:8000 and opening port 8000 in the firewall.
 
 **Who can reach it:** Notebook project with no server of its own. Reachable by whoever runs the notebook; if the documented JupyterHub setup is followed it is exposed on all interfaces of the VPS on port 8000, protected only by JupyterHub Linux-user login.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"ms"}}
+    U(["Callers:<br>background_agents,<br>notebook"]) --> APP
+    O1["CSV files (1)"]
+    APP -->|write| O1
+    F2["Local files (3 paths)"]
+    APP -->|write| F2
+    E3["EXTERNAL:<br>archive.apache.org"]
+    E3 -->|read| APP
+    E4["EXTERNAL:<br>CIFAR-10 download via<br>keras.datasets.cifar1..."]
+    E4 -->|read| APP
+    E5["LAN:<br>localhost:9092 (Apache<br>Kafka broker, local)"]
+    APP <-->|read/write| E5
+    class E3,E4 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| archive.apache.org | external API | read | yes | image_classification/image_class.ipynb |
+| CIFAR-10 download via keras.datasets.cifar10.load_data (upstream dataset host, not named in code) | external API | read | yes | image_classification/stage2_image_class.ipynb |
+| localhost:9092 (Apache Kafka broker, local) | external API | read_write | no | image_classification/stage2_image_class.ipynb |
 
 **Data sources touched**
 
@@ -1117,6 +1697,54 @@ Link: https://github.com/johnzastrow/mydocmost | Languages: node | Findings: cri
 - Optionally sends prompts/page content to a configured AI provider (OpenAI, OpenAI-compatible, Gemini or Ollama) when AI features are enabled by environment variables.
 
 **Who can reach it:** Server binds to 0.0.0.0 on port 3000 (collaboration server on 3001) by default and CORS is enabled with no restrictions (app.enableCors()). Almost all API routes require a JWT session; a small set of routes (login, setup, share pages, health, collab/stats) are reachable without login. Reachable by anyone on the network that can reach the host.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mydocmost"}}
+    U(["Callers:<br>cli, scheduled_job,<br>web_api, web_frontend"]) --> APP
+    D1[("DB: postgresql")]
+    APP <-->|read/write| D1
+    D2[("DB: redis")]
+    APP <-->|read/write| D2
+    O3["CSV files (1)"]
+    O3 -->|read| APP
+    F4["Local files (2 paths)"]
+    APP <-->|read/write| F4
+    E5["EXTERNAL:<br>tel.docmost.com"]
+    APP -->|write| E5
+    E6["EXTERNAL:<br>api.github.com"]
+    E6 -->|read| APP
+    E7["EXTERNAL:<br>configurable OpenAI /<br>OpenAI-compatible /..."]
+    APP -->|write| E7
+    E8["EXTERNAL:<br>configurable S3 endpoint<br>(AWS_S3_ENDPOINT)"]
+    APP <-->|read/write| E8
+    E9["EXTERNAL:<br>SMTP/Postmark<br>(MAIL_DRIVER)"]
+    APP -->|write| E9
+    E10["EXTERNAL:<br>login.microsoftonline...<br>/ accounts.google.com..."]
+    APP -.-|unclear| E10
+    E11["EXTERNAL:<br>embed.diagrams.net<br>(draw.io embed,..."]
+    E11 -->|read| APP
+    E12["EXTERNAL:<br>SMTP_HOST (configurable)<br>via nodemailer, outbo..."]
+    APP -->|write| E12
+    class E5,E6,E7,E8,E9,E10,E11,E12 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| tel.docmost.com | external API | write | yes | apps/server/src/integrations/telemetry/telemetry.service.ts |
+| api.github.com | external API | read | yes | apps/server/src/integrations/security/version.service.ts |
+| configurable OpenAI / OpenAI-compatible / Gemini / Ollama endpoint (AI_DRIVER, OPENAI_API_URL) | external API | write | yes | apps/server/src/integrations/environment/environment.validation.ts |
+| configurable S3 endpoint (AWS_S3_ENDPOINT) | external API | read_write | yes | apps/server/package.json |
+| SMTP/Postmark (MAIL_DRIVER) | external API | write | yes | apps/server/src/integrations/mail/drivers/smtp.driver.ts |
+| login.microsoftonline.com / accounts.google.com (SSO references) | external API | unclear | yes | apps/client/src |
+| embed.diagrams.net (draw.io embed, DRAWIO_URL) | external API | read | yes | apps/client/src/features/editor |
+| SMTP_HOST (configurable) via nodemailer; outbound only | email_mailbox | write | yes | apps/server/src/integrations/mail/drivers/smtp.driver.ts |
 
 **Data sources touched**
 
@@ -1160,6 +1788,34 @@ Link: https://github.com/johnzastrow/myvinyl | Languages: python | Findings: cri
 
 **Who can reach it:** Bound to loopback by default; the documented deployment publishes 127.0.0.1 only behind Caddy with HTTPS at a public hostname, so it is reachable by anyone on the internet who can reach that hostname, but every page except login, invite/reset links, favicon, health and static assets requires an authenticated session; there is no open sign-up.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"myvinyl"}}
+    U(["Callers:<br>cli, scheduled, web_app"]) --> APP
+    D1[("DB: sqlite")]
+    APP <-->|read/write| D1
+    O2["CSV files (1)"]
+    APP -->|write| O2
+    F3["Local files (2 paths)"]
+    APP <-->|read/write| F3
+    E4["EXTERNAL:<br>api.discogs.com"]
+    E4 -->|read| APP
+    E5["EXTERNAL:<br>i.discogs.com"]
+    E5 -->|read| APP
+    class E4,E5 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| api.discogs.com | external API | read | yes | src/myvinyl/discogs.py |
+| i.discogs.com | external API | read | yes | src/myvinyl/discogs.py |
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1195,6 +1851,48 @@ Link: https://github.com/johnzastrow/niva | Languages: python, node | Findings: 
 
 **Who can reach it:** Local tool run by the user (CLI, QGIS plugin, LSP over stdio). No network listener or web routes were found, so it is reachable only by whoever runs it on their own machine.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"niva"}}
+    U(["Callers:<br>cli, language_server,<br>qgis_plugin,<br>vscode_extension"]) --> APP
+    D1[("DB: sqlite (GeoPackage)<br>via stdlib sqlite3")]
+    APP <-->|read/write| D1
+    D2[("DB: PostgreSQL/PostGIS<br>and other databases v...")]
+    APP <-->|read/write| D2
+    O3["CSV files (1)"]
+    APP <-->|read/write| O3
+    F4["Local files (3 paths)"]
+    APP <-->|read/write| F4
+    E5["EXTERNAL:<br>ntfy.sh (default,<br>NIVA_NTFY_SERVER..."]
+    APP -->|write| E5
+    E6["EXTERNAL:<br>user-configured SMTP<br>host (smtp.gmail.com..."]
+    APP -->|write| E6
+    E7["EXTERNAL:<br>user-supplied<br>WFS/WMS/ArcGIS REST/X..."]
+    E7 -->|read| APP
+    E8["EXTERNAL:<br>github.com (marimo<br>on-ramp release zip..."]
+    E8 -->|read| APP
+    E9["EXTERNAL:<br>micro.mamba.pm (install<br>hint text only)"]
+    E9 -->|read| APP
+    E10["EXTERNAL:<br>SMTP host from<br>NIVA_SMTP_HOST (send..."]
+    APP -->|write| E10
+    class E5,E6,E7,E8,E9,E10 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| ntfy.sh (default; NIVA_NTFY_SERVER overridable) | external API | write | yes | niva/utilities.py |
+| user-configured SMTP host (smtp.gmail.com default for gmail senders) | external API | write | yes | niva/utilities.py |
+| user-supplied WFS/WMS/ArcGIS REST/XYZ URLs (read only, http/https only) | external API | read | yes | niva/remote.py |
+| github.com (marimo on-ramp release zip download) | external API | read | yes | niva/setup/marimo.py |
+| micro.mamba.pm (install hint text only) | external API | read | yes | niva/pdal_doctor.py |
+| SMTP host from NIVA_SMTP_HOST (send only, optional attachment) | email_mailbox | write | yes | niva/utilities.py |
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1228,6 +1926,24 @@ Link: https://github.com/johnzastrow/orgphoto | Languages: python | Findings: cr
 
 **Who can reach it:** Command-line tool run locally by whoever invokes it; no network listener and no authentication, with the file-system permissions of the running user.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"orgphoto"}}
+    U(["Callers:<br>cli"]) --> APP
+    D1[("DB: sqlite")]
+    APP <-->|read/write| D1
+    F2["Local files (2 paths)"]
+    APP <-->|read/write| F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1257,6 +1973,56 @@ Link: https://github.com/johnzastrow/pgeo | Languages: python, node | Findings: 
 - Provisions VMs and hosts with Proxmox scripts and Ansible, including an optional nginx edge that requires hashed API keys and rate limits requests.
 
 **Who can reach it:** By default every service binds to 127.0.0.1. The documented deployment puts an nginx edge behind a TLS terminator on a public URL; the FastAPI app itself has no authentication (api_key parameter is validated and ignored), and API-key enforcement exists only in the Ansible-managed edge (edge_require_api_key) with rate limiting. Intended exposure is a public geocoding service.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"pgeo"}}
+    U(["Callers:<br>cli, reverse_proxy,<br>web_api, web_frontend"]) --> APP
+    D1[("DB: postgresql (PostGIS)<br>via asyncpg and...")]
+    D1 -->|read| APP
+    D2[("DB: postgresql (PostGIS)<br>loader/owner role")]
+    APP <-->|read/write| D2
+    D3[("DB: duckdb / sqlite<br>(read-only Who's On...")]
+    APP <-->|read/write| D3
+    O4["CSV files (2)"]
+    APP <-->|read/write| O4
+    F5["Local files (4 paths)"]
+    APP <-->|read/write| F5
+    E6["EXTERNAL:<br>www2.census.gov"]
+    E6 -->|read| APP
+    E7["EXTERNAL:<br>download.geofabrik.de"]
+    E7 -->|read| APP
+    E8["EXTERNAL:<br>data.whosonfirst.org"]
+    E8 -->|read| APP
+    E9["EXTERNAL:<br>batch.openaddresses.io"]
+    E9 -->|read| APP
+    E10["EXTERNAL:<br>stac.overturemaps.org"]
+    E10 -->|read| APP
+    E11["EXTERNAL:<br>prd-tnm.s3.amazonaws.com"]
+    E11 -->|read| APP
+    E12["EXTERNAL:<br>build.protomaps.com"]
+    E12 -->|read| APP
+    E13["EXTERNAL:<br>raw.githubusercontent..."]
+    E13 -->|read| APP
+    class E6,E7,E8,E9,E10,E11,E12,E13 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| www2.census.gov | external API | read | yes | scripts/fetch_data.sh |
+| download.geofabrik.de | external API | read | yes | scripts/fetch_data.sh |
+| data.whosonfirst.org | external API | read | yes | scripts/fetch_data.sh |
+| batch.openaddresses.io | external API | read | yes | scripts/fetch_data.sh |
+| stac.overturemaps.org | external API | read | yes | pgeo/src/pgeo/load/sources.py |
+| prd-tnm.s3.amazonaws.com | external API | read | yes | scripts/fetch_data.sh |
+| build.protomaps.com | external API | read | yes | scripts/fetch_data.sh |
+| raw.githubusercontent.com | external API | read | yes | scripts/vendor_web.sh |
 
 **Data sources touched**
 
@@ -1290,6 +2056,30 @@ Link: https://github.com/johnzastrow/photochomper | Languages: python, shell | F
 
 **Who can reach it:** Local command-line/TUI tool run by whoever starts it; no network listener and no login. It acts with that user's file-system permissions.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"photochomper"}}
+    U(["Callers:<br>cli"]) --> APP
+    D1[("DB: sqlite")]
+    APP <-->|read/write| D1
+    D2[("DB: sqlite")]
+    APP <-->|read/write| D2
+    D3[("DB: sqlite")]
+    APP -->|write| D3
+    O4["CSV files (1)"]
+    APP <-->|read/write| O4
+    F5["Local files (4 paths)"]
+    APP <-->|read/write| F5
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1322,6 +2112,24 @@ Link: https://github.com/johnzastrow/postgis_linear_referencing | Languages: sql
 
 **Who can reach it:** Not a running service: the script is executed manually by someone who already has database access. Access is governed entirely by the PostgreSQL role used, which is not specified in the repo.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"postgis_linear_re..."}}
+    U(["Callers:<br>sql_script"]) --> APP
+    D1[("DB: postgresql (PostGIS)")]
+    APP <-->|read/write| D1
+    F2["Local files (1 paths)"]
+    F2 -->|read| APP
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1352,6 +2160,24 @@ Link: https://github.com/johnzastrow/pydataminer | Languages: python | Findings:
 
 **Who can reach it:** Run locally by a user inside ArcGIS (script tool) on their own machine; there is no network service.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"pydataminer"}}
+    U(["Callers:<br>arcgis_script_tool"]) --> APP
+    O1["EXCEL files (1)"]
+    APP -->|write| O1
+    F2["Local files (3 paths)"]
+    APP <-->|read/write| F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1380,6 +2206,38 @@ Link: https://github.com/johnzastrow/QGIS | Languages: batch, powershell, python
 - Includes a Python validator that checks the tree for required runtime files.
 
 **Who can reach it:** Desktop software run locally by whoever copies the tree; no network listener or authentication layer exists in the repo's own code.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"QGIS"}}
+    U(["Callers:<br>cli"]) --> APP
+    D1[("DB: sqlite (GeoPackage)")]
+    APP -.-|unclear| D1
+    F2["Local files (4 paths)"]
+    APP <-->|read/write| F2
+    E3["EXTERNAL:<br>plugins.qgis.org"]
+    E3 -->|read| APP
+    E4["EXTERNAL:<br>feed.qgis.org"]
+    E4 -->|read| APP
+    E5["EXTERNAL:<br>tile.openstreetmap.org"]
+    E5 -->|read| APP
+    E6["EXTERNAL:<br>s3.amazonaws.com (Mapzen<br>terrain tiles)"]
+    E6 -->|read| APP
+    class E3,E4,E5,E6 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| plugins.qgis.org | external API | read | yes | Profiles/profiles/default/QGIS/QGIS3.ini |
+| feed.qgis.org | external API | read | yes | Profiles/profiles/default/QGIS/QGIS3.ini |
+| tile.openstreetmap.org | external API | read | yes | Profiles/profiles/default/QGIS/QGIS3.ini |
+| s3.amazonaws.com (Mapzen terrain tiles) | external API | read | yes | Profiles/profiles/default/QGIS/QGIS3.ini |
 
 **Data sources touched**
 
@@ -1413,6 +2271,22 @@ Link: https://github.com/johnzastrow/qgis-plugin-skill | Languages: python, shel
 
 **Who can reach it:** No network service. Scripts run locally by whoever invokes them; the release workflow runs in GitHub Actions with contents: write permission.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"qgis-plugin-skill"}}
+    U(["Callers:<br>cli"]) --> APP
+    F1["Local files (2 paths)"]
+    APP <-->|read/write| F1
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1440,6 +2314,22 @@ Link: https://github.com/johnzastrow/qgis-vscode-setup | Languages: python | Fin
 - hook_lines.py adds hook barbs to lines of a named layer and outputs them to an in-memory layer.
 
 **Who can reach it:** Local developer machine only: scripts run in the user's QGIS console and the setup helper is a local command; no network listener or authentication layer.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"qgis-vscode-setup"}}
+    U(["Callers:<br>cli, qgis_console_script"]) --> APP
+    F1["Local files (4 paths)"]
+    APP <-->|read/write| F1
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
 
 **Data sources touched**
 
@@ -1469,6 +2359,22 @@ Link: https://github.com/johnzastrow/QGISModes | Languages: python | Findings: c
 - Stores the active mode in QGIS settings and user modes in the active QGIS profile folder.
 
 **Who can reach it:** Runs only inside the local QGIS desktop session of whoever installs it; no network listener, no authentication layer, no remote interface.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"QGISModes"}}
+    U(["Callers:<br>dev_script, qgis_plugin"]) --> APP
+    F1["Local files (4 paths)"]
+    APP <-->|read/write| F1
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
 
 **Data sources touched**
 
@@ -1500,6 +2406,39 @@ Link: https://github.com/johnzastrow/seh | Languages: python | Findings: critica
 - Can send email notifications (via a configurable SMTP server) when a sync succeeds or fails.
 
 **Who can reach it:** Command-line tool run by the user or a cron/systemd job; no network listener and no user authentication layer. Reach is limited to whoever can run it and read its .env and database.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"seh"}}
+    U(["Callers:<br>cli, scheduled_job,<br>script"]) --> APP
+    D1[("DB: sqlite (default),<br>postgresql, mariadb v...")]
+    APP <-->|read/write| D1
+    O2["EXCEL files (1)"]
+    APP -->|write| O2
+    O3["CSV files (1)"]
+    APP -->|write| O3
+    F4["Local files (3 paths)"]
+    APP -->|write| F4
+    E5["EXTERNAL:<br>monitoringapi.solared..."]
+    E5 -->|read| APP
+    E6["EXTERNAL:<br>smtp.gmail.com (default<br>SEH_SMTP_HOST,..."]
+    APP -->|write| E6
+    E7["EXTERNAL:<br>SMTP server from<br>SEH_SMTP_HOST (defaul..."]
+    APP -->|write| E7
+    class E5,E6,E7 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| monitoringapi.solaredge.com | external API | read | yes | src/seh/api/client.py |
+| smtp.gmail.com (default SEH_SMTP_HOST; configurable) | external API | write | yes | src/seh/config/logging.py |
+| SMTP server from SEH_SMTP_HOST (default smtp.gmail.com), sends sync success/failure notifications | email_mailbox | write | yes | src/seh/config/logging.py |
 
 **Data sources touched**
 
@@ -1533,6 +2472,14 @@ Link: https://github.com/johnzastrow/starshipsuits | Languages: - | Findings: cr
 
 **Who can reach it:** Public static site intended for the open internet (starshipsuits.com via Netlify; optional GitHub Pages staging). No authentication, which is appropriate for a public static page; no data is exposed beyond the published web/ directory.
 
+**Data flow**
+
+No data stores, files or network endpoints recorded in the inventory.
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched:** none recorded.
 
 **Top findings**
@@ -1553,6 +2500,14 @@ Link: https://github.com/johnzastrow/stratavis | Languages: - | Findings: critic
 - Nothing is executable yet: the repository holds only design documents for a planned multi-user web application that stores, edits and visualizes time-based (and optionally spatial) event data in timeline and map viewers.
 
 **Who can reach it:** Not applicable: there is no running code. The design documents describe a planned FastAPI service with JWT login, public read access and role-gated editing, deployable locally, on a LAN or on a VPS behind HTTPS.
+
+**Data flow**
+
+No data stores, files or network endpoints recorded in the inventory.
+
+**Network endpoints**
+
+None recorded.
 
 **Data sources touched:** none recorded.
 
@@ -1578,6 +2533,22 @@ Link: https://github.com/johnzastrow/surveyart | Languages: python | Findings: c
 - Generates HTML style guides and optimizes SVG files using svgo, scour or built-in compression.
 
 **Who can reach it:** Runs only as a command-line tool by whoever executes it on their own machine; no network listener and no authentication.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"surveyart"}}
+    U(["Callers:<br>cli"]) --> APP
+    F1["Local files (4 paths)"]
+    APP <-->|read/write| F1
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
 
 **Data sources touched**
 
@@ -1610,6 +2581,24 @@ Link: https://github.com/johnzastrow/systers | Languages: rust | Findings: criti
 - Deletes data older than a configurable retention period.
 
 **Who can reach it:** Command-line tools run by whoever executes them on the host; no network listener and no authentication. Database file permissions are the default umask (docs/SECURITY_EVALUATION.md notes this as a recommendation). Reading /var/log/auth.log typically requires elevated privileges.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"systers"}}
+    U(["Callers:<br>cli"]) --> APP
+    D1[("DB: sqlite")]
+    APP <-->|read/write| D1
+    F2["Local files (4 paths)"]
+    APP <-->|read/write| F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
 
 **Data sources touched**
 
@@ -1646,6 +2635,26 @@ Link: https://github.com/johnzastrow/tictactoe | Languages: go, rust, python, ja
 
 **Who can reach it:** By default only the local machine (loopback bind with Host/Origin allowlists). The pt and demo servers can be bound to other interfaces, but refuse non-loopback binds without TLS unless --allow-plaintext is given. The tic-tac-toe servers have no authentication (loopback only); the pt server requires login for /ws, /api/me and /api/logout with login throttling.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"tictactoe"}}
+    U(["Callers:<br>cli, web_api,<br>web_client_wasm"]) --> APP
+    D1[("DB: sqlite")]
+    APP <-->|read/write| D1
+    D2[("DB: sqlite")]
+    APP <-->|read/write| D2
+    F3["Local files (4 paths)"]
+    APP <-->|read/write| F3
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1677,6 +2686,23 @@ Link: https://github.com/johnzastrow/trilium-farmer | Languages: - | Findings: c
 
 **Who can reach it:** No server code present. Per README the tool runs as a stdio subprocess of Claude Code, so it is reachable only by the local user running it; it uses a Trilium API token to reach the Trilium host on the network.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"trilium-farmer"}}
+    E1["LAN:<br>Trilium Notes ETAPI (URL<br>from TRILIUM_URL, REA..."]
+    APP <-->|read/write| E1
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| Trilium Notes ETAPI (URL from TRILIUM_URL; README example http://192.168.1.102:8080) | external API | read_write | no | README.md |
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1707,6 +2733,22 @@ Link: https://github.com/johnzastrow/utilities | Languages: shell | Findings: cr
 
 **Who can reach it:** Local command-line scripts run by whoever has shell access; no network service. Several reads (auth.log, lastlog) and the /var/log cleanup need elevated privileges.
 
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"utilities"}}
+    U(["Callers:<br>cli"]) --> APP
+    F1["Local files (6 paths)"]
+    APP <-->|read/write| F1
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
+
 **Data sources touched**
 
 | Source | Access | Leaves organization |
@@ -1735,6 +2777,24 @@ Link: https://github.com/johnzastrow/vidstack | Languages: python | Findings: cr
 - Looks up place names for GPS coordinates in a local GeoNames GeoPackage (offline, read-only).
 
 **Who can reach it:** Local command-line tool run by the user; no network listener and no authentication needed. Reach is limited to whoever runs it on their machine.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"vidstack"}}
+    U(["Callers:<br>cli, script"]) --> APP
+    D1[("DB: sqlite (GeoNames<br>GeoPackage...")]
+    D1 -->|read| APP
+    F2["Local files (5 paths)"]
+    APP <-->|read/write| F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
 
 **Data sources touched**
 
@@ -1766,6 +2826,28 @@ Link: https://github.com/johnzastrow/waterlogger | Languages: go | Findings: cri
 - Because the session cookie holds only the numeric user ID and the server accepts any value, anyone who can reach the server can send 'session=1' and act as user 1 without a password, reaching all of the above including user management and backup import.
 
 **Who can reach it:** Default bind is localhost:2342 (local only). Docker compose and the documented server deployment expose it on the network (2342, plus phpMyAdmin 8080 with the tools profile). Session check is forgeable, so reachability equals full access.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"waterlogger"}}
+    U(["Callers:<br>service, web_app"]) --> APP
+    D1[("DB: sqlite (default) or<br>mariadb via gorm")]
+    APP <-->|read/write| D1
+    O2["EXCEL files (1)"]
+    APP -->|write| O2
+    O3["CSV files (1)"]
+    APP -->|write| O3
+    F4["Local files (4 paths)"]
+    APP <-->|read/write| F4
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+None recorded.
 
 **Data sources touched**
 
@@ -1802,6 +2884,35 @@ Link: https://github.com/johnzastrow/waxgrove | Languages: go, typescript, sql |
 - Serves its own React PWA from the Go binary.
 
 **Who can reach it:** Default bind is loopback; the compose deployment publishes only to host 127.0.0.1 and expects a TLS reverse proxy in front. All data routes require a session cookie; only health, instance, version, register (invite-only by default) and login are public. Reachability beyond localhost depends on the deployer's proxy, which is not in the repo.
+
+**Data flow**
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":22,"rankSpacing":45,"padding":8},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"14","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"waxgrove"}}
+    U(["Callers:<br>background_jobs, cli,<br>web_api, web_client"]) --> APP
+    D1[("DB: sqlite")]
+    APP <-->|read/write| D1
+    F2["Local files (1 paths)"]
+    APP <-->|read/write| F2
+    E3["EXTERNAL:<br>api.spotify.com"]
+    APP <-->|read/write| E3
+    E4["EXTERNAL:<br>accounts.spotify.com"]
+    APP -->|write| E4
+    E5["EXTERNAL:<br>musicbrainz.org"]
+    E5 -->|read| APP
+    class E3,E4,E5 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+**Network endpoints**
+
+| Endpoint | Kind | Access | Leaves host network | Source file |
+|---|---|---|---|---|
+| api.spotify.com | external API | read_write | yes | internal/spotify/client.go |
+| accounts.spotify.com | external API | write | yes | internal/spotify/auth.go |
+| musicbrainz.org | external API | read | yes | internal/musicbrainz/client.go |
 
 **Data sources touched**
 

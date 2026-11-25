@@ -14,8 +14,9 @@ All notable changes to this repository are documented here. The format follows
 - Matrix 2.9 "Network endpoints (all repositories)" listing every endpoint across the 43 inventories.
 
 ### Changed
-- Diagrams are laid out in three fixed columns (sources, app, destinations) with wrapped labels so they stay
-  readable when printed on letter-size paper.
+- Diagrams stay readable when printed on letter-size paper: each repository's data flow is split into small
+  diagrams (local data, then network endpoints at most four per diagram), labels are wrapped, and redundant
+  edge labels are dropped because arrowheads already show read/write direction.
 
 ## [1.0.1] - 2026-11-25
 

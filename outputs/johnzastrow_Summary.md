@@ -1,6 +1,6 @@
 # Governance Scan Summary - johnzastrow public repositories
 
-Generated: 2026-11-25 21:56 UTC  
+Generated: 2026-11-25 21:57 UTC  
 Method: [governance-scan skill v1.0](https://github.com/MichaelHynesRoux/INFO-7375-Governance-Scan-Skill) (read-only inventory) applied to each public, non-fork repository of [johnzastrow](https://github.com/johnzastrow), excluding this results repository.  
 Repositories scanned: **43**. Per-repo inventories: `<repo>.json`; questionnaire answers: `<repo>_Governance.md`.
 
@@ -532,7 +532,7 @@ Every external API host and network mail/collaboration source recorded in the in
 
 ## 3. Repository sections
 
-Each section has a small data flow diagram built only from that repository's JSON. Arrows follow the recorded `access_type`: an arrow into the app means read, out of the app means write, a double-headed arrow means read/write, and a dashed line means unclear. Endpoints that leave the host network are labelled EXTERNAL and shaded red; loopback or private-LAN endpoints are labelled LAN. Diagrams are sized to print on letter paper; labels are shortened, and the full endpoint text is in the table under each diagram. Local file access is shown as one node; databases and network endpoints are itemized.
+Each section has a small data flow diagram built only from that repository's JSON. Arrows follow the recorded `access_type`: an arrow into the app means read, out of the app means write, a double-headed arrow means read/write, and a dashed line means unclear. Local data and network endpoints are drawn as separate small diagrams (split further when long) so each prints at a readable size. Endpoints that leave the host network are labelled EXTERNAL and shaded red; loopback or private-LAN endpoints are labelled LAN. Diagrams are sized to print on letter paper; labels are shortened, and the full endpoint text is in the table under each diagram. Local file access is shown as one node; databases and network endpoints are itemized.
 
 ### actalog
 
@@ -550,6 +550,8 @@ Link: https://github.com/johnzastrow/actalog | Languages: go, javascript, vue, s
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -561,6 +563,15 @@ flowchart LR
     APP <--> O2
     F3["Local files (5 paths)"]
     APP <--> F3
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"actalog"}}
     E4["EXTERNAL:<br>SMTP server configured<br>via SMTP_HOST (net/sm..."]
     APP --> E4
     E5["EXTERNAL:<br>youtube.com (video<br>links/embeds entered..."]
@@ -622,6 +633,8 @@ Link: https://github.com/johnzastrow/actalog-benchmark | Languages: go | Finding
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -629,6 +642,15 @@ flowchart LR
     U(["Callers:<br>cli"]) --> APP
     F1["Local files (3 paths)"]
     APP <--> F1
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"actalog-benchmark"}}
     E2["EXTERNAL:<br>user-supplied ActaLog<br>instance (--url),..."]
     APP <--> E2
     E3["EXTERNAL:<br>same target: POST<br>/api/auth/login, GET..."]
@@ -679,6 +701,8 @@ Link: https://github.com/johnzastrow/bittabby | Languages: go, javascript | Find
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -692,6 +716,15 @@ flowchart LR
     O3 --> APP
     F4["Local files (2 paths)"]
     APP <--> F4
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"bittabby"}}
     E5["EXTERNAL:<br>configurable SMTP server<br>(BITT_SMTP_HOST)"]
     APP --> E5
     E6["EXTERNAL:<br>ntfy server<br>(BITT_NTFY_URL, ntfy...."]
@@ -748,6 +781,8 @@ Link: https://github.com/johnzastrow/choreme | Languages: go, typescript, vue, j
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -757,6 +792,15 @@ flowchart LR
     APP <--> D1
     F2["Local files (1 paths)"]
     APP <--> F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"choreme"}}
     E3["EXTERNAL:<br>SMTP server from<br>SMTP_HOST (example..."]
     APP --> E3
     class E3 ext
@@ -803,6 +847,8 @@ Link: https://github.com/johnzastrow/DocQGISProject | Languages: python | Findin
 **Who can reach it:** Runs locally inside QGIS (dialog, Processing toolbox, Python console). No network listener or outbound network code found.
 
 **Data flow**
+
+*Local data*
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -851,6 +897,8 @@ Link: https://github.com/johnzastrow/garminview | Languages: python, typescript,
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -864,6 +912,15 @@ flowchart LR
     APP <--> O3
     F4["Local files (3 paths)"]
     APP <--> F4
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"garminview"}}
     E5["EXTERNAL:<br>Garmin Connect (via<br>garmindb_cli /..."]
     E5 --> APP
     E6["EXTERNAL:<br>Actalog server (URL and<br>credentials stored in..."]
@@ -983,6 +1040,8 @@ Link: https://github.com/johnzastrow/jz_jupyters | Languages: python, jupyter | 
 
 **Data flow**
 
+*Local data (part 1 of 2)*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -998,12 +1057,30 @@ flowchart LR
     APP -.-|unclear| D4
     D5[("DB: sqlite")]
     D5 --> APP
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Local data (part 2 of 2)*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"jz_jupyters"}}
     O6["EXCEL files (2)"]
     O6 --> APP
     O7["CSV files (2)"]
     O7 --> APP
     F8["Local files (5 paths)"]
     APP <--> F8
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"jz_jupyters"}}
     E9["EXTERNAL:<br>api.github.com"]
     E9 --> APP
     class E9 ext
@@ -1053,6 +1130,8 @@ Link: https://github.com/johnzastrow/LearningPy | Languages: python | Findings: 
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1068,6 +1147,15 @@ flowchart LR
     APP <--> O4
     F5["Local files (3 paths)"]
     APP --> F5
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"LearningPy"}}
     E6["EXTERNAL:<br>se.mantishub.io"]
     E6 --> APP
     E7["EXTERNAL:<br>www.bloomberg.com"]
@@ -1124,6 +1212,8 @@ Link: https://github.com/johnzastrow/lineup | Languages: python | Findings: crit
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1175,6 +1265,8 @@ Link: https://github.com/johnzastrow/localfeather | Languages: python, cpp, shel
 **Who can reach it:** Bound to 0.0.0.0:5000 over plain HTTP, so reachable by anyone on the network (or internet if forwarded). The web UI requires login, but the device-management API, readings list and OTA endpoints have no authentication.
 
 **Data flow**
+
+*Local data*
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -1261,6 +1353,8 @@ Link: https://github.com/johnzastrow/mapsplat | Languages: python | Findings: cr
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1268,6 +1362,15 @@ flowchart LR
     U(["Callers:<br>ci_workflow,<br>qgis_plugin,<br>web_static_server_gen..."]) --> APP
     F1["Local files (4 paths)"]
     APP <--> F1
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mapsplat"}}
     E2["EXTERNAL:<br>unpkg.com<br>(maplibre-gl@4.7.1,..."]
     E2 --> APP
     class E2 ext
@@ -1314,6 +1417,8 @@ Link: https://github.com/johnzastrow/mapsplat4 | Languages: python, node, shell,
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1323,6 +1428,15 @@ flowchart LR
     D1 --> APP
     F2["Local files (4 paths)"]
     APP <--> F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints (part 1 of 2)*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mapsplat4"}}
     E3["EXTERNAL:<br>unpkg.com (MapLibre GL<br>JS and PMTiles JS..."]
     E3 --> APP
     E4["EXTERNAL:<br>build.protomaps.com /<br>maps.protomaps.com /..."]
@@ -1331,9 +1445,19 @@ flowchart LR
     E5 --> APP
     E6["EXTERNAL:<br>user-supplied<br>basemap/style URLs..."]
     E6 --> APP
+    class E3,E4,E5,E6 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints (part 2 of 2)*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mapsplat4"}}
     E7["EXTERNAL:<br>raw.githubusercontent...<br>(Protomaps license text)"]
     E7 --> APP
-    class E3,E4,E5,E6,E7 ext
+    class E7 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -1383,6 +1507,8 @@ Link: https://github.com/johnzastrow/marimo-qgis | Languages: python, shell | Fi
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1392,6 +1518,15 @@ flowchart LR
     D1 --> APP
     F2["Local files (4 paths)"]
     APP --> F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"marimo-qgis"}}
     E3["EXTERNAL:<br>github.com (downloads<br>repository zip of..."]
     E3 --> APP
     E4["EXTERNAL:<br>PyPI via pip (installs<br>marimo and..."]
@@ -1446,6 +1581,8 @@ Link: https://github.com/johnzastrow/metadatamgr | Languages: python | Findings:
 **Who can reach it:** Runs inside the user's own QGIS desktop session; no listener, no authentication and none needed. Anyone with filesystem access to the shared GeoPackage can read the inventory, including recorded usernames and hostnames.
 
 **Data flow**
+
+*Local data*
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -1502,6 +1639,8 @@ Link: https://github.com/johnzastrow/mqs | Languages: python, shell | Findings: 
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1517,6 +1656,15 @@ flowchart LR
     APP <--> D4
     F5["Local files (4 paths)"]
     APP <--> F5
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mqs"}}
     E6["EXTERNAL:<br>plugins.qgis.org<br>(XML-RPC plugin upload)"]
     APP --> E6
     E7["EXTERNAL:<br>unpkg.com<br>(MapLibre/pmtiles JS..."]
@@ -1570,6 +1718,8 @@ Link: https://github.com/johnzastrow/mqs4 | Languages: python | Findings: critic
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1585,6 +1735,15 @@ flowchart LR
     APP <--> D4
     F5["Local files (6 paths)"]
     APP <--> F5
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mqs4"}}
     E6["EXTERNAL:<br>plugins.qgis.org<br>(XML-RPC upload of..."]
     APP --> E6
     E7["EXTERNAL:<br>user-specified<br>PostgreSQL host"]
@@ -1636,6 +1795,8 @@ Link: https://github.com/johnzastrow/ms | Languages: python | Findings: critical
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1645,6 +1806,15 @@ flowchart LR
     APP --> O1
     F2["Local files (3 paths)"]
     APP --> F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"ms"}}
     E3["EXTERNAL:<br>archive.apache.org"]
     E3 --> APP
     E4["EXTERNAL:<br>CIFAR-10 download via<br>keras.datasets.cifar1..."]
@@ -1700,6 +1870,8 @@ Link: https://github.com/johnzastrow/mydocmost | Languages: node | Findings: cri
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1713,6 +1885,15 @@ flowchart LR
     O3 --> APP
     F4["Local files (2 paths)"]
     APP <--> F4
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints (part 1 of 2)*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mydocmost"}}
     E5["EXTERNAL:<br>tel.docmost.com"]
     APP --> E5
     E6["EXTERNAL:<br>api.github.com"]
@@ -1721,6 +1902,16 @@ flowchart LR
     APP --> E7
     E8["EXTERNAL:<br>configurable S3 endpoint<br>(AWS_S3_ENDPOINT)"]
     APP <--> E8
+    class E5,E6,E7,E8 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints (part 2 of 2)*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"mydocmost"}}
     E9["EXTERNAL:<br>SMTP/Postmark<br>(MAIL_DRIVER)"]
     APP --> E9
     E10["EXTERNAL:<br>login.microsoftonline...<br>/ accounts.google.com..."]
@@ -1729,7 +1920,7 @@ flowchart LR
     E11 --> APP
     E12["EXTERNAL:<br>SMTP_HOST (configurable)<br>via nodemailer, outbo..."]
     APP --> E12
-    class E5,E6,E7,E8,E9,E10,E11,E12 ext
+    class E9,E10,E11,E12 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -1790,6 +1981,8 @@ Link: https://github.com/johnzastrow/myvinyl | Languages: python | Findings: cri
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1801,6 +1994,15 @@ flowchart LR
     APP --> O2
     F3["Local files (2 paths)"]
     APP <--> F3
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"myvinyl"}}
     E4["EXTERNAL:<br>api.discogs.com"]
     E4 --> APP
     E5["EXTERNAL:<br>i.discogs.com"]
@@ -1853,6 +2055,8 @@ Link: https://github.com/johnzastrow/niva | Languages: python, node | Findings: 
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1866,6 +2070,15 @@ flowchart LR
     APP <--> O3
     F4["Local files (3 paths)"]
     APP <--> F4
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints (part 1 of 2)*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"niva"}}
     E5["EXTERNAL:<br>ntfy.sh (default,<br>NIVA_NTFY_SERVER..."]
     APP --> E5
     E6["EXTERNAL:<br>user-configured SMTP<br>host (smtp.gmail.com..."]
@@ -1874,11 +2087,21 @@ flowchart LR
     E7 --> APP
     E8["EXTERNAL:<br>github.com (marimo<br>on-ramp release zip..."]
     E8 --> APP
+    class E5,E6,E7,E8 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints (part 2 of 2)*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"niva"}}
     E9["EXTERNAL:<br>micro.mamba.pm (install<br>hint text only)"]
     E9 --> APP
     E10["EXTERNAL:<br>SMTP host from<br>NIVA_SMTP_HOST (send..."]
     APP --> E10
-    class E5,E6,E7,E8,E9,E10 ext
+    class E9,E10 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -1928,6 +2151,8 @@ Link: https://github.com/johnzastrow/orgphoto | Languages: python | Findings: cr
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1976,6 +2201,8 @@ Link: https://github.com/johnzastrow/pgeo | Languages: python, node | Findings: 
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -1991,6 +2218,15 @@ flowchart LR
     APP <--> O4
     F5["Local files (4 paths)"]
     APP <--> F5
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints (part 1 of 2)*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"pgeo"}}
     E6["EXTERNAL:<br>www2.census.gov"]
     E6 --> APP
     E7["EXTERNAL:<br>download.geofabrik.de"]
@@ -1999,6 +2235,16 @@ flowchart LR
     E8 --> APP
     E9["EXTERNAL:<br>batch.openaddresses.io"]
     E9 --> APP
+    class E6,E7,E8,E9 ext
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints (part 2 of 2)*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"pgeo"}}
     E10["EXTERNAL:<br>stac.overturemaps.org"]
     E10 --> APP
     E11["EXTERNAL:<br>prd-tnm.s3.amazonaws.com"]
@@ -2007,7 +2253,7 @@ flowchart LR
     E12 --> APP
     E13["EXTERNAL:<br>raw.githubusercontent..."]
     E13 --> APP
-    class E6,E7,E8,E9,E10,E11,E12,E13 ext
+    class E10,E11,E12,E13 ext
     classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
 ```
 
@@ -2057,6 +2303,8 @@ Link: https://github.com/johnzastrow/photochomper | Languages: python, shell | F
 **Who can reach it:** Local command-line/TUI tool run by whoever starts it; no network listener and no login. It acts with that user's file-system permissions.
 
 **Data flow**
+
+*Local data*
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -2114,6 +2362,8 @@ Link: https://github.com/johnzastrow/postgis_linear_referencing | Languages: sql
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2162,6 +2412,8 @@ Link: https://github.com/johnzastrow/pydataminer | Languages: python | Findings:
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2209,6 +2461,8 @@ Link: https://github.com/johnzastrow/QGIS | Languages: batch, powershell, python
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2218,6 +2472,15 @@ flowchart LR
     APP -.-|unclear| D1
     F2["Local files (4 paths)"]
     APP <--> F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"QGIS"}}
     E3["EXTERNAL:<br>plugins.qgis.org"]
     E3 --> APP
     E4["EXTERNAL:<br>feed.qgis.org"]
@@ -2273,6 +2536,8 @@ Link: https://github.com/johnzastrow/qgis-plugin-skill | Languages: python, shel
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2316,6 +2581,8 @@ Link: https://github.com/johnzastrow/qgis-vscode-setup | Languages: python | Fin
 **Who can reach it:** Local developer machine only: scripts run in the user's QGIS console and the setup helper is a local command; no network listener or authentication layer.
 
 **Data flow**
+
+*Local data*
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -2361,6 +2628,8 @@ Link: https://github.com/johnzastrow/QGISModes | Languages: python | Findings: c
 **Who can reach it:** Runs only inside the local QGIS desktop session of whoever installs it; no network listener, no authentication layer, no remote interface.
 
 **Data flow**
+
+*Local data*
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -2409,6 +2678,8 @@ Link: https://github.com/johnzastrow/seh | Languages: python | Findings: critica
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2422,6 +2693,15 @@ flowchart LR
     APP --> O3
     F4["Local files (3 paths)"]
     APP --> F4
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"seh"}}
     E5["EXTERNAL:<br>monitoringapi.solared..."]
     E5 --> APP
     E6["EXTERNAL:<br>smtp.gmail.com (default<br>SEH_SMTP_HOST,..."]
@@ -2536,6 +2816,8 @@ Link: https://github.com/johnzastrow/surveyart | Languages: python | Findings: c
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2583,6 +2865,8 @@ Link: https://github.com/johnzastrow/systers | Languages: rust | Findings: criti
 **Who can reach it:** Command-line tools run by whoever executes them on the host; no network listener and no authentication. Database file permissions are the default umask (docs/SECURITY_EVALUATION.md notes this as a recommendation). Reading /var/log/auth.log typically requires elevated privileges.
 
 **Data flow**
+
+*Local data*
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -2637,6 +2921,8 @@ Link: https://github.com/johnzastrow/tictactoe | Languages: go, rust, python, ja
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2688,6 +2974,8 @@ Link: https://github.com/johnzastrow/trilium-farmer | Languages: - | Findings: c
 
 **Data flow**
 
+*Network endpoints*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2735,6 +3023,8 @@ Link: https://github.com/johnzastrow/utilities | Languages: shell | Findings: cr
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2779,6 +3069,8 @@ Link: https://github.com/johnzastrow/vidstack | Languages: python | Findings: cr
 **Who can reach it:** Local command-line tool run by the user; no network listener and no authentication needed. Reach is limited to whoever runs it on their machine.
 
 **Data flow**
+
+*Local data*
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -2828,6 +3120,8 @@ Link: https://github.com/johnzastrow/waterlogger | Languages: go | Findings: cri
 **Who can reach it:** Default bind is localhost:2342 (local only). Docker compose and the documented server deployment expose it on the network (2342, plus phpMyAdmin 8080 with the tools profile). Session check is forgeable, so reachability equals full access.
 
 **Data flow**
+
+*Local data*
 
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
@@ -2887,6 +3181,8 @@ Link: https://github.com/johnzastrow/waxgrove | Languages: go, typescript, sql |
 
 **Data flow**
 
+*Local data*
+
 ```mermaid
 %%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
 flowchart LR
@@ -2896,6 +3192,15 @@ flowchart LR
     APP <--> D1
     F2["Local files (1 paths)"]
     APP <--> F2
+    classDef ext fill:#fdecea,stroke:#b4413c,stroke-width:2px,color:#000000
+```
+
+*Network endpoints*
+
+```mermaid
+%%{init: {"theme":"base","flowchart":{"useMaxWidth":true,"nodeSpacing":16,"rankSpacing":38,"padding":6},"themeVariables":{"background":"#ffffff","primaryColor":"#ebf5ff","primaryTextColor":"#000000","primaryBorderColor":"#8c939b","lineColor":"#7c96bb","secondaryColor":"#d7e1ee","tertiaryColor":"#c3d2e5","fontFamily":"\"Inter\", \"Noto Sans SC\", sans-serif","fontSize":"18px","pie1":"#b4413c","pie2":"#d9893b","pie3":"#7c96bb","pie4":"#73A78D","pie5":"#CB9B7A","pie6":"#6B8CAE","pie7":"#c3d2e5","pie8":"#8c939b"}}}%%
+flowchart LR
+    APP{{"waxgrove"}}
     E3["EXTERNAL:<br>api.spotify.com"]
     APP <--> E3
     E4["EXTERNAL:<br>accounts.spotify.com"]

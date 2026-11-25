@@ -369,3 +369,45 @@ Answered Claude's questions:
 · Should I add a table of contents, section numbers, and figure and table numbers as described above? → Yes, all of it (Recommended)
 
 
+I'm adding a separate numbering pass over the generated files, rather than reworking every table call in the generator. That keeps the numbers continuous and lets the overview link into the parts. · summary
+
+  Made 1 scratchpad edit +169, ran 1 shell command
+
+The numbering checks out across 67 figures, 70 tables and 43 repository sections. I'm checking a part's table of contents and an empty-section case next, then pushing. · summary
+
+  Ran 1 shell command
+
+Every repo section has all 7 numbered subsections (301 in total) and no unconverted bold labels remain. I'll update the docs, push, and check in the browser.
+
+  Called claude-in-chrome 3 times, ran 1 shell command, did not run 1 other call
+Claude in Chrome[javascript_tool]
+1 action not run · permission denied
+│ Reason: Can't interact with browser-internal or unparseable URLs. Navigate to a web page first.
+
+Cross-file links work: opening Part2.md#figure-46 scrolls straight to Figure 46. Next I'll re-run the render check on all four files.
+
+  Called claude-in-chrome 9 times
+
+Yes, they do now. All four summary files have a table of contents, numbered sections, and numbered figures and tables, pushed to main as commit 60257e9. I checked every page in the browser after this push: all 67 diagrams render with no errors.
+
+┌──────────────────────────────┬───────────────────┬─────────────────┬────────────────┐
+│             File             │ Diagrams rendered │ Figure captions │ Table captions │
+├──────────────────────────────┼───────────────────┼─────────────────┼────────────────┤
+│ johnzastrow_Summary.md       │            4 of 4 │               4 │             11 │
+├──────────────────────────────┼───────────────────┼─────────────────┼────────────────┤
+│ johnzastrow_Summary_Part1.md │          28 of 28 │              28 │             26 │
+├──────────────────────────────┼───────────────────┼─────────────────┼────────────────┤
+│ johnzastrow_Summary_Part2.md │          28 of 28 │              28 │             25 │
+├──────────────────────────────┼───────────────────┼─────────────────┼────────────────┤
+│ johnzastrow_Summary_Part3.md │            7 of 7 │               7 │              8 │
+└──────────────────────────────┴───────────────────┴─────────────────┴────────────────┘
+
+- Table of contents: the overview's lists sections 1-2.9, the three parts with their section ranges (Part 1 covers 3.1-3.18, Part 2 3.19-3.37, Part 3 3.38-3.43), and the two lists below. Each part has its own list of its repositories.
+- Section numbers: they run through the whole set: 1.1-1.4 for the charts, 2.1-2.9 for the matrices, and 3.1-3.43 for the repositories. Each repository has seven numbered subsections, from "What this application can do" to "Unauthorized-action red flags".
+- Figures 1-67: captions sit below each diagram, for example "Figure 46. pgeo - data flow, local data."
+- Tables 1-70: captions sit above each table, for example "Table 2. Severity matrix."
+- List of Figures and List of Tables: both are in the overview and link straight into the parts. Opening Part2.md#figure-46 lands on Figure 46.
+
+Existing links still work, including the repo links in the overview's matrices. The README and the 1.1.0 CHANGELOG entry describe the new structure.
+
+Version 1.1.0 is still untagged; tell me if you want a v1.1.0 tag and a GitHub release like v1.0.1's.

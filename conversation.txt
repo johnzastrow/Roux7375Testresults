@@ -311,4 +311,61 @@ You chose to keep the flow diagrams in each repo's <repo>_Governance.md, with th
 
 Your new message ("Split the document into parts") seems to be missing a number, and it changes the plan, so I'll confirm before writing anything.
 
+The split gives an overview with 4 diagrams and three parts with 28, 28, and 7 diagrams, covering all 43 repositories. I'm updating the README and CHANGELOG next, then pushing and checking each part in the browser. · summary
+
+  Ran 1 shell command
+
+Pushed. Now the browser check for each file. On each page I'll scroll through every diagram so the lazy-loaded frames render, then count rendered frames against "Unable to render" errors.
+
+  Called claude-in-chrome 2 times
+
+Part 1: all 28 diagrams render with no errors. Next, Parts 2 and 3 and the overview.
+
+  Calling claude-in-chrome 6 times · 6s…
+
+
+All 67 diagrams render with no errors (Part 1: 28, Part 2: 28, Part 3: 7, overview: 4), and the overview has 89 links into the parts. As a final check I'll look at pgeo's split diagrams.
+
+  Called claude-in-chrome 3 times
+
+The pgeo local-data diagram looks good, and I'll close the tab and save your preference for browser checks along with the GitHub Mermaid limits I found today. · summary
+
+  Called claude-in-chrome, ran 1 shell command, wrote 2 memories
+
+The summary is now split into four files, and all 67 diagrams render on GitHub. I checked each page in the browser after the last push (3fab0c5): every diagram renders, and there are no "Unable to render" errors.
+
+┌──────────────────────────────┬────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┬──────────┐
+│             File             │                                                     What it holds                                                      │ Diagrams │
+├──────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼──────────┤
+│ johnzastrow_Summary.md       │ Overview, charts, the nine matrices (including the all-repos endpoint list), and a table linking each repo to its part │        4 │
+├──────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼──────────┤
+│ johnzastrow_Summary_Part1.md │ 18 repo sections, actalog to mqs                                                                                       │       28 │
+├──────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼──────────┤
+│ johnzastrow_Summary_Part2.md │ 19 repo sections, mqs4 to systers                                                                                      │       28 │
+├──────────────────────────────┼────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┼──────────┤
+│ johnzastrow_Summary_Part3.md │ 6 repo sections, tictactoe to waxgrove                                                                                 │        7 │
+└──────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┴──────────┘
+
+Each part links back to the overview and to the other parts, and the repo names in the overview's severity table jump straight to that repo's section.
+
+What the browser checks caught:
+- Diagram cap: GitHub stopped rendering after the 30th diagram on a page, so the single 67-diagram file was broken from the 31st diagram on. Each part is now capped at 28.
+- Font value: my "18px" font setting broke every flow diagram; GitHub only accepts a plain number like "18". Fixed. That change was itself a guess, though: GitHub's diagram failures were what actually broke the page.
+- Broken commits on main: two of my earlier commits (453aeb1 and b984341) left the summary partly broken on main. The current version is correct.
+
+The README's products table and the CHANGELOG's 1.1.0 entry now describe the split. Version 1.1.0 is still untagged and unreleased; tell me if you want a v1.1.0 tag and a GitHub release like v1.0.1's.
+
+I also saved two notes for future sessions: you want rendered pages checked in the browser after each push, and GitHub's Mermaid limits found today.
+
+Worked for 5m 46s · done 5:03 PM
+
+❯ do we have a table of contents and figure numbers? Table numbers? Numbered sections?
+
+  Ran 1 shell command
+
+The four files only partly have structure: the overview numbers some sections, while the parts have no TOC, numbers, or figure and table labels. I'll number all four under one scheme, add a TOC to each, and number figures and tables continuously. · summary
+
+Answered Claude's questions:
+· Should I add a table of contents, section numbers, and figure and table numbers as described above? → Yes, all of it (Recommended)
+
 
